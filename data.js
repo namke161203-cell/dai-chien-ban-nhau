@@ -228,7 +228,19 @@ const DATA = {
       "Bạn đã bao giờ đem quà người khác tặng mình đi tặng lại cho người khác chưa?",
       "Trò đáng xấu hổ nhất bạn từng làm chỉ để gây sự chú ý với ai đó?",
       "Bạn đã bao giờ khai gian tuổi của mình chưa?",
-      "Pha nhắn tin lỗi tự sửa (autocorrect) xấu hổ nhất bạn từng gửi là gì?"
+      "Pha nhắn tin lỗi tự sửa (autocorrect) xấu hổ nhất bạn từng gửi là gì?",
+      "Món ăn nào ai cũng khen ngon nhưng bạn thấy dở tệ?",
+      "Bạn đã bao giờ lén ăn vụng đồ của bạn cùng phòng hoặc người nhà rồi chối bay biến chưa?",
+      "Ấn tượng đầu tiên của bạn về người ngồi bên phải bạn là gì?",
+      "Bạn đã bao giờ giả vờ nghe điện thoại để né phải chào người quen ngoài đường chưa?",
+      "Thói quen kỳ lạ nhất của bạn khi ở một mình là gì?",
+      "Bạn đã bao giờ ngủ quên trong rạp chiếu phim hoặc trên lớp học chưa?",
+      "Kỷ niệm quê độ nhất của bạn khi đi ăn ở quán hoặc nhà hàng là gì?",
+      "Bạn đã bao giờ nói xấu ai đó mà quên mất họ đang đứng ngay sau lưng chưa?",
+      "Bộ phim hoạt hình hoặc truyện tranh nào lớn rồi bạn vẫn lén xem?",
+      "Bạn đã bao giờ mở tin nhắn đọc trên thông báo nhưng cố tình không vào app để khỏi hiện 'Đã xem' chưa?",
+      "Món đồ đắt tiền nhất bạn từng mua về nhưng chỉ dùng đúng một lần rồi bỏ xó là gì?",
+      "Nếu phải đổi cuộc sống với một người trong mâm này trong 1 tuần, bạn sẽ chọn ai?"
     ],
     spicy: [
       "Bức ảnh nào đáng xấu hổ nhất trong thư viện ảnh của bạn lúc này?",
@@ -245,7 +257,19 @@ const DATA = {
       "Điều ngu ngốc nhất bạn từng làm vì crush là gì?",
       "Bạn đã bao giờ ghost một người mà bạn thực sự có tình cảm chưa?",
       "Bạn đã bao giờ huỷ theo dõi hoặc block ai đó trong căn phòng này chưa?",
-      "Bức ảnh dìm hàng nhất của bạn đang tồn tại trên mạng là bức nào?"
+      "Bức ảnh dìm hàng nhất của bạn đang tồn tại trên mạng là bức nào?",
+      "Nếu buộc phải chọn một người trong mâm này để đi hẹn hò thử, bạn sẽ chọn ai?",
+      "Bạn đã bao giờ có cảm tình với người yêu hoặc crush của bạn thân chưa?",
+      "Lần gần nhất bạn khóc là khi nào và vì lý do gì?",
+      "Bạn đã bao giờ dùng tài khoản ảo (clone) để đi stalk hoặc bình luận dạo chưa?",
+      "Điểm yếu hoặc tật xấu lớn nhất của bạn trong một mối quan hệ yêu đương là gì?",
+      "Trong mâm này, ai là người bạn thấy khó đoán hoặc khó hiểu nhất?",
+      "Bạn đã bao giờ hối hận vì đã bỏ lỡ một người nào đó chưa? Kể tên chữ cái đầu của họ.",
+      "Kỷ niệm say xỉn mất kiểm soát nhất trong đời bạn là gì?",
+      "Bạn đã bao giờ nói dối người yêu để đi chơi hoặc đi nhậu với bạn bè chưa?",
+      "Tiêu chuẩn 'red flag' nào ở người khác khiến bạn muốn chạy mất dép ngay lập tức?",
+      "Nếu ngay bây giờ người yêu cũ nhắn tin 'Mình quay lại nhé', bạn sẽ trả lời sao?",
+      "Bạn đã bao giờ bị từ chối phũ phàng nhất theo cách nào?"
     ]
   },
 
@@ -253,7 +277,6 @@ const DATA = {
     mild: [
       "Nhắn tin 'anh/chị yêu em' cho người đầu tiên trong danh bạ điện thoại của bạn (không được giải thích gì thêm, gửi rồi đặt điện thoại xuống).",
       "Đứng lên và làm 1 động tác múa phụ họa cho bài hát đang phát (hoặc bài hát bạn tự hát). Phải đủ 15 giây.",
-      "Nhắn tin cho người yêu cũ, bảo rằng anh n.",
       "Nhờ người ngồi kế bên đặt tên cho bạn bằng 1 biệt danh mới và bạn phải dùng tên đó suốt buổi hôm nay.",
       "Chụp ảnh tự sướng với biểu cảm xấu hổ nhất có thể và đăng lên story trong 10 phút.",
       "Nói 'tôi rất tự hào về bản thân' to và dõng dạc 3 lần liên tiếp không được cười.",
@@ -262,7 +285,19 @@ const DATA = {
       "Nhắn tin cho người bạn thân nhất ngoài mâm này: 'Tao đang nhậu với mấy người bạn thần thánh của tao đây!'",
       "Gọi to tên 1 người trong mâm và tặng họ 1 lời khen siêu sến (phải mịn, không được cứng).",
       "Làm mặt xấu nhất có thể trong 10 giây, cả mâm chụp ảnh lại làm kỷ niệm.",
-      "Thực hiện 10 cái nhảy cóc hoặc 15 cái hít đất (chọn 1) để 'giải rượu' cho bản thân."
+      "Thực hiện 10 cái nhảy cóc hoặc 15 cái hít đất (chọn 1) để 'giải rượu' cho bản thân.",
+      "Uống một ngụm bia/nước mà không được dùng tay chạm vào ly.",
+      "Kể một câu chuyện cười trong 30 giây. Nếu không ai trong mâm cười thì bạn phải uống.",
+      "Đọc to tin nhắn gần nhất bạn nhận được (không tính tin nhắn tổng đài/ngân hàng).",
+      "Để người ngồi bên trái vẽ một hình bất kỳ lên mu bàn tay bạn bằng bút (hoặc tương ớt/nước chấm).",
+      "Nói chuyện bằng giọng địa phương khác (Bắc/Trung/Nam) trong suốt 2 vòng chơi tiếp theo.",
+      "Gắp một miếng đồ ăn và đút cho người ngồi đối diện theo phong cách thật lãng mạn.",
+      "Giữ nguyên tư thế 'tượng sáp' không nhúc nhích, không chớp mắt lâu nhất có thể trong 20 giây, cả bàn được quyền chọc cười.",
+      "Đứng dậy đi catwalk 1 vòng quanh bàn như người mẫu chuyên nghiệp.",
+      "Vừa vỗ đầu vừa xoa bụng theo vòng tròn cùng lúc trong 15 giây; làm rối nhịp là uống.",
+      "Quay video 5 giây nói 'Hôm nay tôi bao cả bàn' (chỉ quay làm bằng chứng vui, không cần đăng).",
+      "Hát bài 'Chúc mừng sinh nhật' theo phong cách nhạc buồn/sâu lắng.",
+      "Bịt mắt lại, để một người bất kỳ trong mâm chạm vào tay bạn và đoán xem đó là ai."
     ],
     spicy: [
       "Chọn 1 người ngồi khác phía bàn, nhìn thẳng vào mắt họ và nói 1 câu thả thính sến nhất có thể trong 10 giây. Ai cười trước uống 100%!",
@@ -276,7 +311,19 @@ const DATA = {
       "Nhắn tin vào group chat gia đình (hoặc group bạn bè khác) dòng chữ: 'Mọi người ơi em đang rất vui và muốn chia sẻ điều đó!' (Không giải thích thêm, gửi rồi thôi).",
       "Thách người ngồi bên trái bạn thi uống: Ai uống xong ly trước thì được quyền ra 1 lệnh cho người kia.",
       "Chọn 1 người trong mâm và 'tặng' họ 1 biệt danh siêu hài hước phù hợp với tính cách. Cả mâm biểu quyết có hay không. Nếu đa số đồng ý thì biệt danh đó có hiệu lực tới cuối buổi.",
-      "Chạy quanh bàn nhậu 1 vòng (hoặc đi bộ nhanh nếu không có không gian) và hô to: 'Hôm nay tao là người vui nhất!' Không được cười trong khi hô."
+      "Chạy quanh bàn nhậu 1 vòng (hoặc đi bộ nhanh nếu không có không gian) và hô to: 'Hôm nay tao là người vui nhất!' Không được cười trong khi hô.",
+      "Mở lịch sử tìm kiếm gần nhất trên TikTok hoặc Facebook và đọc to 3 từ khóa đầu tiên.",
+      "Cho người ngồi bên phải xem bức ảnh thứ 5 tính từ trên xuống trong thư viện ảnh của bạn.",
+      "Nhắn tin cho một người khác giới bất kỳ trong danh sách chat gần đây: 'Ê, dạo này thấy bạn xinh/đẹp trai ra hẳn luôn á'.",
+      "Để cả bàn chọn một người trong danh bạ của bạn, bạn phải gọi điện hỏi vay họ 500 nghìn với giọng thật nghiêm túc.",
+      "Kể tên 3 điểm tốt và 1 điểm xấu của người ngồi đối diện bạn ngay lúc này.",
+      "Đăng một dòng trạng thái (Note Messenger hoặc Story) đúng 3 chữ: 'Hết yêu rồi...' trong vòng 15 phút.",
+      "Nhìn thẳng vào mắt người ngồi bên trái và nói 'Thật ra tao thích mày lâu rồi' với vẻ mặt nghiêm túc nhất có thể.",
+      "Uống cạn ly của mình theo kiểu giao bôi (khoác tay) với người mà bạn chọn trên bàn.",
+      "Mở mục 'Đã chặn' (Blocked) trên Facebook hoặc Messenger và giải thích lý do chặn người đầu tiên trong danh sách.",
+      "Để người thắng ở lượt trước chọn một bài nhạc bất kỳ, bạn phải hát nhép (lip-sync) cực kỳ nhập tâm trong 20 giây.",
+      "Gọi điện cho một người bạn không có mặt ở đây và cố gắng thuyết phục họ ra quán nhậu ngay lập tức trong vòng 1 phút.",
+      "Cho người ngồi đối diện quyền soạn 1 tin nhắn bất kỳ (không thô tục) gửi vào group chat chung của lớp/công ty/nhóm bạn."
     ]
   },
 
@@ -310,7 +357,22 @@ const DATA = {
     "🛵 Kể tên các đặc điểm giao thông ở Việt Nam",
     "😴 Kể tên các tư thế ngủ buồn cười",
     "🌟 Kể tên các siêu anh hùng mà bạn biết",
-    "🎯 Kể tên các trò chơi dân gian Việt Nam"
+    "🎯 Kể tên các trò chơi dân gian Việt Nam",
+    "🍵 Kể tên các loại trà sữa hoặc topping trà sữa",
+    "💔 Kể tên các câu chia tay kinh điển ('Anh không xứng với em'...)",
+    "🍜 Kể tên các món ăn sáng phổ biến ở Việt Nam",
+    "🐶 Kể tên các giống chó hoặc mèo mà bạn biết",
+    "🏖️ Kể tên các tỉnh/thành phố ở Việt Nam",
+    "🎤 Kể tên các ca sĩ hoặc rapper Việt Nam",
+    "🍎 Kể tên các loại trái cây miền nhiệt đới",
+    "🚩 Kể tên các dấu hiệu 'red flag' khi yêu",
+    "💸 Kể tên các lý do phổ biến khiến bạn hết tiền cuối tháng",
+    "🏫 Kể tên các môn học ở trường cấp 3",
+    "🛒 Kể tên các món đồ hay mua trên Shopee/TikTok Shop nhưng ít dùng",
+    "👻 Kể tên những thứ khiến nhiều người sợ hãi (gián, độ cao, deadline...)",
+    "☕ Kể tên các chuỗi cà phê nổi tiếng ở Việt Nam",
+    "🎁 Kể tên những món quà hay tặng người yêu vào dịp lễ",
+    "🎬 Kể tên các bộ phim hoạt hình tuổi thơ (Doraemon, Conan...)"
   ],
 
   // ─────────────────────────────────────────────────────────

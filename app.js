@@ -264,7 +264,6 @@ function renderHomePlayerGrid() {
         <div class="w-8 h-8 rounded-full ${avatarStyle} flex items-center justify-center font-clash font-bold text-xs shrink-0 shadow-sm relative">
           ${char}
           ${hasShield ? '<span class="absolute -top-1 -right-1 text-[11px]">🛡️</span>' : ''}
-          ${hasCooldown ? '<span class="absolute -top-1 -left-1 text-[11px]">🧊</span>' : ''}
         </div>
         <div class="flex-1 min-w-0">
           <div class="font-clash font-bold text-xs truncate ${p.active ? 'text-[#10233D]' : 'text-slate-400 line-through'}">
@@ -273,7 +272,6 @@ function renderHomePlayerGrid() {
           <div class="text-[10px] flex items-center gap-1">
             ${p.active ? '<span class="text-[#18C9A6] font-semibold">● Đang chơi</span>' : '<span class="text-slate-400">○ Tạm vắng</span>'}
             ${hasShield ? `<span class="text-[#C65D3B] font-bold">· Né ${p.shieldTurns} lượt</span>` : ''}
-            ${hasCooldown ? `<span class="text-[#0080FF] font-bold">· Nghỉ ${p.cooldownTurns} lượt</span>` : ''}
           </div>
         </div>
       </button>
@@ -470,7 +468,6 @@ function renderModalPlayerList() {
         <span class="w-4 h-4 rounded-full flex items-center justify-center text-[10px] font-bold ${p.active ? 'bg-[#C65D3B] text-white' : 'bg-slate-300 text-white'}">${i + 1}</span>
         <span class="truncate">${escHtml(p.name)}</span>
         ${hasShield ? `<span class="text-[9px] text-[#C65D3B] font-bold">🛡️${p.shieldTurns}</span>` : ''}
-        ${hasCooldown ? `<span class="text-[9px] text-[#0080FF] font-bold">🧊${p.cooldownTurns}</span>` : ''}
       </button>
       <button onclick="togglePlayerWeight(${i})" class="px-1.5 py-0.5 rounded text-[10px] font-extrabold border ${weight > 1 ? 'bg-[#C65D3B] text-white' : 'bg-slate-100 text-[#756856]'}">
         ${weight}x
@@ -602,8 +599,6 @@ function drawWheel() {
     let name = p.name;
     if (p.shieldTurns && p.shieldTurns > 0) {
       name = `🛡️${name}`;
-    } else if (p.cooldownTurns && p.cooldownTurns > 0) {
-      name = `🧊${name}`;
     }
     if (name.length > maxLen) name = name.slice(0, maxLen - 1) + '…';
 
@@ -708,9 +703,6 @@ function onSpinEnd(winner) {
       <div class="font-clash text-xl sm:text-2xl font-black text-[#10233D] py-3 px-4 bg-[#F5EFE3] rounded-2xl border-2 border-[#D8C49D]">
         ${escHtml(winner.name)}
       </div>
-      <p class="text-[11px] text-[#0080FF] font-bold">
-        🧊 ${escHtml(winner.name)} sẽ được NGHỈ 2 ROUND TIẾP THEO để công bằng!
-      </p>
       <div class="bg-[#FFFDF9] border border-[#E8DEC9] rounded-2xl p-4 text-left space-y-1.5 shadow-sm">
         <div class="text-[11px] font-bold text-[#C65D3B] uppercase tracking-wider font-clash">⚡ Lệnh Phạt / Thử thách</div>
         <div class="font-clash font-bold text-[#10233D] text-base" id="spinChallengeTitleEl">${escHtml(challenge.title)}</div>
@@ -885,7 +877,7 @@ function pickToDPlayer() {
 
       if (playerEl) playerEl.textContent = todState.player.name;
       if (promptText) promptText.textContent = `${todState.player.name} ơi, bạn chọn THẬT hay THÁCH?`;
-      if (promptSub) promptSub.textContent = `Chạm nút THẬT hoặc THÁCH bên dưới! (Sau lượt này được nghỉ 2 round)`;
+      if (promptSub) promptSub.textContent = `Chạm nút THẬT hoặc THÁCH bên dưới!`;
       if (subtitle) subtitle.textContent = `Đã chọn: ${todState.player.name}! Hãy chọn Thật hoặc Thách`;
 
       if (choiceBox) {
@@ -893,7 +885,7 @@ function pickToDPlayer() {
       }
 
       playCelebration();
-      showToast(`🎯 Lượt của: ${todState.player.name} (Nghỉ 2 round kế)`);
+      showToast(`🎯 Lượt của: ${todState.player.name}`);
     }
   }, interval);
 }
