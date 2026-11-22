@@ -1,13 +1,15 @@
 <!DOCTYPE html>
-<html lang="vi" class="dark">
+<html lang="vi">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <meta name="theme-color" content="#070E1A" />
+  <meta name="theme-color" content="#F9F6F0" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <title>🍺 Đại Chiến Bàn Nhậu</title>
 
-  <!-- Google Font: Be Vietnam Pro (Chuẩn tiếng Việt, hiện đại, rõ nét) -->
+  <!-- Fontshare Fonts: Clash Display + Boska + Satoshi (Phong cách Pháp cổ kính Art Deco) -->
+  <link href="https://api.fontshare.com/v2/css?f[]=clash-display@700,600,500&f[]=boska@500,400i&f[]=satoshi@700,500,400&display=swap" rel="stylesheet">
+  <!-- Google Font: Be Vietnam Pro (Fallback tiếng Việt chuẩn không bao giờ lỗi dấu) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -15,21 +17,26 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
-      darkMode: 'class',
       theme: {
         extend: {
           colors: {
-            app: {
-              bg: '#070E1A',
-              card: '#0D1B2A',
-              cardBorder: 'rgba(56, 189, 248, 0.14)',
-              primary: '#0EA5E9',
-              primaryDark: '#0284C7',
-              accent: '#14B8A6'
+            french: {
+              cream: '#F9F6F0',
+              gold: '#C5A059',
+              goldDark: '#B8924A',
+              navy: '#10233D',
+              slate: '#55708D',
+              cyan: '#00D9FF',
+              blue: '#0088FF',
+              emerald: '#18C9A6',
+              danger: '#D9383A'
             }
           },
           fontFamily: {
-            sans: ['"Be Vietnam Pro"', 'system-ui', '-apple-system', 'sans-serif']
+            clash: ['"Clash Display"', '"Be Vietnam Pro"', 'sans-serif'],
+            boska: ['"Boska"', '"Be Vietnam Pro"', 'serif'],
+            satoshi: ['"Satoshi"', '"Be Vietnam Pro"', 'sans-serif'],
+            sans: ['"Satoshi"', '"Be Vietnam Pro"', 'system-ui', 'sans-serif']
           }
         }
       }
@@ -39,112 +46,122 @@
     * {
       -webkit-tap-highlight-color: transparent;
       box-sizing: border-box;
-      font-family: 'Be Vietnam Pro', system-ui, -apple-system, sans-serif;
+      font-family: 'Satoshi', 'Be Vietnam Pro', system-ui, -apple-system, sans-serif;
     }
     body {
-      background-color: #070E1A;
-      background-image: 
-        radial-gradient(ellipse at 50% 0%, #0F2847 0%, transparent 65%),
-        radial-gradient(ellipse at 50% 100%, #081628 0%, transparent 70%);
-      background-attachment: fixed;
-      color: #E2E8F0;
+      background-color: #F9F6F0;
+      /* Họa tiết chấm bi deco cổ điển tinh tế */
+      background-image: radial-gradient(#C5A059 0.8px, transparent 0.8px);
+      background-size: 18px 18px;
+      color: #10233D;
       overscroll-behavior: none;
       min-height: 100dvh;
     }
 
-    /* Scrollbar ẩn hoặc tối giản */
+    .font-clash { font-family: 'Clash Display', 'Be Vietnam Pro', sans-serif; }
+    .font-boska { font-family: 'Boska', 'Be Vietnam Pro', serif; }
+    .font-satoshi { font-family: 'Satoshi', 'Be Vietnam Pro', sans-serif; }
+
+    /* Scrollbar ẩn */
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-    ::-webkit-scrollbar { width: 4px; height: 4px; }
-    ::-webkit-scrollbar-track { background: #070E1A; }
-    ::-webkit-scrollbar-thumb { background: #1E293B; border-radius: 4px; }
 
-    /* Thẻ Card: Gọn gàng, mờ nhẹ tinh tế, KHÔNG lóe sáng */
-    .clean-card {
-      background: rgba(13, 27, 42, 0.82);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(56, 189, 248, 0.16);
-      border-radius: 20px;
-      box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.45);
+    /* Khung thẻ Art Deco viền vàng sang trọng */
+    .art-deco-card {
+      background: #FFFFFF;
+      border: 2px solid rgba(197, 160, 89, 0.55);
+      border-radius: 26px;
+      box-shadow: 0 4px 18px -2px rgba(16, 35, 61, 0.06);
+      position: relative;
+    }
+    .art-deco-card::before {
+      content: '';
+      position: absolute;
+      inset: 4px;
+      border: 1px solid rgba(197, 160, 89, 0.25);
+      border-radius: 22px;
+      pointer-events: none;
     }
 
-    /* Nút chính: Rõ nét, êm mắt, độ tương phản cao */
-    .btn-primary {
-      background: linear-gradient(135deg, #0EA5E9 0%, #14B8A6 100%);
-      color: #041424;
-      font-weight: 800;
-      border-radius: 16px;
-      padding: 13px 20px;
+    /* Nút chính Art Deco Gradient Neon Blue / Cyan */
+    .btn-deco-primary {
+      background: linear-gradient(135deg, #0088FF 0%, #00D9FF 100%);
+      color: #FFFFFF;
+      font-family: 'Clash Display', 'Be Vietnam Pro', sans-serif;
+      font-weight: 700;
+      border-radius: 18px;
+      padding: 14px 22px;
       border: none;
       cursor: pointer;
       transition: all 0.15s ease;
-      font-size: 15px;
-      letter-spacing: 0.2px;
-      box-shadow: 0 4px 14px rgba(14, 165, 233, 0.25);
+      font-size: 15.5px;
+      letter-spacing: 0.5px;
+      box-shadow: 0 6px 18px rgba(0, 136, 255, 0.28);
       width: 100%;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
     }
-    .btn-primary:active {
+    .btn-deco-primary:active {
       transform: scale(0.97);
-      box-shadow: 0 2px 6px rgba(14, 165, 233, 0.15);
+      box-shadow: 0 2px 8px rgba(0, 136, 255, 0.2);
     }
 
-    /* Nút phụ */
-    .btn-secondary {
-      background: rgba(15, 32, 53, 0.85);
-      color: #BAE6FD;
+    /* Nút phụ viền cyan */
+    .btn-deco-secondary {
+      background: #FFFFFF;
+      color: #0088FF;
+      font-family: 'Clash Display', 'Be Vietnam Pro', sans-serif;
       font-weight: 700;
-      border-radius: 16px;
-      padding: 11px 18px;
-      border: 1px solid rgba(56, 189, 248, 0.2);
+      border-radius: 18px;
+      padding: 12px 20px;
+      border: 2px solid #00D9FF;
       cursor: pointer;
       transition: all 0.15s ease;
-      font-size: 13.5px;
+      font-size: 14px;
       width: 100%;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 6px;
     }
-    .btn-secondary:active {
+    .btn-deco-secondary:active {
       transform: scale(0.97);
-      background: rgba(22, 45, 75, 0.95);
+      background: #F0FAFF;
     }
 
-    /* Bottom Navigation: Tinh giản, chỉn chu */
+    /* Bottom Navigation 5 tab */
     .nav-btn {
       display: flex; flex-direction: column; align-items: center;
-      gap: 3px; padding: 6px 3px; border-radius: 12px;
-      transition: all 0.18s ease;
-      color: #64748B; flex: 1;
-      font-size: 10.5px; font-weight: 600;
+      gap: 3px; padding: 6px 8px; border-radius: 16px;
+      transition: all 0.2s ease;
+      color: #6B8199; flex: 1;
+      font-size: 11px; font-weight: 600;
       background: transparent; border: 1px solid transparent; cursor: pointer;
     }
-    .nav-btn:active { transform: scale(0.93); }
+    .nav-btn:active { transform: scale(0.92); }
     .nav-active {
-      color: #38BDF8;
-      background: rgba(14, 165, 233, 0.12);
-      border-color: rgba(56, 189, 248, 0.25);
+      color: #0088FF;
+      background: #E7FAFF;
+      border-color: #00D9FF;
+      font-weight: 700;
     }
     .nav-active .nav-icon {
-      transform: translateY(-1px);
+      transform: scale(1.1);
     }
 
     /* Canvas Vòng Quay */
     #spinWheel { display: block; margin: 0 auto; cursor: pointer; border-radius: 50%; }
 
-    /* Dice */
-    .dice-face {
-      width: 68px; height: 68px;
-      background: #F8FAFC;
-      color: #0F172A;
-      border-radius: 14px; padding: 9px;
-      border: 1.5px solid #CBD5E1;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+    /* Dice 3D */
+    .dice-cube {
+      width: 72px; height: 72px;
+      background: linear-gradient(135deg, #0088FF 0%, #00B4D8 100%);
+      color: #FFFFFF;
+      border-radius: 18px; padding: 11px;
+      border: 2px solid rgba(255, 255, 255, 0.8);
+      box-shadow: 0 8px 20px rgba(0, 136, 255, 0.35);
       transition: all 0.25s;
     }
     @keyframes diceShake {
@@ -157,16 +174,16 @@
     .dice-shake { animation: diceShake 0.3s ease-in-out; }
 
     .active-dice-btn {
-      background: #0EA5E9 !important;
-      color: #041424 !important;
-      border-color: #38BDF8 !important;
+      background: #00D9FF !important;
+      color: #10233D !important;
+      border-color: #00D9FF !important;
       font-weight: 800 !important;
     }
 
-    /* Thẻ bài Thật / Thách */
+    /* Thẻ lật bài Thật / Thách */
     .tod-card-container {
       perspective: 1000px;
-      height: 210px; width: 100%;
+      height: 220px; width: 100%;
     }
     .tod-card-inner {
       position: relative; width: 100%; height: 100%;
@@ -176,7 +193,7 @@
     .tod-card-inner.flipped { transform: rotateY(180deg); }
     .tod-card-face {
       position: absolute; inset: 0;
-      border-radius: 18px;
+      border-radius: 22px;
       backface-visibility: hidden;
       -webkit-backface-visibility: hidden;
     }
@@ -185,111 +202,111 @@
       overflow-y: auto;
     }
 
-    /* Bom */
-    @keyframes bombHeartbeat {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.06); }
+    /* Đồng hồ đếm ngược bom */
+    @keyframes dangerPulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); transform: scale(1); }
+      50% { box-shadow: 0 0 0 16px rgba(239, 68, 68, 0); transform: scale(1.03); }
     }
-    .bomb-flash { animation: bombHeartbeat 0.22s ease-in-out !important; }
-    @keyframes bombExplodeAnim {
-      0% { transform: scale(1); }
-      30% { transform: scale(1.35) rotate(-5deg); }
-      60% { transform: scale(0.92) rotate(5deg); }
-      100% { transform: scale(1); }
-    }
-    .bomb-explode { animation: bombExplodeAnim 0.75s ease-out forwards; }
-    #bombVisual { animation: bombHeartbeat 1.6s ease-in-out infinite; font-size: 76px; line-height: 1; }
+    .danger-pulse { animation: dangerPulse 1.4s ease-in-out infinite; }
+    .bomb-flash { animation: dangerPulse 0.3s ease-in-out !important; }
 
-    /* Modal */
-    #modalOverlay { backdrop-filter: blur(8px); }
+    /* Modal Backdrop */
+    #modalOverlay { backdrop-filter: blur(6px); }
     #modalContent {
-      background: #0B192C;
-      border: 1px solid rgba(56, 189, 248, 0.24);
-      border-radius: 24px;
-      padding: 20px;
+      background: #FFFFFF;
+      border: 2px solid #C5A059;
+      border-radius: 26px;
+      padding: 22px;
       width: calc(100% - 32px);
-      max-width: 410px;
+      max-width: 420px;
       max-height: 85dvh;
       overflow-y: auto;
-      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.65);
+      box-shadow: 0 20px 45px rgba(16, 35, 61, 0.25);
     }
 
     .app-main {
-      padding-bottom: 84px;
+      padding-bottom: 92px;
     }
   </style>
 </head>
-<body class="flex flex-col min-h-screen select-none text-slate-100">
+<body class="flex flex-col min-h-screen select-none">
 
 <!-- ══════════════════════════════════════════════════
      TOAST THÔNG BÁO
 ══════════════════════════════════════════════════ -->
 <div id="toast"
   class="fixed top-4 left-1/2 -translate-x-1/2 z-50 opacity-0 translate-y-3
-         bg-[#0E2238] text-sky-200 text-xs sm:text-sm font-semibold px-4 py-2.5 rounded-xl
-         border border-sky-400/30 shadow-xl pointer-events-none max-w-xs text-center transition-all duration-200">
+         bg-[#10233D] text-white text-xs sm:text-sm font-semibold px-4 py-2.5 rounded-2xl
+         border border-[#C5A059] shadow-xl pointer-events-none max-w-xs text-center transition-all duration-200">
 </div>
 
 <!-- ══════════════════════════════════════════════════
      MODAL OVERLAY
 ══════════════════════════════════════════════════ -->
 <div id="modalOverlay"
-  class="fixed inset-0 z-40 hidden items-center justify-center p-4 bg-black/75">
+  class="fixed inset-0 z-40 hidden items-center justify-center p-4 bg-[#10233D]/60">
   <div id="modalContent"></div>
 </div>
 
 <!-- ══════════════════════════════════════════════════
-     MÀN HÌNH CHỚP ĐỎ KHI BOM NỔ
+     CHỚP ĐỎ KHI BOM NỔ
 ══════════════════════════════════════════════════ -->
 <div id="bombFlash"
   class="fixed inset-0 z-30 bg-red-600 pointer-events-none transition-opacity duration-300"
   style="opacity:0;"></div>
 
 <!-- ══════════════════════════════════════════════════
-     HEADER: THANH ĐẦU TRANG GỌN GÀNG, SẮC NÉT
+     HEADER: ART DECO PHÁP CỔ KÍNH
 ══════════════════════════════════════════════════ -->
-<header class="sticky top-0 z-20 bg-[#070E1A]/95 backdrop-blur-md border-b border-slate-800/80 px-4 py-3 flex items-center justify-between">
-  <div class="flex items-center gap-2">
-    <span class="text-xl">🍺</span>
+<header class="sticky top-0 z-20 bg-[#F9F6F0]/95 backdrop-blur-md border-b border-[#E5DEC9] px-4 py-3.5 relative">
+  <!-- Dải viền màu Deco phía trên cùng -->
+  <div class="absolute left-0 top-0 h-1 w-full bg-gradient-to-r from-[#0088FF] via-[#00D9FF] to-[#C5A059]"></div>
+
+  <div class="flex items-center justify-between">
     <div>
-      <h1 class="text-sm sm:text-base font-extrabold tracking-tight text-white uppercase flex items-center gap-1.5">
-        Đại Chiến Bàn Nhậu
-      </h1>
-      <p class="text-[10px] text-slate-400 font-medium">Drinking game mâm 16 người</p>
+      <div class="flex items-center gap-1.5">
+        <span class="text-[#C5A059] text-base">✦</span>
+        <h1 id="headerTitle" class="font-clash text-[18px] sm:text-[20px] font-bold text-[#10233D] tracking-tight uppercase">
+          VÒNG QUAY NHÂN PHẨM
+        </h1>
+      </div>
+      <p id="headerSubtitle" class="font-boska text-[13px] sm:text-[14px] italic text-[#55708D] mt-0.5 ml-5">
+        Trúng tên ai người đó nhận hình phạt!
+      </p>
     </div>
-  </div>
-  <div class="flex items-center gap-1.5">
-    <button id="soundBtn" onclick="toggleSound()" title="Bật/tắt âm thanh"
-      class="w-9 h-9 rounded-xl bg-slate-800/80 border border-slate-700/80 text-base flex items-center justify-center active:scale-90 transition-transform">
-      🔊
-    </button>
-    <button onclick="openSettingsModal()" title="Cài đặt & Luật chơi"
-      class="w-9 h-9 rounded-xl bg-slate-800/80 border border-slate-700/80 text-base flex items-center justify-center active:scale-90 transition-transform text-slate-300">
-      ⚙️
-    </button>
+
+    <div class="flex items-center gap-2">
+      <!-- Nút âm thanh -->
+      <button id="soundBtn" onclick="toggleSound()" title="Bật/tắt âm thanh"
+        class="w-10 h-10 rounded-full border border-[#C5A059] text-[#0088FF] bg-white flex items-center justify-center text-base active:scale-90 transition-transform shadow-sm">
+        🔊
+      </button>
+      <!-- Nút cài đặt Art Deco -->
+      <button onclick="openSettingsModal()" title="Cài đặt & Luật chơi"
+        class="w-10 h-10 rounded-full border border-[#C5A059] text-[#0088FF] bg-white flex items-center justify-center text-lg active:scale-90 transition-transform shadow-sm">
+        ⚙️
+      </button>
+    </div>
   </div>
 </header>
 
 <!-- ══════════════════════════════════════════════════
      THANH THÀNH VIÊN (MEMBER BAR)
 ══════════════════════════════════════════════════ -->
-<div class="sticky top-[57px] z-20 bg-[#070E1A]/95 backdrop-blur-md border-b border-slate-800/80 px-3 py-2">
-  <div class="flex items-center justify-between mb-1.5 px-1">
-    <div class="flex items-center gap-2">
-      <span class="text-[11px] font-bold uppercase tracking-wider text-slate-300">Thành viên</span>
-      <span id="memberCountBadge" class="text-[10.5px] font-bold px-2 py-0.5 rounded-full bg-sky-500/15 text-sky-300 border border-sky-400/30">
-        16/16
-      </span>
-    </div>
-    <span class="text-[10.5px] text-slate-400">Chạm để bật / tắt</span>
+<div class="sticky top-[67px] z-20 bg-[#F9F6F0]/95 backdrop-blur-md border-b border-[#E5DEC9] px-4 py-2.5">
+  <div class="flex items-center justify-between mb-1.5">
+    <span class="font-clash text-xs font-bold text-[#10233D] tracking-wider uppercase">THÀNH VIÊN</span>
+    <span id="memberCountBadge" class="text-[11px] font-bold px-2.5 py-0.5 rounded-full border border-[#00D9FF] bg-[#E7FAFF] text-[#0088FF]">
+      16/16
+    </span>
   </div>
-  <div class="flex items-center gap-2.5 overflow-x-auto no-scrollbar py-0.5" id="memberBarList">
-    <!-- Nút + tròn & danh sách avatar sẽ render bằng JavaScript -->
+  <div class="flex items-center gap-3 overflow-x-auto no-scrollbar py-1" id="memberBarList">
+    <!-- Nút + tròn xanh cyan & avatar thành viên sẽ được render bằng JS -->
   </div>
 </div>
 
 <!-- ══════════════════════════════════════════════════
-     KHU VỰC TRÒ CHƠI CHÍNH
+     MAIN GAME AREA
 ══════════════════════════════════════════════════ -->
 <main class="app-main px-4 py-4 space-y-4 max-w-md mx-auto w-full">
 
@@ -297,35 +314,31 @@
        TRÒ 1: VÒNG QUAY NHÂN PHẨM
   ─────────────────────────────────────────────── -->
   <section id="section-spin">
-    <div class="space-y-3.5">
+    <div class="space-y-4">
 
-      <div class="text-center">
-        <h2 class="text-base font-extrabold text-white flex items-center justify-center gap-1.5">
-          <span>🎡</span> Vòng Quay Nhân Phẩm
-        </h2>
-        <p class="text-[11.5px] text-slate-400 mt-0.5">Trúng tên ai người đó nhận hình phạt!</p>
-      </div>
-
-      <!-- Vòng quay Canvas + Nút tròn ở tâm -->
-      <div class="clean-card p-3 flex justify-center relative">
-        <div class="relative w-full flex items-center justify-center" style="max-width:340px;">
+      <!-- Thẻ Art Deco Vòng Quay -->
+      <div class="art-deco-card p-4 sm:p-5 flex flex-col items-center justify-center relative">
+        <div class="relative w-full flex items-center justify-center" style="max-width:330px;">
+          <!-- Canvas Wheel -->
           <canvas id="spinWheel" onclick="spinWheel()" class="touch-none select-none" width="300" height="300"></canvas>
 
-          <!-- Nút tròn "QUAY" ở tâm: Tinh tế, rõ ràng, KHÔNG lóe sáng -->
+          <!-- Nút tròn "QUAY" màu cyan ở tâm -->
           <button onclick="spinWheel()"
             title="Chạm để QUAY!"
-            class="absolute inset-0 m-auto w-14 h-14 rounded-full bg-gradient-to-tr from-sky-500 to-teal-400 text-slate-950 font-black text-xs tracking-wider shadow-md flex items-center justify-center cursor-pointer active:scale-90 transition-transform z-10 border-2 border-white/80">
+            class="absolute inset-0 m-auto w-14 h-14 rounded-full bg-[#00D9FF] border-2 border-white text-[#10233D] font-clash font-bold text-xs tracking-wider shadow-md flex items-center justify-center cursor-pointer active:scale-90 transition-transform z-10">
             QUAY
           </button>
         </div>
       </div>
 
-      <!-- Nút quay lớn bên dưới -->
-      <button class="btn-primary text-base py-3.5 font-bold" onclick="spinWheel()">
-        🎡 QUAY NGAY
+      <!-- Nút bấm chính và phụ theo đúng mẫu Superdesign -->
+      <button class="btn-deco-primary" onclick="spinWheel()">
+        <span>✦</span> QUAY NGAY
       </button>
 
-      <p class="text-center text-[11px] text-slate-400">Có thể bấm nút hoặc chạm trực tiếp vào tâm vòng quay</p>
+      <button id="requestMotionBtn" class="btn-deco-secondary" onclick="toggleShakeSensor()">
+        <span>📱</span> BẬT CẢM BIẾN LẮC (IOS)
+      </button>
 
     </div>
   </section>
@@ -334,52 +347,56 @@
        TRÒ 2: AI LÀ NGƯỜI...
   ─────────────────────────────────────────────── -->
   <section id="section-whois" class="hidden">
-    <div class="space-y-3.5">
+    <div class="space-y-4">
 
       <div class="text-center">
-        <h2 class="text-base font-extrabold text-white flex items-center justify-center gap-1.5">
-          <span>👆</span> Ai Là Người...
+        <h2 class="font-clash text-lg font-bold text-[#10233D] flex items-center justify-center gap-1.5">
+          <span>☝</span> Ai Là Người...
         </h2>
-        <p class="text-[11.5px] text-slate-400 mt-0.5">Cả 16 người cùng giơ tay chỉ mặt!</p>
+        <p class="font-boska text-xs italic text-[#55708D] mt-0.5">Cả 16 người cùng giơ tay chỉ một!</p>
       </div>
 
-      <!-- Khung hiển thị câu hỏi -->
-      <div class="clean-card text-center space-y-4 py-6 px-4">
-        <p id="whoIsQuestion"
-          class="text-base font-bold leading-relaxed text-slate-300 min-h-[80px] flex items-center justify-center px-1">
-          Bấm "Đổi câu hỏi khác" để bắt đầu!
-        </p>
+      <!-- Thẻ câu hỏi Art Deco -->
+      <div class="art-deco-card p-4 sm:p-5 space-y-4">
+        <!-- Top bar: Câu hỏi số & điểm -->
+        <div class="flex items-center justify-between">
+          <span class="font-clash text-xs font-bold text-[#55708D] uppercase tracking-wider" id="whoIsOrder">CÂU HỎI SỐ 01</span>
+          <span class="text-xs font-bold px-2.5 py-0.5 rounded-full border border-[#00D9FF] bg-[#E7FAFF] text-[#0088FF]">
+            ⭐ 3 điểm
+          </span>
+        </div>
 
-        <!-- Đếm ngược 3-2-1 -->
+        <!-- Khung tối chứa câu hỏi -->
+        <div class="bg-[#10233D] text-white rounded-2xl p-6 text-center space-y-2 shadow-inner min-h-[140px] flex flex-col justify-center items-center">
+          <span class="text-cyan-400 text-xl font-bold">“</span>
+          <p id="whoIsQuestion" class="font-clash text-base sm:text-lg font-bold leading-relaxed px-2 text-slate-100">
+            Bấm "Đổi câu hỏi khác" để bắt đầu!
+          </p>
+          <span class="text-cyan-400 text-xl font-bold">”</span>
+        </div>
+
+        <!-- Vòng tròn đếm ngược -->
         <div id="whoIsCount"
-          class="hidden text-5xl font-black text-sky-400 scale-0 mx-auto w-20 h-20
-                 rounded-full bg-sky-500/10 border-2 border-sky-400 flex items-center justify-center">
+          class="hidden text-5xl font-clash font-bold text-[#0088FF] scale-0 mx-auto w-20 h-20
+                 rounded-full bg-[#E7FAFF] border-2 border-[#00D9FF] flex items-center justify-center shadow-md">
           3
         </div>
 
         <!-- Kết quả -->
         <div id="whoIsResult"
-          class="hidden text-xs font-bold text-sky-200 bg-sky-950/40 border border-sky-500/30 rounded-xl px-4 py-3 leading-relaxed">
+          class="hidden text-xs font-bold text-[#0088FF] bg-[#E7FAFF] border border-[#00D9FF] rounded-xl px-4 py-3 text-center leading-relaxed">
         </div>
       </div>
 
       <!-- Nút điều khiển -->
-      <button class="btn-secondary" onclick="pickWhoIsQuestion()">
-        🔀 Đổi câu hỏi khác
+      <button class="btn-deco-secondary" onclick="pickWhoIsQuestion()">
+        <span>✦</span> ĐỔI CÂU HỎI
       </button>
 
       <div id="whoIsBtn" class="hidden">
-        <button id="whoIsStartBtn" class="btn-primary text-base py-3.5 font-bold" onclick="startWhoIsCountdown()">
-          ⏱ 3 - 2 - 1 - CHỈ!
+        <button id="whoIsStartBtn" class="btn-deco-primary" onclick="startWhoIsCountdown()">
+          <span>⏱</span> 3 - 2 - 1 - CHỈ!
         </button>
-      </div>
-
-      <!-- Hướng dẫn ngắn gọn -->
-      <div class="clean-card p-3.5 text-xs text-slate-300 space-y-1">
-        <p class="font-bold text-white">🎮 Cách chơi:</p>
-        <p>1. Đọc to câu hỏi cho cả bàn nghe</p>
-        <p>2. Bấm 3-2-1 và cả mâm đồng loạt giơ tay chỉ 1 người</p>
-        <p>3. Người nhận nhiều ngón tay chỉ nhất thì <strong class="text-amber-400 font-bold">UỐNG! 🍺</strong></p>
       </div>
 
     </div>
@@ -389,55 +406,74 @@
        TRÒ 3: THẬT HAY THÁCH
   ─────────────────────────────────────────────── -->
   <section id="section-tod" class="hidden">
-    <div class="space-y-3.5">
+    <div class="space-y-4">
 
       <div class="text-center">
-        <h2 class="text-base font-extrabold text-white flex items-center justify-center gap-1.5">
+        <h2 class="font-clash text-lg font-bold text-[#10233D] flex items-center justify-center gap-1.5">
           <span>🃏</span> Thật hay Thách
         </h2>
-        <p class="text-[11.5px] text-slate-400 mt-0.5">Chọn ngẫu nhiên 1 người rồi kiểm tra dũng khí!</p>
+        <p class="font-boska text-xs italic text-[#55708D] mt-0.5">Chọn một thử thách cho đêm nay</p>
       </div>
 
-      <!-- Người được chọn ngẫu nhiên -->
-      <div class="clean-card text-center space-y-3 p-4">
-        <p class="text-[11px] text-slate-400 font-bold uppercase tracking-wider">Người được chỉ định</p>
-        <div class="text-xl font-bold text-white min-h-11 flex items-center justify-center rounded-xl bg-[#091524] border border-slate-700/80 py-2.5 px-4"
-          id="todPlayerName">?</div>
-        <button class="btn-primary py-3 font-bold" onclick="pickToDPlayer()">
-          🎲 Chọn ngẫu nhiên 1 người
+      <!-- 2 Nút lớn: THẬT (Blue) vs THÁCH (Purple) theo mẫu Superdesign -->
+      <div class="grid grid-cols-2 gap-3">
+        <button onclick="quickPickToD('truth')"
+          class="py-3.5 rounded-2xl bg-[#0088FF] text-white font-clash font-bold text-base shadow-sm active:scale-95 transition-all text-center">
+          THẬT
+        </button>
+        <button onclick="quickPickToD('dare')"
+          class="py-3.5 rounded-2xl bg-[#5B3EE4] text-white font-clash font-bold text-base shadow-sm active:scale-95 transition-all text-center">
+          THÁCH
         </button>
       </div>
 
-      <!-- Chọn chế độ Thật / Thách -->
-      <div id="todSelection" class="hidden clean-card space-y-3 p-4">
-        <p class="text-xs font-bold text-slate-300 text-center uppercase tracking-wider">Chọn hình thức thử thách:</p>
-
-        <div class="grid grid-cols-2 gap-2.5">
-          <div class="space-y-2">
-            <p class="text-xs text-center font-bold text-sky-400">🤔 THẬT</p>
-            <button class="btn-secondary text-xs py-2 w-full" onclick="selectToDMode('truth','mild')">☀️ Nhẹ nhàng</button>
-            <button class="btn-secondary text-xs py-2 w-full border-sky-400/40 text-sky-200" onclick="selectToDMode('truth','spicy')">🔥 Cháy phố</button>
-          </div>
-          <div class="space-y-2">
-            <p class="text-xs text-center font-bold text-teal-400">🔥 THÁCH</p>
-            <button class="btn-secondary text-xs py-2 w-full text-teal-200" onclick="selectToDMode('dare','mild')">☀️ Nhẹ nhàng</button>
-            <button class="btn-secondary text-xs py-2 w-full border-teal-400/40 text-teal-200" onclick="selectToDMode('dare','spicy')">🔥 Cháy phố</button>
-          </div>
+      <!-- Khung thẻ bài Art Deco -->
+      <div class="art-deco-card p-4 sm:p-5 space-y-3.5">
+        <div class="text-center font-clash text-xs font-bold text-[#C5A059] tracking-widest uppercase flex items-center justify-center gap-2">
+          <span>✦</span> THỬ THÁCH CỦA BẠN <span>✦</span>
         </div>
-      </div>
 
-      <!-- Thẻ lật bài -->
-      <div id="todCardArea" class="hidden space-y-3">
         <div class="tod-card-container">
           <div class="tod-card-inner cursor-pointer" id="todCardInner">
-            <div class="tod-card-face" id="todCardFront"></div>
-            <div class="tod-card-face tod-card-back" id="todCardBack"></div>
+            <!-- Mặt trước -->
+            <div class="tod-card-face tod-card-front bg-[#FFFDF9] border border-[#E5DEC9] rounded-2xl p-5 flex flex-col justify-center items-center text-center shadow-inner">
+              <p class="font-clash text-lg font-bold text-[#10233D]" id="todPromptText">
+                Bạn chọn Thật hay Thách?
+              </p>
+              <p class="text-xs text-[#55708D] mt-2">Chạm vào thẻ bài để lật</p>
+            </div>
+            <!-- Mặt sau -->
+            <div class="tod-card-face tod-card-back bg-[#FFFDF9] border border-[#00D9FF] rounded-2xl p-5 flex flex-col justify-between shadow-inner">
+              <div class="space-y-2">
+                <span class="text-[11px] font-bold text-[#0088FF] uppercase" id="todCardType">THẬT · NHẸ NHÀNG</span>
+                <p class="font-clash text-base font-bold text-[#10233D] leading-relaxed" id="todCardQuestion">
+                  Nội dung câu hỏi sẽ hiển thị ở đây...
+                </p>
+              </div>
+              <div class="pt-2 border-t border-[#E5DEC9] text-right">
+                <span class="text-xs font-semibold text-[#0088FF]">Chạm để lật lại ↩</span>
+              </div>
+            </div>
           </div>
         </div>
-        <button class="btn-secondary text-red-300 border-red-800/80 bg-red-950/20 py-2.5" onclick="todGiveUp()">
-          🏳️ Chịu thua (Uống phạt 1 ly)
-        </button>
+
+        <div class="text-center pt-1">
+          <span class="text-xs font-bold text-[#0088FF]">Dành cho: <span class="text-[#10233D] font-extrabold" id="todPlayerName">Linh Tiến</span></span>
+        </div>
       </div>
+
+      <!-- Nút điều khiển -->
+      <button class="btn-deco-primary" onclick="changeCurrentToD()">
+        <span>✦</span> ĐỔI CÂU HỎI
+      </button>
+
+      <button class="btn-deco-secondary" onclick="pickToDPlayer()">
+        <span>🎲</span> CHỌN NGƯỜI NGẪU NHIÊN
+      </button>
+
+      <button class="w-full text-center text-xs text-red-600 font-bold py-1 active:scale-95" onclick="todGiveUp()">
+        🏳️ Chịu thua (Uống phạt 1 ly)
+      </button>
 
     </div>
   </section>
@@ -446,44 +482,50 @@
        TRÒ 4: LẮC XÚC XẮC
   ─────────────────────────────────────────────── -->
   <section id="section-dice" class="hidden">
-    <div class="space-y-3.5">
+    <div class="space-y-4">
 
       <div class="text-center">
-        <h2 class="text-base font-extrabold text-white flex items-center justify-center gap-1.5">
+        <h2 class="font-clash text-lg font-bold text-[#10233D] flex items-center justify-center gap-1.5">
           <span>🎲</span> Lắc Xúc Xắc
         </h2>
-        <p class="text-[11.5px] text-slate-400 mt-0.5">Lắc điện thoại hoặc bấm nút để đổ điểm</p>
+        <p class="font-boska text-xs italic text-[#55708D] mt-0.5">Lắc điện thoại hoặc bấm nút để đo điểm</p>
       </div>
 
-      <!-- Chọn 1 đến 5 viên -->
-      <div class="clean-card p-3">
-        <p class="text-[11px] font-bold text-slate-300 mb-2 text-center uppercase tracking-wider">Số lượng xúc xắc</p>
+      <!-- Khung chọn số lượng xúc xắc (1-5) -->
+      <div class="art-deco-card p-4 text-center space-y-3">
+        <p class="font-clash text-xs font-bold text-[#55708D] uppercase tracking-wider">SỐ LƯỢNG XÚC XẮC</p>
         <div class="flex gap-2 justify-center">
-          <button class="dice-count-btn flex-1 py-2 rounded-xl border border-slate-700 bg-slate-800/80 text-slate-300 font-bold text-sm active:scale-95 transition-all" onclick="setDiceCount(1)">1</button>
-          <button class="dice-count-btn flex-1 py-2 rounded-xl border border-slate-700 bg-slate-800/80 text-slate-300 font-bold text-sm active:scale-95 transition-all" onclick="setDiceCount(2)">2</button>
-          <button class="dice-count-btn flex-1 py-2 rounded-xl border border-slate-700 bg-slate-800/80 text-slate-300 font-bold text-sm active:scale-95 transition-all" onclick="setDiceCount(3)">3</button>
-          <button class="dice-count-btn flex-1 py-2 rounded-xl border border-slate-700 bg-slate-800/80 text-slate-300 font-bold text-sm active:scale-95 transition-all" onclick="setDiceCount(4)">4</button>
-          <button class="dice-count-btn flex-1 py-2 rounded-xl border border-slate-700 bg-slate-800/80 text-slate-300 font-bold text-sm active:scale-95 transition-all" onclick="setDiceCount(5)">5</button>
+          <button class="dice-count-btn flex-1 py-2.5 rounded-xl border border-slate-300 bg-white text-[#10233D] font-clash font-bold text-sm active:scale-95 transition-all shadow-sm" onclick="setDiceCount(1)">1</button>
+          <button class="dice-count-btn flex-1 py-2.5 rounded-xl border border-slate-300 bg-white text-[#10233D] font-clash font-bold text-sm active:scale-95 transition-all shadow-sm" onclick="setDiceCount(2)">2</button>
+          <button class="dice-count-btn flex-1 py-2.5 rounded-xl border border-slate-300 bg-white text-[#10233D] font-clash font-bold text-sm active:scale-95 transition-all shadow-sm" onclick="setDiceCount(3)">3</button>
+          <button class="dice-count-btn flex-1 py-2.5 rounded-xl border border-slate-300 bg-white text-[#10233D] font-clash font-bold text-sm active:scale-95 transition-all shadow-sm" onclick="setDiceCount(4)">4</button>
+          <button class="dice-count-btn flex-1 py-2.5 rounded-xl border border-slate-300 bg-white text-[#10233D] font-clash font-bold text-sm active:scale-95 transition-all shadow-sm" onclick="setDiceCount(5)">5</button>
         </div>
       </div>
 
-      <!-- Bàn xúc xắc -->
-      <div class="clean-card min-h-32 flex flex-col items-center justify-center gap-3 py-5 px-4">
-        <div id="diceContainer" class="flex flex-wrap gap-3 justify-center"></div>
-        <div id="diceTotal" class="text-base font-extrabold text-sky-400"></div>
+      <!-- Khung hiển thị xúc xắc 3D & Thanh May Mắn -->
+      <div class="art-deco-card p-5 space-y-4">
+        <!-- Khu vực hiển thị các viên xúc xắc -->
+        <div id="diceContainer" class="flex flex-wrap gap-4 justify-center py-2 min-h-[90px] items-center"></div>
+
+        <!-- Thanh Điểm May Mắn đúng mẫu Superdesign -->
+        <div class="space-y-1.5 pt-2 border-t border-[#E5DEC9]">
+          <div class="flex justify-between items-center text-xs font-bold font-clash">
+            <span class="text-[#55708D] uppercase">ĐIỂM MAY MẮN</span>
+            <span class="text-[#0088FF]" id="dicePercent">72%</span>
+          </div>
+          <div class="w-full bg-[#E5DEC9]/50 h-3 rounded-full overflow-hidden p-0.5 border border-[#C5A059]/40">
+            <div id="diceProgressBar" class="h-full rounded-full bg-gradient-to-r from-[#0088FF] via-[#00D9FF] to-[#18C9A6] transition-all duration-500" style="width: 72%;"></div>
+          </div>
+        </div>
+
+        <div id="diceTip" class="hidden text-xs text-center text-[#55708D] font-medium leading-relaxed bg-[#F0FBFF] p-2.5 rounded-xl border border-[#00D9FF]/40"></div>
       </div>
 
-      <!-- Nút lắc -->
-      <button class="btn-primary text-base py-3.5 font-bold" onclick="rollDice()">
-        🎲 LẮC NGAY
+      <!-- Nút LẮC NGAY -->
+      <button class="btn-deco-primary" onclick="rollDice()">
+        <span>🎲</span> LẮC NGAY
       </button>
-
-      <button id="requestMotionBtn" class="hidden btn-secondary text-xs py-2">
-        📱 Bật cảm biến lắc (iOS)
-      </button>
-
-      <!-- Gợi ý vui -->
-      <div id="diceTip" class="hidden clean-card text-xs font-semibold text-center text-sky-200 leading-relaxed py-3 px-4"></div>
 
     </div>
   </section>
@@ -492,52 +534,56 @@
        TRÒ 5: QUẢ BOM HẸN GIỜ
   ─────────────────────────────────────────────── -->
   <section id="section-bomb" class="hidden">
-    <div class="space-y-3.5">
+    <div class="space-y-4">
 
       <div class="text-center">
-        <h2 class="text-base font-extrabold text-white flex items-center justify-center gap-1.5">
+        <h2 class="font-clash text-lg font-bold text-[#10233D] flex items-center justify-center gap-1.5">
           <span>💣</span> Quả Bom Hẹn Giờ
         </h2>
-        <p class="text-[11.5px] text-slate-400 mt-0.5">Chuyền tay nhanh – Nổ trên tay ai người đó UỐNG!</p>
+        <p class="font-boska text-xs italic text-[#55708D] mt-0.5">Chuyền thật nhanh — đừng để bom phát nổ!</p>
       </div>
 
-      <!-- Thẻ chủ đề -->
-      <div class="clean-card text-center space-y-2 py-4 px-4">
-        <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">📌 Chủ đề</p>
-        <p id="bombTopic" class="text-base font-bold leading-relaxed text-slate-300 min-h-11 flex items-center justify-center">
-          Bấm "Đổi chủ đề mới" để bắt đầu!
+      <!-- Khung Quả Bom Art Deco -->
+      <div class="art-deco-card p-5 text-center space-y-4">
+        <!-- Badge Cảnh báo nguy hiểm -->
+        <div class="inline-flex items-center gap-1.5 text-xs font-clash font-bold text-[#D9383A] tracking-wider uppercase bg-red-50 border border-red-200 px-3 py-1 rounded-full">
+          <span>●</span> CẢNH BÁO NGUY HIỂM <span>●</span>
+        </div>
+
+        <div>
+          <p class="text-xs text-[#55708D] flex items-center justify-center gap-1">
+            <span>💣</span> <span id="bombStatusLabel">Chủ đề chuyền bom:</span>
+          </p>
+          <h3 id="bombTopic" class="font-clash text-xl font-bold text-[#10233D] mt-1 leading-snug">
+            Kể tên các loại bia Việt Nam
+          </h3>
+        </div>
+
+        <!-- Đồng hồ tròn đếm ngược kiểu cổ điển -->
+        <div class="flex justify-center py-2">
+          <div id="bombTimerCircle" class="w-44 h-44 rounded-full bg-[#10233D] border-4 border-[#D9383A] danger-pulse flex flex-col items-center justify-center text-white shadow-xl relative">
+            <span id="bombTimeDisplay" class="font-clash text-4xl font-extrabold tracking-wider">00:25</span>
+            <span class="text-[10px] uppercase font-bold tracking-widest text-[#FF8A8A] mt-1">CÒN LẠI</span>
+          </div>
+        </div>
+
+        <p class="font-boska text-xs italic text-[#55708D]">
+          Chuyền thật nhanh — bom nổ trên tay ai thì người đó UỐNG!
         </p>
       </div>
 
-      <!-- Hình ảnh quả bom -->
-      <div class="flex justify-center py-1">
-        <div id="bombVisual" class="select-none cursor-default">💣</div>
-      </div>
-
-      <div id="bombStatus" class="text-center text-xs font-semibold text-slate-300 min-h-6">
-        Nhấn BẮT ĐẦU khi cả mâm sẵn sàng!
-      </div>
-
-      <!-- Nút điều khiển -->
-      <button class="btn-secondary" onclick="pickBombTopic()">
-        🔀 Đổi chủ đề mới
+      <!-- Nút Chuyền Bom / Bắt đầu -->
+      <button id="bombStartBtn" class="btn-deco-primary" onclick="startBomb()">
+        <span>💣</span> BẮT ĐẦU ĐẾM GIỜ
       </button>
 
-      <button id="bombStartBtn" class="btn-primary text-base py-3.5 font-bold" onclick="startBomb()">
-        🚀 BẮT ĐẦU
+      <button id="bombPassBtn" class="hidden btn-deco-primary !bg-gradient-to-r !from-[#D9383A] !to-[#FF6B6B]" onclick="passBomb()">
+        <span>💣</span> CHUYỀN BOM TIẾP!
       </button>
 
-      <button id="bombStopBtn" class="hidden btn-secondary text-red-300 border-red-800 bg-red-950/20 py-3 font-bold" onclick="stopBomb()">
-        ⏹ Dừng lại
+      <button class="btn-deco-secondary" onclick="pickBombTopic()">
+        <span>✦</span> ĐỔI CHỦ ĐỀ KHÁC
       </button>
-
-      <!-- Hướng dẫn -->
-      <div class="clean-card p-3.5 text-xs text-slate-300 space-y-1">
-        <p class="font-bold text-white">🎮 Quy tắc chuyền bom:</p>
-        <p>• Thời gian đếm ngược ẩn ngẫu nhiên 20–45 giây</p>
-        <p>• Mỗi người nói 1 đáp án không trùng rồi chuyền ngay</p>
-        <p>• Bom nổ trên tay ai thì người đó <strong class="text-amber-400 font-bold">UỐNG! 🍺</strong></p>
-      </div>
 
     </div>
   </section>
@@ -545,18 +591,18 @@
 </main>
 
 <!-- ══════════════════════════════════════════════════
-     BOTTOM NAVIGATION: 5 TAB CỐ ĐỊNH, TINH GỌN
+     BOTTOM NAVIGATION (5 TABS ART DECO)
 ══════════════════════════════════════════════════ -->
-<nav class="fixed bottom-0 left-0 right-0 z-30 bg-[#070E1A]/95 backdrop-blur-md border-t border-slate-800/80 px-2 py-1.5">
-  <div class="max-w-md mx-auto flex items-center justify-around gap-1">
+<footer class="fixed bottom-0 left-0 right-0 z-30 bg-[#F9F6F0]/95 backdrop-blur-md border-t border-[#E5DEC9] px-2 py-2">
+  <nav class="max-w-md mx-auto flex items-center justify-around" aria-label="Điều hướng trò chơi">
 
     <button class="nav-btn nav-active" data-section="spin" onclick="showSection('spin')">
-      <span class="nav-icon text-lg">🎡</span>
+      <span class="nav-icon text-lg">✥</span>
       <span>Vòng Quay</span>
     </button>
 
     <button class="nav-btn" data-section="whois" onclick="showSection('whois')">
-      <span class="nav-icon text-lg">👆</span>
+      <span class="nav-icon text-lg">☝</span>
       <span>Ai Là Người</span>
     </button>
 
@@ -575,8 +621,8 @@
       <span>Quả Bom</span>
     </button>
 
-  </div>
-</nav>
+  </nav>
+</footer>
 
 <!-- Scripts -->
 <script src="data.js"></script>
