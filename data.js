@@ -297,6 +297,62 @@ const DATA = {
   ],
 
   // ─────────────────────────────────────────────────────────
+  // TRÒ 4: Nối Từ Căng Não (Từ khởi đầu & gợi ý từ tiếp theo)
+  // ─────────────────────────────────────────────────────────
+  wordChain: [
+    { word: "Bàn nhậu", nextHint: "Nhậu..." },
+    { word: "Uống rượu", nextHint: "Rượu..." },
+    { word: "Cà khịa", nextHint: "Khịa..." },
+    { word: "Say xỉn", nextHint: "Xỉn..." },
+    { word: "Cụng ly", nextHint: "Ly..." },
+    { word: "Nhân phẩm", nextHint: "Phẩm..." },
+    { word: "Tiền bạc", nextHint: "Bạc..." },
+    { word: "Đẹp trai", nextHint: "Trai..." },
+    { word: "Xinh gái", nextHint: "Gái..." },
+    { word: "Hẹn hò", nextHint: "Hò..." },
+    { word: "Tương tư", nextHint: "Tư..." },
+    { word: "Thất tình", nextHint: "Tình..." },
+    { word: "Chốt đơn", nextHint: "Đơn..." },
+    { word: "Trà đá", nextHint: "Đá..." },
+    { word: "Cơm tấm", nextHint: "Tấm..." },
+    { word: "Vui vẻ", nextHint: "Vẻ..." },
+    { word: "Giao lưu", nextHint: "Lưu..." },
+    { word: "Hát hò", nextHint: "Hò..." },
+    { word: "Đoàn kết", nextHint: "Kết..." },
+    { word: "Tự tin", nextHint: "Tin..." },
+    { word: "Cháy phố", nextHint: "Phố..." },
+    { word: "Bùng cháy", nextHint: "Cháy..." },
+    { word: "Phố xá", nextHint: "Xá..." },
+    { word: "Đêm nay", nextHint: "Nay..." },
+    { word: "Quẩy hết", nextHint: "Hết..." },
+    { word: "Rượu ngon", nextHint: "Ngon..." },
+    { word: "Bạn thân", nextHint: "Thân..." },
+    { word: "Trí nhớ", nextHint: "Nhớ..." },
+    { word: "Lú lẫn", nextHint: "Lẫn..." },
+    { word: "Khó tính", nextHint: "Tính..." },
+    { word: "Hớn hở", nextHint: "Hở..." },
+    { word: "Ngơ ngác", nextHint: "Ngác..." },
+    { word: "Rối bời", nextHint: "Bời..." },
+    { word: "Đắc thắng", nextHint: "Thắng..." },
+    { word: "Gục ngã", nextHint: "Ngã..." },
+    { word: "Tỉnh táo", nextHint: "Táo..." },
+    { word: "Bia ôm", nextHint: "Ôm..." },
+    { word: "Mồi ngon", nextHint: "Ngon..." },
+    { word: "Chén chú", nextHint: "Chú..." },
+    { word: "Thao thức", nextHint: "Thức..." },
+    { word: "Gió lạnh", nextHint: "Lạnh..." },
+    { word: "Nắng ấm", nextHint: "Ấm..." },
+    { word: "Thời gian", nextHint: "Gian..." },
+    { word: "Cuộc sống", nextHint: "Sống..." },
+    { word: "Thành công", nextHint: "Công..." },
+    { word: "Thử thách", nextHint: "Thách..." },
+    { word: "May mắn", nextHint: "Mắn..." },
+    { word: "Bí mật", nextHint: "Mật..." },
+    { word: "Bất ngờ", nextHint: "Ngờ..." },
+    { word: "Đam mê", nextHint: "Mê..." }
+  ],
+
+  // ─────────────────────────────────────────────────────────
   // Tên mẫu 16 người
   // ─────────────────────────────────────────────────────────
   sampleNames: [

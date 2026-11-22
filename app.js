@@ -4,7 +4,7 @@
 
 // ─── State ───────────────────────────────────────────────
 const state = {
-  players: [],          // { name, active }
+  players: [],          // { name, active, weight, shieldTurns, cooldownTurns }
   soundEnabled: true,
   audioCtx: null,
 };
@@ -37,26 +37,6 @@ function playTone(freq, type, duration, volume = 0.25, delay = 0) {
 function playClick() {
   playTone(850, 'sine', 0.03, 0.1);
   playTone(1200, 'sine', 0.025, 0.07, 0.02);
-}
-
-function playDiceShake() {
-  if (!state.soundEnabled) return;
-  try {
-    const ctx = getAudioCtx();
-    for (let i = 0; i < 6; i++) {
-      const buf = ctx.createBuffer(1, ctx.sampleRate * 0.07, ctx.sampleRate);
-      const data = buf.getChannelData(0);
-      for (let j = 0; j < data.length; j++) data[j] = (Math.random() * 2 - 1) * 0.3;
-      const src = ctx.createBufferSource();
-      src.buffer = buf;
-      const gain = ctx.createGain();
-      gain.gain.setValueAtTime(0.2, ctx.currentTime + i * 0.07);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.07 + 0.07);
-      src.connect(gain);
-      gain.connect(ctx.destination);
-      src.start(ctx.currentTime + i * 0.07);
-    }
-  } catch (e) {}
 }
 
 function playCelebration() {
@@ -111,12 +91,28 @@ function loadPlayers() {
     state.players = [];
   }
   if (!state.players || state.players.length === 0) {
-    state.players = DATA.sampleNames.map(name => ({ name, active: true }));
+    state.players = DATA.sampleNames.map(name => ({
+      name,
+      active: true,
+      weight: 1,
+      shieldTurns: name.toLowerCase() === 'nam ké' ? 10 : 0,
+      cooldownTurns: 0
+    }));
     savePlayers();
+  } else {
+    state.players.forEach(p => {
+      if (p.weight === undefined) p.weight = 1;
+      if (p.shieldTurns === undefined) {
+        p.shieldTurns = p.name.toLowerCase() === 'nam ké' ? 10 : 0;
+      }
+      if (p.cooldownTurns === undefined) {
+        p.cooldownTurns = 0;
+      }
+    });
   }
 }
 
-// ─── Player Management ────────────────────────────────────
+// ─── Player Management, Shield & 2-Round Cooldown Mechanics ──
 function getActivePlayers() {
   return state.players.filter(p => p.active);
 }
@@ -126,6 +122,97 @@ function getAvatarChar(name) {
   const parts = name.trim().split(/\s+/);
   const last = parts[parts.length - 1];
   return (last[0] || name[0]).toUpperCase();
+}
+
+// Lấy danh sách những người có thể bị trúng (loại trừ: người có khiên bảo kê >0 HOẶC đang trong 2 round nghỉ >0)
+function getEligiblePlayers() {
+  const active = getActivePlayers();
+  // 1. Lọc người không có khiên và không trong 2 round hồi chiêu
+  let eligible = active.filter(p => (!p.shieldTurns || p.shieldTurns <= 0) && (!p.cooldownTurns || p.cooldownTurns <= 0));
+  
+  // 2. Fallback nếu số người bị loại quá nhiều dẫn đến danh sách trống (ví dụ bàn chỉ có 2-3 người chơi)
+  if (eligible.length === 0) {
+    eligible = active.filter(p => !p.shieldTurns || p.shieldTurns <= 0);
+  }
+  return eligible.length > 0 ? eligible : active;
+}
+
+// Chọn người ngẫu nhiên theo trọng số (1x, 2x, 3x)
+function pickWeightedWinner(list) {
+  if (!list || list.length === 0) return null;
+  const totalWeight = list.reduce((sum, p) => sum + (p.weight || 1), 0);
+  let random = Math.random() * totalWeight;
+  for (const p of list) {
+    random -= (p.weight || 1);
+    if (random <= 0) return p;
+  }
+  return list[list.length - 1];
+}
+
+// Xử lý sau khi kết thúc 1 round: Người vừa trúng nghỉ 2 round tiếp theo + Giảm khiên bảo kê
+function processRoundEnd(winner) {
+  if (!winner) return;
+
+  // Người vừa trúng nghỉ 2 round tiếp theo để đảm bảo công bằng!
+  winner.cooldownTurns = 2;
+
+  // Giảm lượt cooldown và khiên của những người khác
+  state.players.forEach(p => {
+    if (p !== winner) {
+      if (p.cooldownTurns && p.cooldownTurns > 0) {
+        p.cooldownTurns--;
+      }
+      if (p.shieldTurns && p.shieldTurns > 0) {
+        p.shieldTurns--;
+        if (p.shieldTurns === 0) {
+          showToast(`🔔 Khiên bảo kê của ${p.name} đã hết!`);
+        } else {
+          showToast(`🛡️ ${p.name}: Còn né ${p.shieldTurns} lượt!`);
+        }
+      }
+    }
+  });
+
+  savePlayers();
+  renderHomePlayerGrid();
+  renderModalPlayerList();
+  if (spinCanvas) drawWheel();
+}
+
+// Bật/tắt hoặc cài đặt khiên né lượt
+function setPlayerShield(name, turns) {
+  const p = state.players.find(x => x.name.toLowerCase() === name.toLowerCase());
+  if (p) {
+    p.shieldTurns = parseInt(turns, 10) || 0;
+    savePlayers();
+    renderHomePlayerGrid();
+    renderModalPlayerList();
+    showToast(`🛡️ Đã bật bảo kê cho ${p.name}: Né ${p.shieldTurns} lượt!`);
+  }
+}
+
+function removePlayerShield(name) {
+  const p = state.players.find(x => x.name.toLowerCase() === name.toLowerCase());
+  if (p) {
+    p.shieldTurns = 0;
+    savePlayers();
+    renderHomePlayerGrid();
+    renderModalPlayerList();
+    showToast(`Đã tắt bảo kê cho ${p.name}`);
+  }
+}
+
+// Chạm để đổi tỷ lệ trúng: 1x ➔ 2x ➔ 3x ➔ 1x
+function togglePlayerWeight(idx) {
+  const p = state.players[idx];
+  if (!p) return;
+  const current = p.weight || 1;
+  p.weight = current === 1 ? 2 : current === 2 ? 3 : 1;
+  savePlayers();
+  renderHomePlayerGrid();
+  renderModalPlayerList();
+  playClick();
+  showToast(`⚡ Tỷ lệ trúng của ${p.name}: ${p.weight}x`);
 }
 
 // Render danh sách thành viên trên TRANG CHỦ
@@ -157,10 +244,7 @@ function renderHomePlayerGrid() {
   }
 
   state.players.forEach((p, idx) => {
-    const card = document.createElement('button');
-    card.type = 'button';
-    card.onclick = () => togglePlayer(idx);
-
+    const card = document.createElement('div');
     const char = getAvatarChar(p.name);
     const borderStyle = p.active
       ? 'border-[#D8C49D] bg-[#FFFDF9] text-[#10233D] shadow-sm'
@@ -170,19 +254,35 @@ function renderHomePlayerGrid() {
       ? 'bg-[#C65D3B] text-white'
       : 'bg-slate-300 text-slate-500';
 
-    card.className = `flex items-center gap-2 p-2 rounded-xl border text-left transition-all active:scale-95 ${borderStyle}`;
+    const hasShield = p.shieldTurns && p.shieldTurns > 0;
+    const hasCooldown = p.cooldownTurns && p.cooldownTurns > 0;
+    const weight = p.weight || 1;
+
+    card.className = `flex items-center justify-between p-2 rounded-xl border transition-all ${borderStyle}`;
     card.innerHTML = `
-      <div class="w-8 h-8 rounded-full ${avatarStyle} flex items-center justify-center font-clash font-bold text-xs shrink-0 shadow-sm">
-        ${char}
-      </div>
-      <div class="flex-1 min-w-0">
-        <div class="font-clash font-bold text-xs truncate ${p.active ? 'text-[#10233D]' : 'text-slate-400 line-through'}">
-          ${escHtml(p.name)}
+      <button type="button" onclick="togglePlayer(${idx})" class="flex items-center gap-2 flex-1 min-w-0 text-left">
+        <div class="w-8 h-8 rounded-full ${avatarStyle} flex items-center justify-center font-clash font-bold text-xs shrink-0 shadow-sm relative">
+          ${char}
+          ${hasShield ? '<span class="absolute -top-1 -right-1 text-[11px]">🛡️</span>' : ''}
+          ${hasCooldown ? '<span class="absolute -top-1 -left-1 text-[11px]">🧊</span>' : ''}
         </div>
-        <div class="text-[10px] ${p.active ? 'text-[#18C9A6] font-semibold' : 'text-slate-400'}">
-          ${p.active ? '● Đang chơi' : '○ Tạm vắng'}
+        <div class="flex-1 min-w-0">
+          <div class="font-clash font-bold text-xs truncate ${p.active ? 'text-[#10233D]' : 'text-slate-400 line-through'}">
+            ${escHtml(p.name)}
+          </div>
+          <div class="text-[10px] flex items-center gap-1">
+            ${p.active ? '<span class="text-[#18C9A6] font-semibold">● Đang chơi</span>' : '<span class="text-slate-400">○ Tạm vắng</span>'}
+            ${hasShield ? `<span class="text-[#C65D3B] font-bold">· Né ${p.shieldTurns} lượt</span>` : ''}
+            ${hasCooldown ? `<span class="text-[#0080FF] font-bold">· Nghỉ ${p.cooldownTurns} lượt</span>` : ''}
+          </div>
         </div>
-      </div>
+      </button>
+
+      <!-- Nút chỉnh tỷ lệ trúng 1x / 2x / 3x -->
+      <button type="button" onclick="togglePlayerWeight(${idx})" title="Chỉnh tỷ lệ trúng (1x, 2x, 3x)"
+        class="ml-1 px-1.5 py-0.5 rounded-lg border text-[10px] font-clash font-extrabold ${weight > 1 ? 'bg-[#C65D3B] text-white border-[#C65D3B]' : 'bg-[#FAF7F0] text-[#756856] border-[#D8C49D]'} active:scale-90">
+        ${weight}x
+      </button>
     `;
     container.appendChild(card);
   });
@@ -214,7 +314,13 @@ function addPlayersFromHomeTextarea() {
   if (!raw) return;
   const names = raw.split(/[\n,]+/).map(n => n.trim()).filter(n => n.length > 0);
   if (names.length === 0) { showToast('Hãy nhập ít nhất 1 tên!'); return; }
-  state.players = names.map(name => ({ name, active: true }));
+  state.players = names.map(name => ({
+    name,
+    active: true,
+    weight: 1,
+    shieldTurns: name.toLowerCase() === 'nam ké' ? 10 : 0,
+    cooldownTurns: 0
+  }));
   ta.value = '';
   savePlayers();
   renderHomePlayerGrid();
@@ -225,7 +331,13 @@ function addPlayersFromHomeTextarea() {
 }
 
 function addSamplePlayers() {
-  state.players = DATA.sampleNames.map(name => ({ name, active: true }));
+  state.players = DATA.sampleNames.map(name => ({
+    name,
+    active: true,
+    weight: 1,
+    shieldTurns: name.toLowerCase() === 'nam ké' ? 10 : 0,
+    cooldownTurns: 0
+  }));
   savePlayers();
   renderHomePlayerGrid();
   renderModalPlayerList();
@@ -243,26 +355,64 @@ function clearPlayers() {
   if (spinCanvas) drawWheel();
 }
 
-// ─── Modal Quản Lý Nhanh Khi Đang Chơi ─────────────────────
+// ─── Modal Quản Lý & Cài Đặt Bảo Kê ───────────────────────
 function openPlayerModal() {
   playClick();
+  const activeShields = state.players.filter(p => p.shieldTurns && p.shieldTurns > 0);
+
   const html = `
-    <div class="space-y-4">
-      <div class="flex items-center justify-between pb-2.5 border-b border-[#E8DEC9]">
+    <div class="space-y-3.5">
+      <div class="flex items-center justify-between pb-2 border-b border-[#E8DEC9]">
         <div class="flex items-center gap-2">
-          <span class="text-xl">👥</span>
+          <span class="text-xl">⚙️</span>
           <div>
-            <h3 class="font-clash text-base font-bold text-[#10233D]">Quản lý Thành viên</h3>
-            <p class="font-boska text-xs italic text-[#756856]">Chạm để bật/tắt người chơi tạm vắng</p>
+            <h3 class="font-clash text-base font-bold text-[#10233D]">Quản lý & Bảo Kê</h3>
+            <p class="font-boska text-xs italic text-[#756856]">Chỉnh tỷ lệ trúng & né phạt theo số lượt</p>
           </div>
         </div>
         <button onclick="closeModal()" class="w-8 h-8 rounded-full bg-slate-100 border border-slate-200 text-slate-500 hover:text-black flex items-center justify-center text-sm font-bold">✕</button>
       </div>
 
+      <!-- KHUNG BẢO KÊ / NÉ LƯỢT PHẠT -->
+      <div class="p-3.5 rounded-2xl bg-[#FAF7F0] border border-[#D8C49D] space-y-2.5">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-1.5 font-clash font-bold text-xs text-[#10233D] uppercase">
+            <span>🛡️</span> KHIÊN BẢO KÊ (NÉ PHẠT)
+          </div>
+          <span class="text-[10px] text-[#756856] italic">Sau X người dính mới tới</span>
+        </div>
+
+        <div class="flex gap-2">
+          <select id="shieldPlayerSelect" class="flex-1 bg-white border border-[#D8C49D] rounded-xl px-2.5 py-2 text-xs text-[#10233D] font-bold">
+            ${state.players.map(p => `<option value="${escHtml(p.name)}" ${p.name.toLowerCase() === 'nam ké' ? 'selected' : ''}>${escHtml(p.name)}</option>`).join('')}
+          </select>
+          <select id="shieldTurnsSelect" class="w-24 bg-white border border-[#D8C49D] rounded-xl px-2 py-2 text-xs text-[#10233D] font-bold">
+            <option value="5">5 lượt</option>
+            <option value="10" selected>10 lượt</option>
+            <option value="15">15 lượt</option>
+            <option value="20">20 lượt</option>
+            <option value="999">Bất tử</option>
+          </select>
+        </div>
+
+        <button onclick="applyShieldFromModal()" class="btn-deco-primary text-xs py-2 w-full">
+          <span>🛡️</span> KÍCH HOẠT NÉ LƯỢT
+        </button>
+
+        <div id="modalActiveShieldsList" class="space-y-1 pt-1">
+          ${activeShields.length > 0 ? activeShields.map(p => `
+            <div class="flex justify-between items-center text-xs p-1.5 rounded-lg bg-white border border-[#D8C49D]">
+              <span class="font-bold text-[#10233D]">🛡️ ${escHtml(p.name)}: <span class="text-[#C65D3B]">còn ${p.shieldTurns} lượt né</span></span>
+              <button onclick="removePlayerShield('${escHtml(p.name)}'); openPlayerModal();" class="text-red-500 font-bold px-1.5 text-xs">✕ Hủy</button>
+            </div>
+          `).join('') : '<p class="text-[11px] text-slate-400 italic text-center">Chưa có ai được bảo kê.</p>'}
+        </div>
+      </div>
+
       <!-- Quick actions -->
       <div class="grid grid-cols-2 gap-2">
         <button class="btn-deco-secondary text-xs py-2" onclick="activateAllPlayers()">
-          <span>⚡</span> Bật tất cả
+          <span>⚡</span> Bật tất cả người
         </button>
         <button class="btn-deco-secondary text-xs py-2" onclick="showSection('home'); closeModal();">
           <span>🏠</span> Về Trang Chủ
@@ -271,7 +421,11 @@ function openPlayerModal() {
 
       <!-- Current players list -->
       <div class="space-y-1.5">
-        <div id="modalPlayerList" class="grid grid-cols-2 gap-2 max-h-56 overflow-y-auto pr-1"></div>
+        <div class="text-[11px] text-[#756856] flex justify-between">
+          <span>Chạm vào tên để bật/tắt:</span>
+          <span>Bấm 1x để chỉnh tỷ lệ:</span>
+        </div>
+        <div id="modalPlayerList" class="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto pr-1"></div>
       </div>
 
       <button onclick="closeModal()" class="btn-deco-primary w-full py-2.5 font-bold text-xs">
@@ -283,6 +437,16 @@ function openPlayerModal() {
   renderModalPlayerList();
 }
 
+function applyShieldFromModal() {
+  const nameSelect = document.getElementById('shieldPlayerSelect');
+  const turnsSelect = document.getElementById('shieldTurnsSelect');
+  if (!nameSelect || !turnsSelect) return;
+  const name = nameSelect.value;
+  const turns = turnsSelect.value;
+  setPlayerShield(name, turns);
+  openPlayerModal();
+}
+
 function renderModalPlayerList() {
   const container = document.getElementById('modalPlayerList');
   if (!container) return;
@@ -292,18 +456,26 @@ function renderModalPlayerList() {
     return;
   }
   state.players.forEach((p, i) => {
-    const btn = document.createElement('button');
-    btn.className = `flex items-center gap-2 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition-all border ${
+    const btn = document.createElement('div');
+    const weight = p.weight || 1;
+    const hasShield = p.shieldTurns && p.shieldTurns > 0;
+    const hasCooldown = p.cooldownTurns && p.cooldownTurns > 0;
+    btn.className = `flex items-center justify-between px-2.5 py-1.5 rounded-xl text-xs font-semibold transition-all border ${
       p.active
         ? 'border-[#D8C49D] bg-[#FFFDF9] text-[#10233D]'
         : 'border-slate-200 bg-slate-100 text-slate-400 opacity-60'
     }`;
     btn.innerHTML = `
-      <span class="w-4 h-4 rounded-full flex items-center justify-center text-[10px] font-bold ${p.active ? 'bg-[#C65D3B] text-white' : 'bg-slate-300 text-white'}">${i + 1}</span>
-      <span class="flex-1 text-left truncate">${escHtml(p.name)}</span>
-      <span class="text-[10px]">${p.active ? '✓' : '✗'}</span>
+      <button onclick="togglePlayer(${i})" class="flex items-center gap-1.5 flex-1 text-left truncate">
+        <span class="w-4 h-4 rounded-full flex items-center justify-center text-[10px] font-bold ${p.active ? 'bg-[#C65D3B] text-white' : 'bg-slate-300 text-white'}">${i + 1}</span>
+        <span class="truncate">${escHtml(p.name)}</span>
+        ${hasShield ? `<span class="text-[9px] text-[#C65D3B] font-bold">🛡️${p.shieldTurns}</span>` : ''}
+        ${hasCooldown ? `<span class="text-[9px] text-[#0080FF] font-bold">🧊${p.cooldownTurns}</span>` : ''}
+      </button>
+      <button onclick="togglePlayerWeight(${i})" class="px-1.5 py-0.5 rounded text-[10px] font-extrabold border ${weight > 1 ? 'bg-[#C65D3B] text-white' : 'bg-slate-100 text-[#756856]'}">
+        ${weight}x
+      </button>
     `;
-    btn.onclick = () => togglePlayer(i);
     container.appendChild(btn);
   });
 }
@@ -344,7 +516,7 @@ function closeModal() {
 }
 
 // ─────────────────────────────────────────────────────────
-// TRÒ 1: VÒNG QUAY NHÂN PHẨM (Desert Art Deco Palette - Ảnh 5)
+// TRÒ 1: VÒNG QUAY NHÂN PHẨM (Target Landing + Nghỉ 2 Round)
 // ─────────────────────────────────────────────────────────
 let spinCanvas, spinCtx;
 let spinAngle = 0;
@@ -352,24 +524,10 @@ let spinVelocity = 0;
 let spinAnimId = null;
 let isSpinning = false;
 
-// Bảng màu Desert Art Deco chuẩn ảnh mockup
 const COLORS = [
-  '#C65D3B', // Terracotta
-  '#8B6F47', // Muted Gold
-  '#7B5364', // Dusty Mauve
-  '#D4A574', // Warm Sand
-  '#A55A3C', // Deep Terracotta
-  '#9B8652', // Olive Gold
-  '#5C4456', // Plum
-  '#C27B52', // Copper Tan
-  '#4E6B66', // Vintage Teal
-  '#B8924A', // Antique Gold
-  '#6D4A5E', // Warm Violet
-  '#A87D56', // Camel
-  '#D7BF8A', // Pale Gold
-  '#3D5A56', // Slate Olive
-  '#BF6B4E', // Brick
-  '#8B734B'  // Bronze
+  '#C65D3B', '#8B6F47', '#7B5364', '#D4A574', '#A55A3C',
+  '#9B8652', '#5C4456', '#C27B52', '#4E6B66', '#B8924A',
+  '#6D4A5E', '#A87D56', '#D7BF8A', '#3D5A56', '#BF6B4E', '#8B734B'
 ];
 
 function initSpinWheel() {
@@ -415,7 +573,6 @@ function drawWheel() {
 
   const sliceAngle = (Math.PI * 2) / n;
 
-  // Vẽ các ô
   players.forEach((p, i) => {
     const start = spinAngle + i * sliceAngle;
     const end = start + sliceAngle;
@@ -430,7 +587,6 @@ function drawWheel() {
     spinCtx.lineWidth = 2;
     spinCtx.stroke();
 
-    // Tên người chơi
     spinCtx.save();
     spinCtx.translate(cx, cy);
     spinCtx.rotate(start + sliceAngle / 2);
@@ -444,20 +600,23 @@ function drawWheel() {
 
     const maxLen = Math.max(5, Math.floor(18 / Math.sqrt(n)));
     let name = p.name;
+    if (p.shieldTurns && p.shieldTurns > 0) {
+      name = `🛡️${name}`;
+    } else if (p.cooldownTurns && p.cooldownTurns > 0) {
+      name = `🧊${name}`;
+    }
     if (name.length > maxLen) name = name.slice(0, maxLen - 1) + '…';
 
     spinCtx.fillText(name, r - 12, fontSize / 3);
     spinCtx.restore();
   });
 
-  // Vành ngoài đậm chất Art Deco
   spinCtx.beginPath();
   spinCtx.arc(cx, cy, r, 0, Math.PI * 2);
   spinCtx.strokeStyle = '#10233D';
   spinCtx.lineWidth = 4;
   spinCtx.stroke();
 
-  // Mũi tên định vị ở đỉnh màu Terracotta đúng ảnh 5
   spinCtx.save();
   spinCtx.translate(cx, 0);
   spinCtx.beginPath();
@@ -480,43 +639,65 @@ function spinWheel() {
     showToast('⚠️ Cần ít nhất 2 người chơi đang hoạt động!');
     return;
   }
+
+  // 1. Lựa chọn người thắng hợp lệ:
+  // - KHÔNG dính khiên bảo kê
+  // - KHÔNG dính 2 round hồi chiêu vừa trúng
+  const eligible = getEligiblePlayers();
+  const winner = pickWeightedWinner(eligible);
+  const targetIdx = players.indexOf(winner);
+
   isSpinning = true;
-  spinVelocity = 0.28 + Math.random() * 0.2;
 
-  function animate() {
-    spinAngle += spinVelocity;
-    spinVelocity *= 0.985;
+  const n = players.length;
+  const sliceAngle = (Math.PI * 2) / n;
 
-    const prevSlice = Math.floor((spinAngle - spinVelocity) / (Math.PI * 2 / players.length));
-    const currSlice = Math.floor(spinAngle / (Math.PI * 2 / players.length));
-    if (currSlice !== prevSlice) {
+  // Tính góc đích dừng chính xác tại tâm ô của winner
+  const offset = (Math.random() - 0.5) * 0.5 * sliceAngle;
+  const targetAngle = -Math.PI / 2 - (targetIdx + 0.5) * sliceAngle + offset;
+
+  const currentNormalized = ((spinAngle % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
+  let diff = (targetAngle - currentNormalized) % (Math.PI * 2);
+  if (diff < 0) diff += Math.PI * 2;
+
+  // Quay từ 5 đến 7 vòng đầy đủ trước khi dừng
+  const totalRotation = (5 + Math.floor(Math.random() * 3)) * Math.PI * 2 + diff;
+  const startAngle = spinAngle;
+  const duration = 4000;
+  const startTime = performance.now();
+
+  let lastSlice = -1;
+
+  function animate(now) {
+    const elapsed = now - startTime;
+    const progress = Math.min(1, elapsed / duration);
+    const ease = 1 - Math.pow(1 - progress, 3);
+    spinAngle = startAngle + totalRotation * ease;
+
+    const currSlice = Math.floor(spinAngle / sliceAngle);
+    if (currSlice !== lastSlice) {
       playSpinTick();
+      lastSlice = currSlice;
     }
 
     drawWheel();
 
-    if (spinVelocity > 0.003) {
+    if (progress < 1) {
       spinAnimId = requestAnimationFrame(animate);
     } else {
       isSpinning = false;
-      onSpinEnd();
+      onSpinEnd(winner);
     }
   }
 
   cancelAnimationFrame(spinAnimId);
-  animate();
+  spinAnimId = requestAnimationFrame(animate);
 }
 
-function onSpinEnd() {
-  const players = getActivePlayers();
-  const n = players.length;
-  const sliceAngle = (Math.PI * 2) / n;
-  const normalized = ((spinAngle % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
-  const pointerAngle = (Math.PI * 2 - normalized + Math.PI * 2) % (Math.PI * 2);
-  const idx = Math.floor(pointerAngle / sliceAngle) % n;
-  const winner = players[idx];
-
+function onSpinEnd(winner) {
   playCelebration();
+  // Kích hoạt: Người vừa trúng nghỉ 2 round tiếp theo + Giảm khiên bảo kê
+  processRoundEnd(winner);
 
   const challenge = randItem(DATA.spins);
 
@@ -527,6 +708,9 @@ function onSpinEnd() {
       <div class="font-clash text-xl sm:text-2xl font-black text-[#10233D] py-3 px-4 bg-[#F5EFE3] rounded-2xl border-2 border-[#D8C49D]">
         ${escHtml(winner.name)}
       </div>
+      <p class="text-[11px] text-[#0080FF] font-bold">
+        🧊 ${escHtml(winner.name)} sẽ được NGHỈ 2 ROUND TIẾP THEO để công bằng!
+      </p>
       <div class="bg-[#FFFDF9] border border-[#E8DEC9] rounded-2xl p-4 text-left space-y-1.5 shadow-sm">
         <div class="text-[11px] font-bold text-[#C65D3B] uppercase tracking-wider font-clash">⚡ Lệnh Phạt / Thử thách</div>
         <div class="font-clash font-bold text-[#10233D] text-base" id="spinChallengeTitleEl">${escHtml(challenge.title)}</div>
@@ -550,7 +734,7 @@ function changeSpinChallenge() {
 }
 
 // ─────────────────────────────────────────────────────────
-// TRÒ 2: AI LÀ NGƯỜI... (Ảnh 4)
+// TRÒ 2: AI LÀ NGƯỜI...
 // ─────────────────────────────────────────────────────────
 let whoIsQuestion = null;
 let whoIsCountdown = null;
@@ -567,16 +751,13 @@ function pickWhoIsQuestion() {
     orderEl.textContent = `CÂU HỎI SỐ ${whoIsIndex < 10 ? '0' + whoIsIndex : whoIsIndex}`;
   }
 
-  // Tăng điểm nhóm vui
   groupScore = Math.min(20, Math.max(1, (groupScore + 1) % 21));
   const scoreEl = document.getElementById('whoIsGroupScore');
   const progressEl = document.getElementById('whoIsProgressBar');
   if (scoreEl) scoreEl.textContent = `${groupScore} / 20`;
   if (progressEl) progressEl.style.width = `${(groupScore / 20) * 100}%`;
 
-  if (qEl) {
-    qEl.textContent = whoIsQuestion;
-  }
+  if (qEl) qEl.textContent = whoIsQuestion;
   const resultEl = document.getElementById('whoIsResult');
   if (resultEl) {
     resultEl.classList.add('hidden');
@@ -645,10 +826,10 @@ function startWhoIsCountdown() {
 }
 
 // ─────────────────────────────────────────────────────────
-// TRÒ 3: THẬT HAY THÁCH (Quy trình: Chọn người ➔ Chọn Thật/Thách ➔ Hiện câu hỏi ➔ Lặp lại)
+// TRÒ 3: THẬT HAY THÁCH (Tôn trọng Khiên + Nghỉ 2 Round)
 // ─────────────────────────────────────────────────────────
 const todState = {
-  step: 1, // 1: chưa chọn người, 2: đã chọn người chờ bấm thật/thách, 3: đã hiện câu hỏi
+  step: 1,
   player: null,
   mode: 'truth',
   level: 'mild',
@@ -656,15 +837,18 @@ const todState = {
   isRolling: false
 };
 
-// Bước 1: Nhấn chọn người ngẫu nhiên (chạy roulette tên vui nhộn)
 function pickToDPlayer() {
-  const players = getActivePlayers();
-  if (players.length === 0) {
+  const active = getActivePlayers();
+  if (active.length === 0) {
     showToast('⚠️ Cần có người chơi trong danh sách!');
     return;
   }
   if (todState.isRolling) return;
   todState.isRolling = true;
+
+  // Lựa chọn người thắng hợp lệ (tôn trọng khiên né lượt và 2 round nghỉ)
+  const eligible = getEligiblePlayers();
+  const winner = pickWeightedWinner(eligible);
 
   const playerEl = document.getElementById('todPlayerName');
   const cardInner = document.getElementById('todCardInner');
@@ -675,7 +859,6 @@ function pickToDPlayer() {
   const actionGroup = document.getElementById('todActionGroup');
   const subtitle = document.getElementById('todSubtitle');
 
-  // Đưa thẻ bài về mặt trước úp xuống
   if (cardInner) cardInner.classList.remove('flipped');
   if (choiceBox) choiceBox.classList.add('hidden');
   if (actionGroup) actionGroup.classList.add('hidden');
@@ -686,35 +869,35 @@ function pickToDPlayer() {
   const interval = 70;
 
   const timer = setInterval(() => {
-    const temp = randItem(players);
+    const temp = randItem(active);
     if (playerEl) playerEl.textContent = temp.name;
     playTone(650 + Math.random() * 250, 'square', 0.03, 0.08);
     rollCount++;
 
     if (rollCount >= totalRolls) {
       clearInterval(timer);
-      todState.player = randItem(players);
+      todState.player = winner;
       todState.step = 2;
       todState.isRolling = false;
 
-      // Cập nhật người trúng
+      // Người này trúng thì nghỉ 2 round tiếp theo!
+      processRoundEnd(winner);
+
       if (playerEl) playerEl.textContent = todState.player.name;
       if (promptText) promptText.textContent = `${todState.player.name} ơi, bạn chọn THẬT hay THÁCH?`;
-      if (promptSub) promptSub.textContent = `Chạm nút THẬT hoặc THÁCH bên dưới!`;
+      if (promptSub) promptSub.textContent = `Chạm nút THẬT hoặc THÁCH bên dưới! (Sau lượt này được nghỉ 2 round)`;
       if (subtitle) subtitle.textContent = `Đã chọn: ${todState.player.name}! Hãy chọn Thật hoặc Thách`;
 
-      // BƯỚC 2: Xuất hiện 2 nút THẬT / THÁCH
       if (choiceBox) {
         choiceBox.classList.remove('hidden');
       }
 
       playCelebration();
-      showToast(`🎯 Lượt của: ${todState.player.name}`);
+      showToast(`🎯 Lượt của: ${todState.player.name} (Nghỉ 2 round kế)`);
     }
   }, interval);
 }
 
-// Bước 2: Người được chọn bấm chọn "THẬT" hoặc "THÁCH"
 function todSelectChoice(mode) {
   if (!todState.player) {
     showToast('⚠️ Hãy chọn người ngẫu nhiên trước!');
@@ -747,11 +930,9 @@ function todSelectChoice(mode) {
   if (playerLabel) playerLabel.textContent = todState.player.name;
   if (subtitle) subtitle.textContent = `Thử thách dành cho ${todState.player.name}`;
 
-  // Ẩn 2 nút chọn, hiện nhóm nút tiếp theo
   if (choiceBox) choiceBox.classList.add('hidden');
   if (actionGroup) actionGroup.classList.remove('hidden');
 
-  // BƯỚC 3: Lật thẻ bài hiện câu hỏi
   if (cardInner) {
     cardInner.classList.remove('flipped');
     setTimeout(() => cardInner.classList.add('flipped'), 80);
@@ -760,7 +941,6 @@ function todSelectChoice(mode) {
   playClick();
 }
 
-// Đổi câu hỏi khác cho người hiện tại
 function changeCurrentToD() {
   if (!todState.player || !todState.mode) return;
   const pool = DATA[todState.mode][todState.level] || DATA[todState.mode]['mild'];
@@ -789,162 +969,176 @@ function todGiveUp() {
 }
 
 // ─────────────────────────────────────────────────────────
-// TRÒ 4: LẮC XÚC XẮC (Ảnh 3)
+// TRÒ 4: NỐI TỪ CĂNG NÃO (Thay thế Xúc Xắc)
 // ─────────────────────────────────────────────────────────
-let diceCount = 2;
-let diceValues = [3, 4];
-let diceShaking = false;
+let wordChainStreak = 0;
+let wordChainTimer = null;
+let wordChainTime = 5;
+let wordChainTicking = false;
+let wordChainCurrent = null;
 
-function setDiceCount(n) {
-  diceCount = n;
-  document.querySelectorAll('.dice-count-btn').forEach((b, i) => {
-    b.classList.toggle('active-dice-btn', i + 1 === n);
-  });
+function initWordChain() {
+  if (!wordChainCurrent) {
+    pickWordChain();
+  }
+}
+
+function pickWordChain() {
+  stopWordChainTimer();
+  const pool = DATA.wordChain || [
+    { word: "Bàn nhậu", nextHint: "Nhậu..." },
+    { word: "Uống rượu", nextHint: "Rượu..." },
+    { word: "Cà khịa", nextHint: "Khịa..." }
+  ];
+  wordChainCurrent = randItem(pool);
+
+  const displayEl = document.getElementById('wordChainDisplay');
+  const hintEl = document.getElementById('wordChainHint');
+  const statusEl = document.getElementById('wordChainStatus');
+  const timerDisplay = document.getElementById('wordChainTimeDisplay');
+
+  if (displayEl) displayEl.textContent = wordChainCurrent.word.toUpperCase();
+  if (hintEl) hintEl.textContent = wordChainCurrent.nextHint;
+  if (statusEl) statusEl.textContent = 'Bấm "BẮT ĐẦU 5 GIÂY" cho mỗi lượt nói!';
+  if (timerDisplay) {
+    timerDisplay.textContent = '5';
+    timerDisplay.className = 'font-clash text-3xl font-extrabold text-[#C65D3B]';
+  }
+
   playClick();
-  rollDice();
 }
 
-function rollDice() {
-  if (diceShaking) return;
-  diceShaking = true;
-  playDiceShake();
+function startWordChainTimer() {
+  if (wordChainTicking) return;
+  wordChainTicking = true;
+  wordChainTime = 5;
 
-  const diceTip = document.getElementById('diceTip');
-  if (diceTip) diceTip.classList.add('hidden');
+  const startBtn = document.getElementById('wordChainStartBtn');
+  const passBtn = document.getElementById('wordChainPassBtn');
+  const timerDisplay = document.getElementById('wordChainTimeDisplay');
+  const statusEl = document.getElementById('wordChainStatus');
 
-  let frame = 0;
-  const totalFrames = 15;
+  if (startBtn) startBtn.classList.add('hidden');
+  if (passBtn) passBtn.classList.remove('hidden');
+  if (statusEl) statusEl.textContent = '⏱ Đang đếm 5 giây... Nhanh miệng lên!';
 
-  const interval = setInterval(() => {
-    const temp = Array.from({ length: diceCount }, () => Math.ceil(Math.random() * 6));
-    renderDice(temp, true);
-    frame++;
-    if (frame >= totalFrames) {
-      clearInterval(interval);
-      diceValues = Array.from({ length: diceCount }, () => Math.ceil(Math.random() * 6));
-      renderDice(diceValues, false);
-      showDiceTip();
-      diceShaking = false;
-      playCelebration();
-    }
-  }, 60);
-}
-
-function renderDice(values, shaking) {
-  const container = document.getElementById('diceContainer');
-  if (!container) return;
-  container.innerHTML = '';
-  values.forEach(val => {
-    const die = document.createElement('div');
-    die.className = `dice-cube flex items-center justify-center ${shaking ? 'dice-shake' : ''}`;
-    die.setAttribute('data-val', val);
-    die.innerHTML = getDiceDots(val);
-    container.appendChild(die);
-  });
-
-  const total = values.reduce((a, b) => a + b, 0);
-
-  // Thanh Điểm May Mắn %
-  const max = diceCount * 6;
-  const min = diceCount;
-  const percent = max > min ? Math.round(((total - min) / (max - min)) * 100) : 100;
-
-  const bar = document.getElementById('diceProgressBar');
-  const pEl = document.getElementById('dicePercent');
-  if (bar) bar.style.width = `${Math.max(5, Math.min(100, percent))}%`;
-  if (pEl) pEl.textContent = `${percent}%`;
-}
-
-function getDiceDots(n) {
-  const positions = {
-    1: [[50, 50]],
-    2: [[25, 25], [75, 75]],
-    3: [[25, 25], [50, 50], [75, 75]],
-    4: [[25, 25], [75, 25], [25, 75], [75, 75]],
-    5: [[25, 25], [75, 25], [50, 50], [25, 75], [75, 75]],
-    6: [[25, 22], [75, 22], [25, 50], [75, 50], [25, 78], [75, 78]],
-  };
-  const dots = positions[n] || [];
-  return `<svg viewBox="0 0 100 100" class="w-full h-full text-white">${dots.map(([x, y]) => `<circle cx="${x}" cy="${y}" r="11" fill="currentColor"/>`).join('')}</svg>`;
-}
-
-function showDiceTip() {
-  const tipEl = document.getElementById('diceTip');
-  if (!tipEl || diceValues.length === 0) return;
-  const total = diceValues.reduce((a, b) => a + b, 0);
-  const max = diceCount * 6;
-  const min = diceCount;
-
-  const freq = {};
-  diceValues.forEach(v => freq[v] = (freq[v] || 0) + 1);
-  const maxFreq = Math.max(...Object.values(freq));
-
-  let tip = '';
-  if (diceValues.length >= 2 && maxFreq === diceValues.length) {
-    if (diceValues.length === 2) tip = '🎯 Đôi! Nhân phẩm cực đại – Chỉ định 1 người uống ngay!';
-    else if (diceValues.length === 3) tip = '🔥 Bộ ba! Quyền lực tối thượng – Chọn 3 người uống cùng bạn!';
-    else tip = '👑 Tứ quý! Bạn là chủ bàn hôm nay – Cả mâm nâng ly theo lệnh bạn!';
-  } else if (total === min) {
-    tip = '😬 Điểm thấp nhất có thể... Tự uống 1 ly giải đen nhé!';
-  } else if (total === max) {
-    tip = '🚀 Điểm tối đa! Cực may mắn – Chỉ định người uống tùy ý!';
-  } else if (total >= max * 0.75) {
-    tip = '💪 Điểm cao! Bạn được quyền ra 1 lệnh cho người bất kỳ.';
-  } else if (total <= min + (max - min) * 0.25) {
-    tip = '😅 Điểm thấp... Tự phạt 1 ngụm cho tỉnh táo!';
-  } else {
-    tip = '👍 Điểm trung bình – Mọi người nâng ly cụng cái nào!';
+  if (timerDisplay) {
+    timerDisplay.textContent = '5';
+    timerDisplay.className = 'font-clash text-3xl font-extrabold text-[#C65D3B] animate-pulse';
   }
 
-  tipEl.textContent = tip;
-  tipEl.classList.remove('hidden');
-}
+  playTone(750, 'square', 0.05, 0.2);
 
-function toggleShakeSensor() {
-  if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
-    DeviceMotionEvent.requestPermission().then(response => {
-      if (response === 'granted') {
-        setupShakeDetector();
-        showToast('✅ Đã bật cảm biến lắc!');
-      } else {
-        showToast('❌ Cảm biến lắc bị từ chối');
-      }
-    });
-  } else {
-    setupShakeDetector();
-    showToast('✅ Cảm biến lắc đã sẵn sàng!');
-  }
-}
-
-function setupShakeDetector() {
-  if (!window.DeviceMotionEvent) return;
-  let lastShake = 0;
-  let lastAcc = { x: 0, y: 0, z: 0 };
-
-  const handler = (e) => {
-    const acc = e.accelerationIncludingGravity;
-    if (!acc) return;
-    const delta = Math.abs(acc.x - lastAcc.x) + Math.abs(acc.y - lastAcc.y) + Math.abs(acc.z - lastAcc.z);
-    lastAcc = { x: acc.x, y: acc.y, z: acc.z };
-    if (delta > 25 && Date.now() - lastShake > 1000) {
-      lastShake = Date.now();
-      const diceSection = document.getElementById('section-dice');
-      if (diceSection && !diceSection.classList.contains('hidden')) {
-        rollDice();
-      }
+  clearInterval(wordChainTimer);
+  wordChainTimer = setInterval(() => {
+    wordChainTime--;
+    if (timerDisplay) {
+      timerDisplay.textContent = wordChainTime;
     }
-  };
 
-  window.addEventListener('devicemotion', handler, { passive: true });
+    if (wordChainTime > 0) {
+      playTone(700 + (5 - wordChainTime) * 80, 'square', 0.05, 0.2);
+    } else {
+      clearInterval(wordChainTimer);
+      wordChainTicking = false;
+
+      playTone(180, 'sawtooth', 0.5, 0.4);
+      if (statusEl) {
+        statusEl.innerHTML = '<span class="text-red-600 font-bold">💥 HẾT 5 GIÂY! BẠN ĐÃ BỊ PHẠT UỐNG! 🍺</span>';
+      }
+
+      showModal(`
+        <div class="text-center space-y-3.5">
+          <div class="text-5xl animate-bounce">⏱️💥</div>
+          <h2 class="font-clash text-xl font-bold text-[#D9383A] uppercase tracking-wider">HẾT 5 GIÂY!</h2>
+          <p class="text-[#10233D] text-sm leading-relaxed">
+            Bạn đã không kịp nối từ trong 5 giây hoặc bị ngọng!<br>
+            <span class="text-[#D9383A] font-clash font-extrabold text-lg mt-1 block">TỰ PHẠT UỐNG 1 LY! 🍺</span>
+          </p>
+          <button onclick="closeModal(); pickWordChain();" class="btn-deco-primary w-full py-3 font-bold text-sm">
+            <span>✓</span> UỐNG XONG, CHƠI TỪ MỚI!
+          </button>
+        </div>
+      `);
+
+      wordChainStreak = 0;
+      updateWordChainStreak();
+
+      if (startBtn) startBtn.classList.remove('hidden');
+      if (passBtn) passBtn.classList.add('hidden');
+    }
+  }, 1000);
+}
+
+function passWordChainSuccess() {
+  if (!wordChainTicking) return;
+  clearInterval(wordChainTimer);
+  wordChainTicking = false;
+
+  wordChainStreak++;
+  updateWordChainStreak();
+
+  const startBtn = document.getElementById('wordChainStartBtn');
+  const passBtn = document.getElementById('wordChainPassBtn');
+  const timerDisplay = document.getElementById('wordChainTimeDisplay');
+  const statusEl = document.getElementById('wordChainStatus');
+
+  if (startBtn) startBtn.classList.remove('hidden');
+  if (passBtn) passBtn.classList.add('hidden');
+  if (timerDisplay) {
+    timerDisplay.textContent = '5';
+    timerDisplay.className = 'font-clash text-3xl font-extrabold text-[#18C9A6]';
+  }
+  if (statusEl) {
+    statusEl.textContent = `✅ Chuỗi nối đạt ${wordChainStreak} từ! Bấm Bắt đầu cho người tiếp theo!`;
+  }
+
+  playCelebration();
+  showToast(`🎉 Tuyệt vời! Chuỗi nối: ${wordChainStreak} từ!`);
+}
+
+function wordChainGiveUp() {
+  stopWordChainTimer();
+  wordChainStreak = 0;
+  updateWordChainStreak();
+
+  showModal(`
+    <div class="text-center space-y-3.5">
+      <div class="text-4xl">😅</div>
+      <h2 class="font-clash text-base font-bold text-[#C65D3B] uppercase tracking-wider">Bí từ rồi!</h2>
+      <p class="text-[#10233D] text-xs sm:text-sm">
+        Từ ngữ hiểm hóc quá không nghĩ ra được từ nối.<br>
+        <span class="text-[#D9383A] font-clash font-bold text-base mt-1 block">Phạt uống 1 ly giải xui! 🍺</span>
+      </p>
+      <button onclick="closeModal(); pickWordChain();" class="btn-deco-primary w-full py-2.5 font-bold text-xs sm:text-sm">
+        <span>🔀</span> UỐNG VÀ ĐỔI TỪ MỚI
+      </button>
+    </div>
+  `);
+  playTone(220, 'sawtooth', 0.35, 0.25);
+}
+
+function stopWordChainTimer() {
+  wordChainTicking = false;
+  clearInterval(wordChainTimer);
+  const startBtn = document.getElementById('wordChainStartBtn');
+  const passBtn = document.getElementById('wordChainPassBtn');
+  if (startBtn) startBtn.classList.remove('hidden');
+  if (passBtn) passBtn.classList.add('hidden');
+}
+
+function updateWordChainStreak() {
+  const el = document.getElementById('wordChainStreak');
+  if (el) el.textContent = `${wordChainStreak} từ`;
 }
 
 // ─────────────────────────────────────────────────────────
-// TRÒ 5: QUẢ BOM HẸN GIỜ (Ảnh 2)
+// TRÒ 5: QUẢ BOM HẸN GIỜ (CHÍNH XÁC 20 GIÂY NỔ)
 // ─────────────────────────────────────────────────────────
 let bombTimer = null;
 let bombEndTime = 0;
 let bombTicking = false;
-let bombDuration = 25;
+let bombDuration = 20;
 
 function pickBombTopic() {
   const topic = randItem(DATA.bombTopics);
@@ -962,8 +1156,8 @@ function startBomb() {
   if (!topicEl) return;
 
   bombTicking = true;
-  bombDuration = 20 + Math.floor(Math.random() * 26); // 20 - 45s
-  bombEndTime = Date.now() + bombDuration * 1000;
+  bombDuration = 20;
+  bombEndTime = Date.now() + 20 * 1000;
 
   const timeDisplay = document.getElementById('bombTimeDisplay');
   const startBtn = document.getElementById('bombStartBtn');
@@ -987,8 +1181,8 @@ function startBomb() {
       return;
     }
 
-    const progress = 1 - (remainingMs / (bombDuration * 1000));
-    tickSpeed = Math.max(250, 1000 - progress * 750);
+    const progress = 1 - (remainingMs / (20 * 1000));
+    tickSpeed = Math.max(200, 1000 - progress * 800);
 
     playBombTick(progress > 0.6);
 
@@ -1030,7 +1224,7 @@ function explodeBomb() {
       <div class="text-5xl animate-bounce">💥</div>
       <h2 class="font-clash text-xl font-bold text-[#D9383A] uppercase tracking-wider">BOM PHÁT NỔ!</h2>
       <p class="text-[#10233D] text-sm leading-relaxed">
-        Quả bom đã phát nổ trên tay!<br>
+        Đúng 20 giây quả bom đã phát nổ trên tay!<br>
         <span class="text-[#D9383A] font-clash font-extrabold text-lg mt-1 block">Người cầm điện thoại UỐNG 1 LY! 🍺</span>
       </p>
       <button onclick="closeModal(); pickBombTopic();" class="btn-deco-primary w-full py-3 font-bold text-sm">
@@ -1053,7 +1247,7 @@ function resetBomb() {
 
   if (startBtn) startBtn.classList.remove('hidden');
   if (passBtn) passBtn.classList.add('hidden');
-  if (timeDisplay) timeDisplay.textContent = '00:00';
+  if (timeDisplay) timeDisplay.textContent = '00:20';
 }
 
 function stopBomb() {
@@ -1070,7 +1264,7 @@ function stopBomb() {
 // ─────────────────────────────────────────────────────────
 // NAVIGATION (6 TABS: HOME + 5 TRÒ CHƠI)
 // ─────────────────────────────────────────────────────────
-const SECTIONS = ['home', 'spin', 'whois', 'tod', 'dice', 'bomb'];
+const SECTIONS = ['home', 'spin', 'whois', 'tod', 'wordchain', 'bomb'];
 
 const HEADER_META = {
   home: {
@@ -1089,13 +1283,13 @@ const HEADER_META = {
     title: 'THẬT HAY THÁCH',
     subtitle: 'Chọn một thử thách cho đêm nay'
   },
-  dice: {
-    title: 'LẮC XÚC XẮC',
-    subtitle: 'Lắc điện thoại hoặc bấm nút để đo điểm'
+  wordchain: {
+    title: 'NỐI TỪ CĂNG NÃO',
+    subtitle: 'Nhanh trí nối từ — chậm 5 giây là uống!'
   },
   bomb: {
-    title: 'QUẢ BOM HẸN GIỜ',
-    subtitle: 'Chuyền thật nhanh — đừng để bom phát nổ!'
+    title: 'QUẢ BOM HẸN GIỜ (20S)',
+    subtitle: 'Đúng 20 giây phát nổ — chuyền thật nhanh!'
   }
 };
 
@@ -1110,7 +1304,6 @@ function showSection(id) {
     btn.classList.toggle('nav-active', isActive);
   });
 
-  // Cập nhật Header Title & Subtitle theo tab
   const meta = HEADER_META[id] || HEADER_META['home'];
   const hTitle = document.getElementById('headerTitle');
   const hSub = document.getElementById('headerSubtitle');
@@ -1126,7 +1319,6 @@ function showSection(id) {
   }
 
   if (id === 'tod') {
-    // Nếu chưa chọn người thì đảm bảo hiển thị nút chọn người
     if (!todState.player) {
       document.getElementById('todPickBtn')?.classList.remove('hidden');
       document.getElementById('todChoiceButtons')?.classList.add('hidden');
@@ -1135,11 +1327,15 @@ function showSection(id) {
     }
   }
 
+  if (id === 'wordchain') {
+    initWordChain();
+  } else {
+    stopWordChainTimer();
+  }
+
   if (id !== 'bomb') stopBomb();
 
   playClick();
-
-  // Cuộn mượt lên đầu khi chuyển tab
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -1153,6 +1349,10 @@ function toggleSound() {
   if (state.soundEnabled) playClick();
 }
 
+function toggleShakeSensor() {
+  showToast('📱 Cảm biến sẵn sàng!');
+}
+
 // ─────────────────────────────────────────────────────────
 // INIT
 // ─────────────────────────────────────────────────────────
@@ -1160,8 +1360,6 @@ document.addEventListener('DOMContentLoaded', () => {
   loadPlayers();
   renderHomePlayerGrid();
   showSection('home');
-
-  setDiceCount(2);
 
   const cardInner = document.getElementById('todCardInner');
   if (cardInner) {

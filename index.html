@@ -10,7 +10,6 @@
   <!-- Fontshare Fonts: Clash Display + Boska + Satoshi (Phong cách Pháp cổ kính Desert Art Deco) -->
   <link href="https://api.fontshare.com/v2/css?f[]=clash-display@700,600,500&f[]=boska@500,400i&f[]=satoshi@700,500,400&display=swap" rel="stylesheet">
   <!-- Google Font: Be Vietnam Pro (Fallback tiếng Việt chuẩn không bao giờ lỗi dấu) -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
@@ -66,7 +65,6 @@
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
       background-color: #F7F3E9;
-      /* Họa tiết chấm bi deco cổ điển tinh tế */
       background-image: radial-gradient(#D8C49D 0.85px, transparent 0.85px);
       background-size: 18px 18px;
       color: #10233D;
@@ -160,7 +158,6 @@
       user-select: none;
     }
     .nav-btn:active { transform: scale(0.92); }
-    /* Active tab pill theo đúng ảnh của người dùng */
     .nav-active {
       color: #0080FF !important;
       background: #E7FAFF !important;
@@ -177,33 +174,7 @@
       margin: 0 auto;
       cursor: pointer;
       border-radius: 50%;
-      touch-action: pan-y; /* Cho phép vuốt dọc để cuộn trang */
-    }
-
-    /* Dice 3D Terracotta */
-    .dice-cube {
-      width: 68px; height: 68px;
-      background: linear-gradient(135deg, #C65D3B 0%, #A5482A 100%);
-      color: #FFFFFF;
-      border-radius: 18px; padding: 10px;
-      border: 2px solid rgba(255, 255, 255, 0.7);
-      box-shadow: 0 8px 18px rgba(165, 72, 42, 0.35);
-      transition: all 0.25s;
-    }
-    @keyframes diceShake {
-      0%, 100% { transform: rotate(0deg) scale(1); }
-      20% { transform: rotate(-14deg) scale(1.08); }
-      40% { transform: rotate(14deg) scale(0.92); }
-      60% { transform: rotate(-8deg) scale(1.04); }
-      80% { transform: rotate(8deg) scale(0.96); }
-    }
-    .dice-shake { animation: diceShake 0.3s ease-in-out; }
-
-    .active-dice-btn {
-      background: #C49A6C !important;
-      color: #10233D !important;
-      border-color: #A5482A !important;
-      font-weight: 800 !important;
+      touch-action: pan-y;
     }
 
     /* Thẻ lật bài Thật / Thách */
@@ -250,7 +221,6 @@
       box-shadow: 0 20px 45px rgba(16, 35, 61, 0.25);
     }
 
-    /* Đệm đáy rộng rãi đảm bảo không bao giờ bị menu che mất nội dung */
     .app-main {
       padding-bottom: 140px;
       padding-bottom: calc(130px + env(safe-area-inset-bottom, 24px));
@@ -292,7 +262,6 @@
      HEADER: ART DECO PHÁP CỔ KÍNH
 ══════════════════════════════════════════════════ -->
 <header class="sticky top-0 z-20 bg-[#F7F3E9]/95 backdrop-blur-md border-b border-[#E8DEC9] px-4 py-3 relative">
-  <!-- Dải viền màu Deco phía trên cùng -->
   <div class="absolute left-0 top-0 h-1 w-full bg-gradient-to-r from-[#C65D3B] via-[#C49A6C] to-[#0080FF]"></div>
 
   <div class="flex items-center justify-between max-w-md mx-auto">
@@ -324,7 +293,7 @@
 </header>
 
 <!-- ══════════════════════════════════════════════════
-     MAIN APP CONTAINER (CUỘN MƯỢT KHÔNG BỊ CẮT)
+     MAIN APP CONTAINER
 ══════════════════════════════════════════════════ -->
 <main class="app-main px-4 py-3.5 space-y-4 max-w-md mx-auto w-full">
 
@@ -392,9 +361,7 @@
           <div class="flex justify-between items-center text-[11px] text-[#756856]">
             <span>Chạm vào tên để bật/tắt (ai đi WC thì tạm tắt):</span>
           </div>
-          <div id="homePlayerGrid" class="grid grid-cols-2 gap-2 max-h-56 overflow-y-auto pr-1">
-            <!-- Render bằng JavaScript -->
-          </div>
+          <div id="homePlayerGrid" class="grid grid-cols-2 gap-2 max-h-56 overflow-y-auto pr-1"></div>
         </div>
 
         <!-- Nút Vào Chơi Ngay -->
@@ -403,7 +370,7 @@
         </button>
       </div>
 
-      <!-- Hub 5 Trò Chơi Nhanh -->
+      <!-- Hub 5 Trò Chơi Nhanh (Đã thay Xúc Xắc bằng Nối Từ) -->
       <div class="space-y-2">
         <span class="font-clash text-xs font-bold text-[#756856] uppercase tracking-wider block ml-1">
           CHỌN TRÒ CHƠI
@@ -424,14 +391,14 @@
             <div class="font-clash text-xs font-bold text-[#10233D]">Thật hay Thách</div>
             <div class="font-boska text-[11px] italic text-[#756856]">Bóc trần bí mật</div>
           </button>
-          <button onclick="showSection('dice')" class="art-deco-card p-3 text-left space-y-1 active:scale-95 transition-transform">
-            <span class="text-xl">🎲</span>
-            <div class="font-clash text-xs font-bold text-[#10233D]">Lắc Xúc Xắc</div>
-            <div class="font-boska text-[11px] italic text-[#756856]">Đo điểm may mắn</div>
+          <button onclick="showSection('wordchain')" class="art-deco-card p-3 text-left space-y-1 active:scale-95 transition-transform">
+            <span class="text-xl">🔤</span>
+            <div class="font-clash text-xs font-bold text-[#10233D]">Nối Từ Căng Não</div>
+            <div class="font-boska text-[11px] italic text-[#756856]">Phản xạ 5 giây</div>
           </button>
           <button onclick="showSection('bomb')" class="art-deco-card p-3 text-left space-y-1 col-span-2 active:scale-95 transition-transform">
             <span class="text-xl">💣</span>
-            <div class="font-clash text-xs font-bold text-[#10233D]">Quả Bom Hẹn Giờ</div>
+            <div class="font-clash text-xs font-bold text-[#10233D]">Quả Bom Hẹn Giờ (20s)</div>
             <div class="font-boska text-[11px] italic text-[#756856]">Chuyền nhanh trước khi nổ tung trên tay!</div>
           </button>
         </div>
@@ -441,18 +408,14 @@
   </section>
 
   <!-- ───────────────────────────────────────────────
-       TRÒ 1: VÒNG QUAY NHÂN PHẨM (Khớp ảnh 5)
+       TRÒ 1: VÒNG QUAY NHÂN PHẨM
   ─────────────────────────────────────────────── -->
   <section id="section-spin" class="hidden">
     <div class="space-y-3.5">
 
-      <!-- Thẻ Art Deco Vòng Quay -->
       <div class="art-deco-card p-3 sm:p-4 flex flex-col items-center justify-center relative">
         <div class="relative w-full flex items-center justify-center" style="max-width:320px;">
-          <!-- Canvas Wheel -->
           <canvas id="spinWheel" onclick="spinWheel()" class="select-none" width="300" height="300"></canvas>
-
-          <!-- Nút tròn "QUAY" màu terracotta ở tâm -->
           <button onclick="spinWheel()"
             title="Chạm để QUAY!"
             class="absolute inset-0 m-auto w-14 h-14 rounded-full bg-[#C65D3B] border-2 border-white text-white font-clash font-bold text-xs tracking-wider shadow-md flex items-center justify-center cursor-pointer active:scale-90 transition-transform z-10">
@@ -461,7 +424,6 @@
         </div>
       </div>
 
-      <!-- Nút bấm chính và phụ theo đúng mẫu Desert Art Deco -->
       <button class="btn-deco-primary" onclick="spinWheel()">
         <span>✦</span> QUAY NGAY
       </button>
@@ -474,7 +436,7 @@
   </section>
 
   <!-- ───────────────────────────────────────────────
-       TRÒ 2: AI LÀ NGƯỜI... (Khớp ảnh 4)
+       TRÒ 2: AI LÀ NGƯỜI...
   ─────────────────────────────────────────────── -->
   <section id="section-whois" class="hidden">
     <div class="space-y-3.5">
@@ -486,9 +448,7 @@
         <p class="font-boska text-xs italic text-[#756856] mt-0.5">Cả 16 người cùng giơ tay chỉ một!</p>
       </div>
 
-      <!-- Thẻ câu hỏi Art Deco -->
       <div class="art-deco-card p-4 space-y-3.5">
-        <!-- Top bar: Câu hỏi số & điểm -->
         <div class="flex items-center justify-between">
           <span class="font-clash text-xs font-bold text-[#756856] uppercase tracking-wider" id="whoIsOrder">CÂU HỎI SỐ 04</span>
           <span class="text-xs font-bold px-2.5 py-0.5 rounded-full border border-[#D8C49D] bg-[#F5EFE3] text-[#8C5E2E]">
@@ -496,7 +456,6 @@
           </span>
         </div>
 
-        <!-- Khung tối chứa câu hỏi -->
         <div class="bg-[#10233D] text-white rounded-2xl p-5 text-center space-y-2 shadow-inner min-h-[130px] flex flex-col justify-center items-center">
           <span class="text-[#C65D3B] text-xl font-bold">“</span>
           <p id="whoIsQuestion" class="font-clash text-base font-bold leading-relaxed px-2 text-slate-100">
@@ -505,19 +464,16 @@
           <span class="text-[#C65D3B] text-xl font-bold">”</span>
         </div>
 
-        <!-- Vòng tròn đếm ngược -->
         <div id="whoIsCount"
           class="hidden text-5xl font-clash font-bold text-[#0080FF] scale-0 mx-auto w-20 h-20
                  rounded-full bg-[#E7FAFF] border-2 border-[#00D9FF] flex items-center justify-center shadow-md">
           3
         </div>
 
-        <!-- Kết quả -->
         <div id="whoIsResult"
           class="hidden text-xs font-bold text-[#C65D3B] bg-[#FDF5F2] border border-[#C65D3B]/40 rounded-xl px-4 py-2.5 text-center leading-relaxed">
         </div>
 
-        <!-- Nút CÂU HỎI TIẾP THEO trong Card -->
         <button class="btn-deco-primary" onclick="pickWhoIsQuestion()">
           <span>🔀</span> CÂU HỎI TIẾP THEO
         </button>
@@ -529,7 +485,6 @@
         </div>
       </div>
 
-      <!-- Thẻ Điểm Nhóm ở dưới đúng mẫu ảnh 4 -->
       <div class="art-deco-card p-3.5 space-y-2">
         <div class="flex justify-between items-center text-xs font-bold font-clash">
           <span class="text-[#756856] uppercase">ĐIỂM NHÓM</span>
@@ -544,7 +499,7 @@
   </section>
 
   <!-- ───────────────────────────────────────────────
-       TRÒ 3: THẬT HAY THÁCH (Vòng lặp chuẩn: Chọn người ➔ Chọn Thật/Thách ➔ Hiện câu hỏi ➔ Lặp lại)
+       TRÒ 3: THẬT HAY THÁCH (Vòng lặp: Chọn người ➔ Chọn Thật/Thách ➔ Hiện câu hỏi ➔ Lặp lại)
   ─────────────────────────────────────────────── -->
   <section id="section-tod" class="hidden">
     <div class="space-y-3.5">
@@ -566,7 +521,7 @@
         </div>
       </div>
 
-      <!-- 2 Nút lớn: THẬT (Màu cát tan) vs THÁCH (Màu đồng thau) - Xuất hiện sau khi chọn người -->
+      <!-- 2 Nút lớn: THẬT vs THÁCH - Xuất hiện sau khi chọn người -->
       <div id="todChoiceButtons" class="hidden grid grid-cols-2 gap-3 transition-all duration-300">
         <button onclick="todSelectChoice('truth')"
           class="py-3.5 rounded-xl bg-[#C49A6C] text-white font-clash font-bold text-base shadow-sm active:scale-95 transition-all text-center flex items-center justify-center gap-1.5">
@@ -620,7 +575,6 @@
 
       <!-- Nhóm nút Bước 3: Sau khi đã hiện câu hỏi -->
       <div id="todActionGroup" class="hidden space-y-2.5">
-        <!-- Nút lặp lại: Chọn người tiếp theo -->
         <button class="btn-deco-primary" onclick="pickToDPlayer()">
           <span>🎲</span> CHỌN NGƯỜI TIẾP THEO ➔
         </button>
@@ -639,59 +593,86 @@
   </section>
 
   <!-- ───────────────────────────────────────────────
-       TRÒ 4: LẮC XÚC XẮC (Khớp ảnh 3)
+       TRÒ 4: NỐI TỪ CĂNG NÃO (Thay thế cho Xúc Xắc)
   ─────────────────────────────────────────────── -->
-  <section id="section-dice" class="hidden">
+  <section id="section-wordchain" class="hidden">
     <div class="space-y-3.5">
 
       <div class="text-center">
         <h2 class="font-clash text-lg font-bold text-[#10233D] flex items-center justify-center gap-1.5">
-          <span>🎲</span> Lắc Xúc Xắc
+          <span>🔤</span> Nối Từ Căng Não
         </h2>
-        <p class="font-boska text-xs italic text-[#756856] mt-0.5">Lắc điện thoại hoặc bấm nút để đo điểm</p>
+        <p class="font-boska text-xs italic text-[#756856] mt-0.5">
+          Chậm 5 giây hoặc bí từ là PHẠT UỐNG!
+        </p>
       </div>
 
-      <!-- Khung chọn số lượng xúc xắc (1-5) -->
-      <div class="art-deco-card p-3.5 text-center space-y-2.5">
-        <p class="font-clash text-xs font-bold text-[#756856] uppercase tracking-wider">SỐ LƯỢNG XÚC XẮC</p>
-        <div class="flex gap-2 justify-center">
-          <button class="dice-count-btn flex-1 py-2 rounded-xl border border-[#D8C49D] bg-white text-[#10233D] font-clash font-bold text-sm active:scale-95 transition-all shadow-sm" onclick="setDiceCount(1)">1</button>
-          <button class="dice-count-btn flex-1 py-2 rounded-xl border border-[#D8C49D] bg-white text-[#10233D] font-clash font-bold text-sm active:scale-95 transition-all shadow-sm" onclick="setDiceCount(2)">2</button>
-          <button class="dice-count-btn flex-1 py-2 rounded-xl border border-[#D8C49D] bg-white text-[#10233D] font-clash font-bold text-sm active:scale-95 transition-all shadow-sm" onclick="setDiceCount(3)">3</button>
-          <button class="dice-count-btn flex-1 py-2 rounded-xl border border-[#D8C49D] bg-white text-[#10233D] font-clash font-bold text-sm active:scale-95 transition-all shadow-sm" onclick="setDiceCount(4)">4</button>
-          <button class="dice-count-btn flex-1 py-2 rounded-xl border border-[#D8C49D] bg-white text-[#10233D] font-clash font-bold text-sm active:scale-95 transition-all shadow-sm" onclick="setDiceCount(5)">5</button>
+      <!-- Khung Thẻ Từ Khởi Đầu Art Deco -->
+      <div class="art-deco-card p-4 text-center space-y-3">
+        <div class="inline-flex items-center gap-1.5 text-xs font-clash font-bold text-[#C65D3B] tracking-wider uppercase bg-[#F5EFE3] border border-[#D8C49D] px-3 py-1 rounded-full">
+          <span>✦</span> TỪ KHỞI ĐẦU <span>✦</span>
         </div>
-      </div>
 
-      <!-- Khung hiển thị xúc xắc 3D & Thanh May Mắn -->
-      <div class="art-deco-card p-4 space-y-3.5">
-        <!-- Khu vực hiển thị các viên xúc xắc -->
-        <div id="diceContainer" class="flex flex-wrap gap-3.5 justify-center py-1 min-h-[85px] items-center"></div>
-
-        <!-- Thanh Điểm May Mắn đúng mẫu ảnh 3 -->
-        <div class="space-y-1.5 pt-2 border-t border-[#E8DEC9]">
-          <div class="flex justify-between items-center text-xs font-bold font-clash">
-            <span class="text-[#756856] uppercase">ĐIỂM MAY MẮN</span>
-            <span class="text-[#C65D3B]" id="dicePercent">72%</span>
+        <!-- Khung tối chữ to hiển thị Từ Khởi Đầu -->
+        <div class="bg-[#10233D] text-white rounded-2xl p-5 text-center space-y-1 shadow-inner">
+          <p class="text-[11px] uppercase tracking-widest text-slate-400 font-semibold">Cụm từ xuất phát</p>
+          <div id="wordChainDisplay" class="font-clash text-2xl sm:text-3xl font-extrabold text-[#FFFDF9] tracking-wide">
+            BÀN NHẬU
           </div>
-          <div class="w-full bg-[#E8DEC9]/50 h-3 rounded-full overflow-hidden p-0.5 border border-[#D8C49D]/40">
-            <div id="diceProgressBar" class="h-full rounded-full bg-gradient-to-r from-[#C65D3B] to-[#A5482A] transition-all duration-500" style="width: 72%;"></div>
+          <div class="pt-2 text-xs font-medium text-[#C49A6C]">
+            Chữ tiếp theo phải bắt đầu bằng: <strong id="wordChainHint" class="text-white underline text-sm">Nhậu...</strong>
           </div>
         </div>
 
-        <p id="diceTip" class="font-boska text-xs italic text-[#756856] text-center hidden"></p>
+        <!-- Vòng tròn Đồng hồ đếm ngược 5 giây -->
+        <div class="flex justify-center py-1">
+          <div id="wordChainTimerCircle" class="w-24 h-24 rounded-full bg-[#FAF7F0] border-4 border-[#C65D3B] flex flex-col items-center justify-center shadow-md transition-all">
+            <span id="wordChainTimeDisplay" class="font-clash text-3xl font-extrabold text-[#C65D3B]">5</span>
+            <span class="text-[9px] uppercase font-bold text-[#756856]">GIÂY</span>
+          </div>
+        </div>
+
+        <p id="wordChainStatus" class="font-boska text-xs italic text-[#756856]">
+          Bấm "BẮT ĐẦU 5 GIÂY" cho mỗi lượt nói!
+        </p>
       </div>
 
-      <!-- Nút LẮC NGAY -->
-      <button class="btn-deco-primary" onclick="rollDice()">
-        <span>🎲</span> LẮC NGAY
-      </button>
+      <!-- Nhóm nút điều khiển Nối Từ -->
+      <div class="space-y-2.5">
+        <button id="wordChainStartBtn" class="btn-deco-primary" onclick="startWordChainTimer()">
+          <span>⏱</span> BẮT ĐẦU 5 GIÂY
+        </button>
+
+        <button id="wordChainPassBtn" class="hidden btn-deco-primary !bg-gradient-to-r !from-[#18C9A6] !to-[#0D9488]" onclick="passWordChainSuccess()">
+          <span>✅</span> NỐI ĐƯỢC RỒI! (CHUYỂN NGƯỜI)
+        </button>
+
+        <div class="flex gap-2">
+          <button class="btn-deco-secondary text-xs flex-1 py-2.5" onclick="pickWordChain()">
+            <span>🔀</span> Đổi từ mới
+          </button>
+          <button class="text-xs py-2.5 px-3 rounded-2xl bg-red-50 border border-red-200 text-red-600 font-bold active:scale-95 flex items-center justify-center gap-1" onclick="wordChainGiveUp()">
+            <span>🏳️</span> Bí từ (Uống 1 ly)
+          </button>
+        </div>
+      </div>
+
+      <!-- Thẻ kỷ lục chuỗi nối của bàn -->
+      <div class="art-deco-card p-3 space-y-1.5 text-center">
+        <div class="flex justify-between items-center text-xs font-bold font-clash px-1">
+          <span class="text-[#756856] uppercase">CHUỖI NỐI LIÊN TIẾP</span>
+          <span class="text-[#C65D3B] font-extrabold text-sm" id="wordChainStreak">0 từ</span>
+        </div>
+        <p class="text-[11px] text-[#756856]">
+          Ai nói từ vô nghĩa, trùng từ hoặc quá 5s ➔ <strong class="text-[#C65D3B]">Phạt uống 1 ly! 🍺</strong>
+        </p>
+      </div>
 
     </div>
   </section>
 
   <!-- ───────────────────────────────────────────────
-       TRÒ 5: QUẢ BOM HẸN GIỜ (Khớp ảnh 2)
+       TRÒ 5: QUẢ BOM HẸN GIỜ (CHÍNH XÁC 20 GIÂY)
   ─────────────────────────────────────────────── -->
   <section id="section-bomb" class="hidden">
     <div class="space-y-3.5">
@@ -700,14 +681,14 @@
         <h2 class="font-clash text-lg font-bold text-[#10233D] flex items-center justify-center gap-1.5">
           <span>💣</span> Quả Bom Hẹn Giờ
         </h2>
-        <p class="font-boska text-xs italic text-[#756856] mt-0.5">Chuyền thật nhanh — đừng để bom phát nổ!</p>
+        <p class="font-boska text-xs italic text-[#756856] mt-0.5">Đúng 20 giây phát nổ — chuyền thật nhanh!</p>
       </div>
 
       <!-- Khung Quả Bom Art Deco -->
       <div class="art-deco-card p-4 text-center space-y-3">
         <!-- Badge Cảnh báo nguy hiểm -->
         <div class="inline-flex items-center gap-1.5 text-xs font-clash font-bold text-[#D9383A] tracking-wider uppercase bg-red-50 border border-red-200 px-3 py-1 rounded-full">
-          <span>●</span> CẢNH BÁO NGUY HIỂM <span>●</span>
+          <span>●</span> 20 GIÂY PHÁT NỔ <span>●</span>
         </div>
 
         <div>
@@ -719,22 +700,22 @@
           </h3>
         </div>
 
-        <!-- Đồng hồ tròn đếm ngược kiểu cổ điển -->
+        <!-- Đồng hồ tròn đếm ngược kiểu cổ điển: Khởi đầu 00:20 -->
         <div class="flex justify-center py-1">
           <div id="bombTimerCircle" class="w-40 h-40 rounded-full bg-[#10233D] border-4 border-[#C65D3B] danger-pulse flex flex-col items-center justify-center text-white shadow-xl relative">
-            <span id="bombTimeDisplay" class="font-clash text-4xl font-extrabold tracking-wider">00:00</span>
+            <span id="bombTimeDisplay" class="font-clash text-4xl font-extrabold tracking-wider">00:20</span>
             <span class="text-[10px] uppercase font-bold tracking-widest text-[#FF8A8A] mt-1">CÒN LẠI</span>
           </div>
         </div>
 
         <p class="font-boska text-xs italic text-[#756856]">
-          Chuyền thật nhanh — đừng để bom phát nổ!
+          Chuyền thật nhanh — bom nổ trên tay ai thì người đó UỐNG!
         </p>
       </div>
 
       <!-- Nút Chuyền Bom / Bắt đầu -->
       <button id="bombStartBtn" class="btn-deco-primary" onclick="startBomb()">
-        <span>💣</span> CHUYỀN BOM
+        <span>💣</span> BẮT ĐẦU ĐẾM 20S
       </button>
 
       <button id="bombPassBtn" class="hidden btn-deco-primary !bg-gradient-to-r !from-[#D9383A] !to-[#FF6B6B]" onclick="passBomb()">
@@ -780,9 +761,9 @@
       <span>Thật/Thách</span>
     </button>
 
-    <button class="nav-btn" data-section="dice" onclick="showSection('dice')">
-      <span class="nav-icon text-base">🎲</span>
-      <span>Xúc Xắc</span>
+    <button class="nav-btn" data-section="wordchain" onclick="showSection('wordchain')">
+      <span class="nav-icon text-base">🔤</span>
+      <span>Nối Từ</span>
     </button>
 
     <button class="nav-btn" data-section="bomb" onclick="showSection('bomb')">
