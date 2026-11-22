@@ -54,14 +54,24 @@
       box-sizing: border-box;
       font-family: 'Satoshi', 'Be Vietnam Pro', system-ui, -apple-system, sans-serif;
     }
+    html {
+      height: 100%;
+      overflow-x: hidden;
+      overflow-y: scroll;
+      -webkit-overflow-scrolling: touch;
+    }
     body {
+      min-height: 100%;
+      overflow-x: hidden;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
       background-color: #F7F3E9;
       /* Họa tiết chấm bi deco cổ điển tinh tế */
       background-image: radial-gradient(#D8C49D 0.85px, transparent 0.85px);
       background-size: 18px 18px;
       color: #10233D;
-      overscroll-behavior: none;
-      min-height: 100dvh;
+      margin: 0;
+      padding: 0;
     }
 
     .font-clash { font-family: 'Clash Display', 'Be Vietnam Pro', sans-serif; }
@@ -108,6 +118,7 @@
       align-items: center;
       justify-content: center;
       gap: 8px;
+      user-select: none;
     }
     .btn-deco-primary:active {
       transform: scale(0.97);
@@ -131,6 +142,7 @@
       align-items: center;
       justify-content: center;
       gap: 6px;
+      user-select: none;
     }
     .btn-deco-secondary:active {
       transform: scale(0.97);
@@ -145,6 +157,7 @@
       color: #756856; flex: 1;
       font-size: 10.5px; font-weight: 600;
       background: transparent; border: 2px solid transparent; cursor: pointer;
+      user-select: none;
     }
     .nav-btn:active { transform: scale(0.92); }
     /* Active tab pill theo đúng ảnh của người dùng */
@@ -159,7 +172,13 @@
     }
 
     /* Canvas Vòng Quay */
-    #spinWheel { display: block; margin: 0 auto; cursor: pointer; border-radius: 50%; }
+    #spinWheel {
+      display: block;
+      margin: 0 auto;
+      cursor: pointer;
+      border-radius: 50%;
+      touch-action: pan-y; /* Cho phép vuốt dọc để cuộn trang */
+    }
 
     /* Dice 3D Terracotta */
     .dice-cube {
@@ -190,10 +209,10 @@
     /* Thẻ lật bài Thật / Thách */
     .tod-card-container {
       perspective: 1000px;
-      height: 200px; width: 100%;
+      min-height: 200px; width: 100%;
     }
     .tod-card-inner {
-      position: relative; width: 100%; height: 100%;
+      position: relative; width: 100%; min-height: 200px;
       transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1);
       transform-style: preserve-3d;
     }
@@ -231,12 +250,19 @@
       box-shadow: 0 20px 45px rgba(16, 35, 61, 0.25);
     }
 
+    /* Đệm đáy rộng rãi đảm bảo không bao giờ bị menu che mất nội dung */
     .app-main {
-      padding-bottom: 84px;
+      padding-bottom: 140px;
+      padding-bottom: calc(130px + env(safe-area-inset-bottom, 24px));
+      min-height: calc(100vh - 54px);
+    }
+
+    footer {
+      padding-bottom: calc(0.5rem + env(safe-area-inset-bottom, 0px));
     }
   </style>
 </head>
-<body class="flex flex-col min-h-screen select-none">
+<body class="flex flex-col min-h-screen">
 
 <!-- ══════════════════════════════════════════════════
      TOAST THÔNG BÁO
@@ -298,7 +324,7 @@
 </header>
 
 <!-- ══════════════════════════════════════════════════
-     MAIN APP CONTAINER
+     MAIN APP CONTAINER (CUỘN MƯỢT KHÔNG BỊ CẮT)
 ══════════════════════════════════════════════════ -->
 <main class="app-main px-4 py-3.5 space-y-4 max-w-md mx-auto w-full">
 
@@ -424,7 +450,7 @@
       <div class="art-deco-card p-3 sm:p-4 flex flex-col items-center justify-center relative">
         <div class="relative w-full flex items-center justify-center" style="max-width:320px;">
           <!-- Canvas Wheel -->
-          <canvas id="spinWheel" onclick="spinWheel()" class="touch-none select-none" width="300" height="300"></canvas>
+          <canvas id="spinWheel" onclick="spinWheel()" class="select-none" width="300" height="300"></canvas>
 
           <!-- Nút tròn "QUAY" màu terracotta ở tâm -->
           <button onclick="spinWheel()"
@@ -518,7 +544,7 @@
   </section>
 
   <!-- ───────────────────────────────────────────────
-       TRÒ 3: THẬT HAY THÁCH (Khớp ảnh 1)
+       TRÒ 3: THẬT HAY THÁCH (Vòng lặp chuẩn: Chọn người ➔ Chọn Thật/Thách ➔ Hiện câu hỏi ➔ Lặp lại)
   ─────────────────────────────────────────────── -->
   <section id="section-tod" class="hidden">
     <div class="space-y-3.5">
@@ -527,18 +553,28 @@
         <h2 class="font-clash text-lg font-bold text-[#10233D] flex items-center justify-center gap-1.5">
           <span>🃏</span> Thật hay Thách
         </h2>
-        <p class="font-boska text-xs italic text-[#756856] mt-0.5">Chọn một thử thách cho đêm nay</p>
+        <p class="font-boska text-xs italic text-[#756856] mt-0.5" id="todSubtitle">
+          Nhấn "Chọn người ngẫu nhiên" để bắt đầu lượt chơi
+        </p>
       </div>
 
-      <!-- 2 Nút lớn: THẬT (Màu cát tan) vs THÁCH (Màu đồng thau) đúng mẫu ảnh 1 -->
-      <div class="grid grid-cols-2 gap-3">
-        <button onclick="quickPickToD('truth')"
-          class="py-3.5 rounded-xl bg-[#C49A6C] text-white font-clash font-bold text-base shadow-sm active:scale-95 transition-all text-center">
-          THẬT
+      <!-- Banner người chơi được chọn -->
+      <div id="todPlayerBanner" class="art-deco-card p-3 text-center transition-all">
+        <span class="text-[11px] font-bold text-[#756856] uppercase tracking-wider block">🎯 Người chơi lượt này:</span>
+        <div id="todPlayerName" class="font-clash text-xl font-extrabold text-[#C65D3B] mt-0.5">
+          Chưa chọn người chơi
+        </div>
+      </div>
+
+      <!-- 2 Nút lớn: THẬT (Màu cát tan) vs THÁCH (Màu đồng thau) - Xuất hiện sau khi chọn người -->
+      <div id="todChoiceButtons" class="hidden grid grid-cols-2 gap-3 transition-all duration-300">
+        <button onclick="todSelectChoice('truth')"
+          class="py-3.5 rounded-xl bg-[#C49A6C] text-white font-clash font-bold text-base shadow-sm active:scale-95 transition-all text-center flex items-center justify-center gap-1.5">
+          <span>🤔</span> THẬT
         </button>
-        <button onclick="quickPickToD('dare')"
-          class="py-3.5 rounded-xl bg-[#7D5F3C] text-white font-clash font-bold text-base shadow-sm active:scale-95 transition-all text-center">
-          THÁCH
+        <button onclick="todSelectChoice('dare')"
+          class="py-3.5 rounded-xl bg-[#7D5F3C] text-white font-clash font-bold text-base shadow-sm active:scale-95 transition-all text-center flex items-center justify-center gap-1.5">
+          <span>🔥</span> THÁCH
         </button>
       </div>
 
@@ -550,45 +586,54 @@
 
         <div class="tod-card-container">
           <div class="tod-card-inner cursor-pointer" id="todCardInner">
-            <!-- Mặt trước -->
+            <!-- Mặt trước (Úp bài) -->
             <div class="tod-card-face tod-card-front bg-[#FFFDF9] border border-[#D8C49D] rounded-2xl p-5 flex flex-col justify-center items-center text-center shadow-inner">
-              <p class="font-clash text-lg font-bold text-[#10233D]" id="todPromptText">
-                Bạn chọn Thật hay Thách?
+              <span class="text-3xl mb-1" id="todCardFrontIcon">🃏</span>
+              <p class="font-clash text-base font-bold text-[#10233D]" id="todPromptText">
+                Bấm "Chọn người ngẫu nhiên" bên dưới!
               </p>
-              <p class="text-xs text-[#756856] mt-2">Chạm vào thẻ bài để lật</p>
+              <p class="text-xs text-[#756856] mt-1.5" id="todPromptSub">
+                Ai sẽ là nạn nhân tiếp theo?
+              </p>
             </div>
-            <!-- Mặt sau -->
-            <div class="tod-card-face tod-card-back bg-[#FFFDF9] border border-[#C65D3B] rounded-2xl p-5 flex flex-col justify-between shadow-inner">
+            <!-- Mặt sau (Mở câu hỏi) -->
+            <div class="tod-card-face tod-card-back bg-[#FFFDF9] border border-[#C65D3B] rounded-2xl p-4 sm:p-5 flex flex-col justify-between shadow-inner">
               <div class="space-y-2">
                 <span class="text-[11px] font-bold text-[#C65D3B] uppercase" id="todCardType">THẬT · NHẸ NHÀNG</span>
-                <p class="font-clash text-base font-bold text-[#10233D] leading-relaxed" id="todCardQuestion">
+                <p class="font-clash text-sm sm:text-base font-bold text-[#10233D] leading-relaxed" id="todCardQuestion">
                   Nội dung câu hỏi sẽ hiển thị ở đây...
                 </p>
               </div>
-              <div class="pt-2 border-t border-[#E8DEC9] text-right">
-                <span class="text-xs font-semibold text-[#0080FF]">Chạm để lật lại ↩</span>
+              <div class="pt-2 border-t border-[#E8DEC9] flex justify-between items-center text-xs">
+                <span class="text-[#756856]">Dành cho: <strong class="text-[#C65D3B]" id="todCardPlayerLabel">---</strong></span>
+                <span class="font-semibold text-[#0080FF]">Chạm lật ↩</span>
               </div>
             </div>
           </div>
         </div>
-
-        <div class="text-center pt-1">
-          <span class="text-xs text-[#756856]">Dành cho: <span class="text-[#10233D] font-extrabold" id="todPlayerName">Linh Tiến</span></span>
-        </div>
       </div>
 
-      <!-- Nút điều khiển -->
-      <button class="btn-deco-primary" onclick="changeCurrentToD()">
-        <span>✦</span> ĐỔI CÂU HỎI
-      </button>
-
-      <button class="btn-deco-secondary" onclick="pickToDPlayer()">
+      <!-- Nút Bước 1: Chọn người ngẫu nhiên -->
+      <button id="todPickBtn" class="btn-deco-primary" onclick="pickToDPlayer()">
         <span>🎲</span> CHỌN NGƯỜI NGẪU NHIÊN
       </button>
 
-      <button class="w-full text-center text-xs text-red-600 font-bold py-1 active:scale-95" onclick="todGiveUp()">
-        🏳️ Chịu thua (Uống phạt 1 ly)
-      </button>
+      <!-- Nhóm nút Bước 3: Sau khi đã hiện câu hỏi -->
+      <div id="todActionGroup" class="hidden space-y-2.5">
+        <!-- Nút lặp lại: Chọn người tiếp theo -->
+        <button class="btn-deco-primary" onclick="pickToDPlayer()">
+          <span>🎲</span> CHỌN NGƯỜI TIẾP THEO ➔
+        </button>
+
+        <div class="flex gap-2">
+          <button class="btn-deco-secondary text-xs flex-1 py-2.5" onclick="changeCurrentToD()">
+            <span>✦</span> Đổi câu khác
+          </button>
+          <button class="text-xs py-2.5 px-3 rounded-2xl bg-red-50 border border-red-200 text-red-600 font-bold active:scale-95 flex items-center justify-center gap-1" onclick="todGiveUp()">
+            <span>🏳️</span> Chịu thua (Uống 1 ly)
+          </button>
+        </div>
+      </div>
 
     </div>
   </section>

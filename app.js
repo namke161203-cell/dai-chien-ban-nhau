@@ -645,48 +645,113 @@ function startWhoIsCountdown() {
 }
 
 // ─────────────────────────────────────────────────────────
-// TRÒ 3: THẬT HAY THÁCH (Ảnh 1)
+// TRÒ 3: THẬT HAY THÁCH (Quy trình: Chọn người ➔ Chọn Thật/Thách ➔ Hiện câu hỏi ➔ Lặp lại)
 // ─────────────────────────────────────────────────────────
-let todPlayer = null;
-let todCurrentMode = 'truth';
-let todCurrentLevel = 'mild';
+const todState = {
+  step: 1, // 1: chưa chọn người, 2: đã chọn người chờ bấm thật/thách, 3: đã hiện câu hỏi
+  player: null,
+  mode: 'truth',
+  level: 'mild',
+  question: '',
+  isRolling: false
+};
 
+// Bước 1: Nhấn chọn người ngẫu nhiên (chạy roulette tên vui nhộn)
 function pickToDPlayer() {
   const players = getActivePlayers();
-  if (players.length === 0) { showToast('⚠️ Cần có người chơi!'); return; }
-  todPlayer = randItem(players);
-  const nameEl = document.getElementById('todPlayerName');
-  if (nameEl) nameEl.textContent = todPlayer.name;
-  playCelebration();
-  showToast(`🎯 Đến lượt: ${todPlayer.name}`);
+  if (players.length === 0) {
+    showToast('⚠️ Cần có người chơi trong danh sách!');
+    return;
+  }
+  if (todState.isRolling) return;
+  todState.isRolling = true;
+
+  const playerEl = document.getElementById('todPlayerName');
+  const cardInner = document.getElementById('todCardInner');
+  const promptText = document.getElementById('todPromptText');
+  const promptSub = document.getElementById('todPromptSub');
+  const choiceBox = document.getElementById('todChoiceButtons');
+  const pickBtn = document.getElementById('todPickBtn');
+  const actionGroup = document.getElementById('todActionGroup');
+  const subtitle = document.getElementById('todSubtitle');
+
+  // Đưa thẻ bài về mặt trước úp xuống
+  if (cardInner) cardInner.classList.remove('flipped');
+  if (choiceBox) choiceBox.classList.add('hidden');
+  if (actionGroup) actionGroup.classList.add('hidden');
+  if (pickBtn) pickBtn.classList.add('hidden');
+
+  let rollCount = 0;
+  const totalRolls = 10;
+  const interval = 70;
+
+  const timer = setInterval(() => {
+    const temp = randItem(players);
+    if (playerEl) playerEl.textContent = temp.name;
+    playTone(650 + Math.random() * 250, 'square', 0.03, 0.08);
+    rollCount++;
+
+    if (rollCount >= totalRolls) {
+      clearInterval(timer);
+      todState.player = randItem(players);
+      todState.step = 2;
+      todState.isRolling = false;
+
+      // Cập nhật người trúng
+      if (playerEl) playerEl.textContent = todState.player.name;
+      if (promptText) promptText.textContent = `${todState.player.name} ơi, bạn chọn THẬT hay THÁCH?`;
+      if (promptSub) promptSub.textContent = `Chạm nút THẬT hoặc THÁCH bên dưới!`;
+      if (subtitle) subtitle.textContent = `Đã chọn: ${todState.player.name}! Hãy chọn Thật hoặc Thách`;
+
+      // BƯỚC 2: Xuất hiện 2 nút THẬT / THÁCH
+      if (choiceBox) {
+        choiceBox.classList.remove('hidden');
+      }
+
+      playCelebration();
+      showToast(`🎯 Lượt của: ${todState.player.name}`);
+    }
+  }, interval);
 }
 
-function quickPickToD(mode) {
-  const players = getActivePlayers();
-  if (!todPlayer && players.length > 0) {
-    todPlayer = randItem(players);
-    const nameEl = document.getElementById('todPlayerName');
-    if (nameEl) nameEl.textContent = todPlayer.name;
+// Bước 2: Người được chọn bấm chọn "THẬT" hoặc "THÁCH"
+function todSelectChoice(mode) {
+  if (!todState.player) {
+    showToast('⚠️ Hãy chọn người ngẫu nhiên trước!');
+    return;
   }
 
-  todCurrentMode = mode;
-  todCurrentLevel = Math.random() > 0.5 ? 'mild' : 'spicy';
+  todState.mode = mode;
+  todState.level = Math.random() > 0.5 ? 'mild' : 'spicy';
 
-  const pool = DATA[mode][todCurrentLevel] || DATA[mode]['mild'];
-  const question = randItem(pool);
+  const pool = DATA[mode][todState.level] || DATA[mode]['mild'];
+  todState.question = randItem(pool);
+  todState.step = 3;
 
   const typeEl = document.getElementById('todCardType');
   const qEl = document.getElementById('todCardQuestion');
+  const playerLabel = document.getElementById('todCardPlayerLabel');
   const cardInner = document.getElementById('todCardInner');
+  const choiceBox = document.getElementById('todChoiceButtons');
+  const actionGroup = document.getElementById('todActionGroup');
+  const subtitle = document.getElementById('todSubtitle');
+
+  const modeName = mode === 'truth' ? 'THẬT' : 'THÁCH';
+  const levelName = todState.level === 'mild' ? 'NHẸ NHÀNG' : 'CHÁY PHỐ';
 
   if (typeEl) {
-    typeEl.textContent = `${mode === 'truth' ? 'THẬT' : 'THÁCH'} · ${todCurrentLevel === 'mild' ? 'NHẸ NHÀNG' : 'CHÁY PHỐ'}`;
+    typeEl.textContent = `${modeName} · ${levelName}`;
     typeEl.className = `text-[11px] font-bold uppercase ${mode === 'truth' ? 'text-[#C65D3B]' : 'text-[#7D5F3C]'}`;
   }
-  if (qEl) {
-    qEl.textContent = question;
-  }
+  if (qEl) qEl.textContent = todState.question;
+  if (playerLabel) playerLabel.textContent = todState.player.name;
+  if (subtitle) subtitle.textContent = `Thử thách dành cho ${todState.player.name}`;
 
+  // Ẩn 2 nút chọn, hiện nhóm nút tiếp theo
+  if (choiceBox) choiceBox.classList.add('hidden');
+  if (actionGroup) actionGroup.classList.remove('hidden');
+
+  // BƯỚC 3: Lật thẻ bài hiện câu hỏi
   if (cardInner) {
     cardInner.classList.remove('flipped');
     setTimeout(() => cardInner.classList.add('flipped'), 80);
@@ -695,8 +760,15 @@ function quickPickToD(mode) {
   playClick();
 }
 
+// Đổi câu hỏi khác cho người hiện tại
 function changeCurrentToD() {
-  quickPickToD(todCurrentMode || 'truth');
+  if (!todState.player || !todState.mode) return;
+  const pool = DATA[todState.mode][todState.level] || DATA[todState.mode]['mild'];
+  todState.question = randItem(pool);
+  const qEl = document.getElementById('todCardQuestion');
+  if (qEl) qEl.textContent = todState.question;
+  playClick();
+  showToast('🔀 Đã đổi câu hỏi khác!');
 }
 
 function todGiveUp() {
@@ -705,7 +777,7 @@ function todGiveUp() {
       <div class="text-4xl">😅</div>
       <h2 class="font-clash text-base font-bold text-[#C65D3B] uppercase tracking-wider">Chịu thua!</h2>
       <p class="text-[#10233D] text-xs sm:text-sm">
-        <span class="font-bold">${todPlayer ? escHtml(todPlayer.name) : 'Người chơi'}</span> không dám thực hiện thử thách.<br>
+        <span class="font-bold">${todState.player ? escHtml(todState.player.name) : 'Người chơi'}</span> không dám thực hiện thử thách.<br>
         <span class="text-[#D9383A] font-clash font-bold text-base mt-1 block">Phạt uống 1 ly! 🍺</span>
       </p>
       <button onclick="closeModal()" class="btn-deco-primary w-full py-2.5 font-bold text-xs sm:text-sm">
@@ -1053,9 +1125,22 @@ function showSection(id) {
     setTimeout(initSpinWheel, 50);
   }
 
+  if (id === 'tod') {
+    // Nếu chưa chọn người thì đảm bảo hiển thị nút chọn người
+    if (!todState.player) {
+      document.getElementById('todPickBtn')?.classList.remove('hidden');
+      document.getElementById('todChoiceButtons')?.classList.add('hidden');
+      document.getElementById('todActionGroup')?.classList.add('hidden');
+      document.getElementById('todCardInner')?.classList.remove('flipped');
+    }
+  }
+
   if (id !== 'bomb') stopBomb();
 
   playClick();
+
+  // Cuộn mượt lên đầu khi chuyển tab
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 // ─────────────────────────────────────────────────────────
