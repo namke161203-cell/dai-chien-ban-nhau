@@ -986,9 +986,9 @@ function initWordChain() {
 function pickWordChain() {
   stopWordChainTimer();
   const pool = DATA.wordChain || [
-    { word: "Bàn nhậu", nextHint: "Nhậu..." },
-    { word: "Uống rượu", nextHint: "Rượu..." },
-    { word: "Cà khịa", nextHint: "Khịa..." }
+    { word: "Bia hơi", nextHint: "Hơi..." },
+    { word: "Mồi nhắm", nextHint: "Nhắm..." },
+    { word: "Cạn ly", nextHint: "Ly..." }
   ];
   wordChainCurrent = randItem(pool);
 
