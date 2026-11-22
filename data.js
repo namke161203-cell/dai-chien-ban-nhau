@@ -189,7 +189,24 @@ const DATA = {
     "Ai là người hay hô to nhất 'một hai ba dzô' nhưng uống ít nhất?",
     "Ai là người mà nếu vắng mặt thì mâm... vui hơn hay buồn hơn? (Trả lời thật nhé!)",
     "Ai là người có biểu cảm mặt hài hước nhất khi uống đồ đắng hoặc cay?",
-    "Ai là người hay đặt ra luật chơi nhưng lại vi phạm chính luật đó trước tiên?"
+    "Ai là người hay đặt ra luật chơi nhưng lại vi phạm chính luật đó trước tiên?",
+    "Ai là người chuyên gia chốt kèo 'tháng sau đi Đà Lạt/Phú Quốc nhé' trên bàn nhậu nhưng sáng hôm sau quên sạch?",
+    "Ai là người có 'nhân phẩm' xui xẻo nhất, cứ chơi trò may rủi trên bàn nhậu là chắc chắn dính phạt?",
+    "Ai là người dễ 'chốt đơn' Shopee hoặc TikTok Shop lúc nửa đêm nhất, đặc biệt là khi đang có hơi men?",
+    "Ai là người hay biến mất kiểu 'ninja', lẳng lặng đi về trước mà không thèm chào ai một câu?",
+    "Ai là người kén ăn nhất mâm, ngồi gắp từng cọng hành, rau mùi ra khỏi bát mất cả thanh xuân?",
+    "Ai là người hễ say vào là chỉ kể đi kể lại đúng một câu chuyện cũ rích từ năm này qua năm khác?",
+    "Ai là người hát lệch tông nhất nhóm nhưng lúc nào cũng cực kỳ tự tin và nhập tâm?",
+    "Ai là người luôn mang theo cả thế giới trong túi xách/balo (khăn giấy, sạc dự phòng, kẹo cao su, thuốc giải rượu...)?",
+    "Ai là người có điệu cười 'bá đạo' và to nhất, cười một phát là cả quán quay sang nhìn?",
+    "Ai là người dễ 'cảm nắng' người lạ nhất, từ nhân viên phục vụ cho đến bàn bên cạnh?",
+    "Ai là người tối nay mạnh miệng hứa 'mai 6 giờ sáng dậy chạy bộ' nhưng thực tế ngủ thẳng cẳng tới trưa?",
+    "Ai là người chuyên làm 'bác sĩ tâm lý', hay bị cả nhóm lôi ra tâm sự chuyện đời, chuyện tình cảm nhất?",
+    "Ai là người hay lén đổ bớt bia hoặc đẩy ly sang cho người bên cạnh khi không ai để ý?",
+    "Ai là người hay 'sĩ diện' xung phong uống hộ người khác nhất dù tửu lượng của mình cũng chẳng khá hơn?",
+    "Ai là người có khả năng trở thành 'đại gia' giàu nhất mâm này trong 5 năm tới?",
+    "Ai là người hay 'đào mộ' những chuyện quê độ ngày xưa của bạn bè ra kể nhất?",
+    "Ai là người miệng lúc nào cũng kêu 'đang giảm cân' nhưng tay vẫn gọi thêm trà sữa và đồ chiên?"
   ],
 
   // ─────────────────────────────────────────────────────────
