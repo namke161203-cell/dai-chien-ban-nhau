@@ -1,762 +1,432 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="vi" class="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <meta name="theme-color" content="#FFFFFF" />
+  <meta name="theme-color" content="#070E1A" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
-  <title>Đại Chiến Bàn Nhậu · Maison de Jeux</title>
+  <title>🍺 Đại Chiến Bàn Nhậu</title>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Jost:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <!-- Google Font: Be Vietnam Pro (Chuẩn tiếng Việt, hiện đại, rõ nét) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
+      darkMode: 'class',
       theme: {
         extend: {
           colors: {
-            fr: {
-              navy: '#16336B',
-              bleu: '#2B5AA7',
-              ciel: '#7FA6D9',
-              paper: '#FBFAF7',
-              line: '#E3E9F2',
-              gold: '#B8945A',
-              rouge: '#C0223B',
-              ink: '#1A2436',
-              muted: '#66748C'
+            app: {
+              bg: '#070E1A',
+              card: '#0D1B2A',
+              cardBorder: 'rgba(56, 189, 248, 0.14)',
+              primary: '#0EA5E9',
+              primaryDark: '#0284C7',
+              accent: '#14B8A6'
             }
           },
           fontFamily: {
-            serif: ['"Cormorant Garamond"', 'Georgia', 'serif'],
-            sans: ['Jost', 'system-ui', '-apple-system', 'sans-serif']
+            sans: ['"Be Vietnam Pro"', 'system-ui', '-apple-system', 'sans-serif']
           }
         }
       }
     };
   </script>
-
   <style>
-    :root {
-      --navy: #16336B;
-      --bleu: #2B5AA7;
-      --line: #E3E9F2;
-      --gold: #B8945A;
-      --rouge: #C0223B;
-      --ink: #1A2436;
-      --muted: #66748C;
+    * {
+      -webkit-tap-highlight-color: transparent;
+      box-sizing: border-box;
+      font-family: 'Be Vietnam Pro', system-ui, -apple-system, sans-serif;
     }
-
-    * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
-
-    ::selection { background: #DCE8F8; color: #16336B; }
-
-    button:focus-visible,
-    textarea:focus-visible {
-      outline: 2px solid #2B5AA7;
-      outline-offset: 2px;
-    }
-
     body {
-      background-color: #FFFFFF;
-      background-image:
-        radial-gradient(900px 460px at 50% -12%, #EEF4FC 0%, rgba(255, 255, 255, 0) 68%),
-        radial-gradient(700px 420px at 108% 102%, #FAF6EE 0%, rgba(255, 255, 255, 0) 62%);
+      background-color: #070E1A;
+      background-image: 
+        radial-gradient(ellipse at 50% 0%, #0F2847 0%, transparent 65%),
+        radial-gradient(ellipse at 50% 100%, #081628 0%, transparent 70%);
       background-attachment: fixed;
-      color: var(--ink);
-      font-family: 'Jost', system-ui, -apple-system, sans-serif;
-      -webkit-font-smoothing: antialiased;
+      color: #E2E8F0;
       overscroll-behavior: none;
       min-height: 100dvh;
     }
 
-    /* ── Scrollbar ─────────────────────────────── */
+    /* Scrollbar ẩn hoặc tối giản */
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     ::-webkit-scrollbar { width: 4px; height: 4px; }
-    ::-webkit-scrollbar-track { background: #F3F6FB; }
-    ::-webkit-scrollbar-thumb { background: #C6D5EA; border-radius: 4px; }
+    ::-webkit-scrollbar-track { background: #070E1A; }
+    ::-webkit-scrollbar-thumb { background: #1E293B; border-radius: 4px; }
 
-    /* ── Typographic system ────────────────────── */
-    .brand-serif {
-      font-family: 'Cormorant Garamond', Georgia, serif;
-      font-weight: 600;
-      letter-spacing: 0.05em;
-      color: var(--navy);
-      line-height: 1.1;
-    }
-    .brand-sub {
-      font-size: 8px;
-      letter-spacing: 0.34em;
-      text-transform: uppercase;
-      color: #9AA6B8;
-      font-weight: 500;
-    }
-    .eyebrow {
-      font-size: 9px;
-      letter-spacing: 0.32em;
-      text-transform: uppercase;
-      color: #93A1B6;
-      font-weight: 500;
-    }
-    .section-title {
-      font-family: 'Cormorant Garamond', Georgia, serif;
-      font-size: 25px;
-      line-height: 1.15;
-      font-weight: 600;
-      letter-spacing: 0.07em;
-      text-transform: uppercase;
-      color: var(--navy);
-    }
-    .section-sub {
-      font-size: 11.5px;
-      letter-spacing: 0.02em;
-      color: #66748C;
-      font-weight: 400;
-    }
-    .ornament {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 9px;
-      width: 100%;
-    }
-    .ornament span {
-      height: 1px;
-      width: 42px;
-      background: linear-gradient(90deg, rgba(184, 148, 90, 0), rgba(184, 148, 90, 0.75));
-    }
-    .ornament span:last-child {
-      background: linear-gradient(90deg, rgba(184, 148, 90, 0.75), rgba(184, 148, 90, 0));
-    }
-    .ornament b {
-      font-size: 7px;
-      color: var(--gold);
-      line-height: 1;
-      font-weight: 400;
+    /* Thẻ Card: Gọn gàng, mờ nhẹ tinh tế, KHÔNG lóe sáng */
+    .clean-card {
+      background: rgba(13, 27, 42, 0.82);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(56, 189, 248, 0.16);
+      border-radius: 20px;
+      box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.45);
     }
 
-    /* ── Tricolore hairline ────────────────────── */
-    .tricolore {
-      height: 2px;
-      width: 100%;
-      background: linear-gradient(90deg,
-        #16336B 0%, #16336B 33.33%,
-        #E4E9F1 33.33%, #E4E9F1 66.66%,
-        #C0223B 66.66%, #C0223B 100%);
-    }
-
-    /* ── Cards (papeterie double border) ───────── */
-    .card {
-      position: relative;
-      background: #FFFFFF;
-      border: 1px solid var(--line);
-      border-radius: 16px;
-      box-shadow: 0 18px 40px -28px rgba(22, 51, 107, 0.45);
-    }
-    .card::before {
-      content: '';
-      position: absolute;
-      inset: 5px;
-      border: 1px solid rgba(184, 148, 90, 0.16);
-      border-radius: 11px;
-      pointer-events: none;
-    }
-    .card-flat {
-      background: #FFFFFF;
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      box-shadow: 0 12px 30px -24px rgba(22, 51, 107, 0.4);
-    }
-
-    /* ── Seal / chip ───────────────────────────── */
-    .seal {
-      width: 38px;
-      height: 38px;
-      border-radius: 9999px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(145deg, #24457F, #16336B);
-      color: #fff;
-      font-size: 17px;
-      box-shadow: 0 0 0 1px #16336B, 0 0 0 3px #fff, 0 0 0 4px rgba(184, 148, 90, 0.55);
-      flex-shrink: 0;
-    }
-    .chip {
-      font-size: 10px;
-      font-weight: 600;
-      letter-spacing: 0.08em;
-      padding: 2px 9px;
-      border-radius: 9999px;
-      background: #F2F6FC;
-      color: var(--navy);
-      border: 1px solid #DCE6F4;
-    }
-
-    /* ── Buttons ───────────────────────────────── */
+    /* Nút chính: Rõ nét, êm mắt, độ tương phản cao */
     .btn-primary {
-      position: relative;
-      background: linear-gradient(135deg, #24457F 0%, #16336B 58%, #102A5C 100%);
-      color: #F9FBFF;
-      font-family: 'Jost', sans-serif;
-      font-weight: 600;
-      font-size: 13px;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      border-radius: 12px;
-      padding: 15px 24px;
-      border: 1px solid #102A5C;
+      background: linear-gradient(135deg, #0EA5E9 0%, #14B8A6 100%);
+      color: #041424;
+      font-weight: 800;
+      border-radius: 16px;
+      padding: 13px 20px;
+      border: none;
       cursor: pointer;
-      transition: transform 0.15s ease, box-shadow 0.2s ease, filter 0.2s ease;
+      transition: all 0.15s ease;
+      font-size: 15px;
+      letter-spacing: 0.2px;
+      box-shadow: 0 4px 14px rgba(14, 165, 233, 0.25);
       width: 100%;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 9px;
-      box-shadow: 0 14px 28px -16px rgba(22, 51, 107, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+      gap: 8px;
     }
-    .btn-primary::after {
-      content: '';
-      position: absolute;
-      inset: 3px;
-      border: 1px solid rgba(255, 255, 255, 0.14);
-      border-radius: 9px;
-      pointer-events: none;
+    .btn-primary:active {
+      transform: scale(0.97);
+      box-shadow: 0 2px 6px rgba(14, 165, 233, 0.15);
     }
-    .btn-primary:active { transform: scale(0.975); box-shadow: 0 6px 14px -10px rgba(22, 51, 107, 0.7); }
 
+    /* Nút phụ */
     .btn-secondary {
-      background: #FFFFFF;
-      color: var(--navy);
-      font-family: 'Jost', sans-serif;
-      font-weight: 500;
-      font-size: 12px;
-      letter-spacing: 0.09em;
-      text-transform: uppercase;
-      border-radius: 12px;
-      padding: 12px 20px;
-      border: 1px solid #D3DEED;
+      background: rgba(15, 32, 53, 0.85);
+      color: #BAE6FD;
+      font-weight: 700;
+      border-radius: 16px;
+      padding: 11px 18px;
+      border: 1px solid rgba(56, 189, 248, 0.2);
       cursor: pointer;
       transition: all 0.15s ease;
+      font-size: 13.5px;
       width: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 7px;
-      box-shadow: 0 8px 20px -20px rgba(22, 51, 107, 0.5);
-    }
-    .btn-secondary:active { transform: scale(0.975); background: #F5F8FD; border-color: #B9CBE2; }
-
-    .btn-danger {
-      background: #FFF8F9;
-      color: var(--rouge);
-      font-family: 'Jost', sans-serif;
-      font-weight: 500;
-      font-size: 12px;
-      letter-spacing: 0.06em;
-      border-radius: 12px;
-      border: 1px solid #F0CFD5;
-      cursor: pointer;
-      transition: all 0.15s ease;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 6px;
     }
-    .btn-danger:active { transform: scale(0.975); background: #FDEDEF; }
-
-    /* ── Form field ────────────────────────────── */
-    .field {
-      width: 100%;
-      background: #FBFCFE;
-      border: 1px solid #DCE5F1;
-      border-radius: 12px;
-      padding: 10px 12px;
-      color: var(--ink);
-      font-size: 12px;
-      font-weight: 400;
-      line-height: 1.6;
-      resize: none;
-      outline: none;
-      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    .btn-secondary:active {
+      transform: scale(0.97);
+      background: rgba(22, 45, 75, 0.95);
     }
-    .field::placeholder { color: #A9B4C4; }
-    .field:focus { border-color: #9DB6D8; box-shadow: 0 0 0 3px rgba(43, 90, 167, 0.09); }
 
-    /* ── Placeholder / chosen text ─────────────── */
-    .placeholder-text { color: #8A97AC; }
-    .chosen-text { color: var(--navy); }
-
-    /* ── Bottom navigation ─────────────────────── */
+    /* Bottom Navigation: Tinh giản, chỉn chu */
     .nav-btn {
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 3px;
-      padding: 7px 4px 11px;
-      border-radius: 12px;
-      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-      color: #97A3B6;
-      flex: 1;
-      font-size: 9.5px;
-      font-weight: 500;
-      letter-spacing: 0.02em;
-      background: transparent;
-      border: 1px solid transparent;
-      cursor: pointer;
+      display: flex; flex-direction: column; align-items: center;
+      gap: 3px; padding: 6px 3px; border-radius: 12px;
+      transition: all 0.18s ease;
+      color: #64748B; flex: 1;
+      font-size: 10.5px; font-weight: 600;
+      background: transparent; border: 1px solid transparent; cursor: pointer;
     }
-    .nav-btn:active { transform: scale(0.94); }
-    .nav-btn .nav-icon {
-      font-size: 19px;
-      line-height: 1;
-      filter: grayscale(0.55) opacity(0.75);
-      transition: filter 0.2s ease, transform 0.2s ease;
-    }
+    .nav-btn:active { transform: scale(0.93); }
     .nav-active {
-      color: var(--navy);
-      background: #F3F7FC;
-      border-color: #DFE8F4;
-      font-weight: 600;
+      color: #38BDF8;
+      background: rgba(14, 165, 233, 0.12);
+      border-color: rgba(56, 189, 248, 0.25);
     }
     .nav-active .nav-icon {
-      filter: none;
       transform: translateY(-1px);
     }
-    .nav-active::after {
-      content: '';
-      position: absolute;
-      left: 50%;
-      bottom: 4px;
-      transform: translateX(-50%);
-      width: 14px;
-      height: 2px;
-      border-radius: 2px;
-      background: var(--gold);
-    }
 
-    /* ── Spin wheel ────────────────────────────── */
+    /* Canvas Vòng Quay */
     #spinWheel { display: block; margin: 0 auto; cursor: pointer; border-radius: 50%; }
-    .wheel-stage {
-      background:
-        radial-gradient(circle at 50% 45%, #F6F9FE 0%, #FFFFFF 62%);
-    }
-    .spin-center {
-      position: absolute;
-      inset: 0;
-      margin: auto;
-      width: 60px;
-      height: 60px;
-      border-radius: 9999px;
-      background: #FFFFFF;
-      color: var(--navy);
-      border: 2px solid var(--navy);
-      box-shadow: 0 0 0 4px #FFFFFF, 0 0 0 5px rgba(184, 148, 90, 0.65), 0 12px 24px -10px rgba(22, 51, 107, 0.55);
-      font-family: 'Cormorant Garamond', Georgia, serif;
-      font-weight: 700;
-      font-size: 13px;
-      letter-spacing: 0.16em;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      z-index: 10;
-      transition: transform 0.15s ease;
-    }
-    .spin-center:active { transform: scale(0.93); }
 
-    /* ── Countdown ring ────────────────────────── */
-    .count-ring {
-      width: 96px;
-      height: 96px;
-      border-radius: 9999px;
-      background: #F5F8FD;
-      border: 1.5px solid var(--navy);
-      box-shadow: 0 0 0 5px #FFFFFF, 0 0 0 6px rgba(184, 148, 90, 0.45), inset 0 0 24px rgba(22, 51, 107, 0.05);
-      color: var(--navy);
-      font-family: 'Cormorant Garamond', Georgia, serif;
-      font-weight: 700;
-      font-size: 46px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    .count-final {
-      font-family: 'Jost', sans-serif !important;
-      font-size: 14px !important;
-      font-weight: 600 !important;
-      letter-spacing: 0.12em;
-    }
-
-    /* ── Dice ──────────────────────────────────── */
+    /* Dice */
     .dice-face {
-      width: 72px;
-      height: 72px;
-      background: linear-gradient(160deg, #FFFFFF 0%, #F6F9FD 100%);
-      color: var(--navy);
-      border-radius: 14px;
-      padding: 10px;
-      border: 1px solid #D9E2EF;
-      box-shadow: 0 12px 22px -14px rgba(22, 51, 107, 0.55), inset 0 1px 0 #FFFFFF;
-      transition: all 0.3s;
+      width: 68px; height: 68px;
+      background: #F8FAFC;
+      color: #0F172A;
+      border-radius: 14px; padding: 9px;
+      border: 1.5px solid #CBD5E1;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+      transition: all 0.25s;
     }
     @keyframes diceShake {
       0%, 100% { transform: rotate(0deg) scale(1); }
-      20% { transform: rotate(-15deg) scale(1.1); }
-      40% { transform: rotate(15deg) scale(0.9); }
-      60% { transform: rotate(-10deg) scale(1.05); }
-      80% { transform: rotate(10deg) scale(0.95); }
+      20% { transform: rotate(-14deg) scale(1.08); }
+      40% { transform: rotate(14deg) scale(0.92); }
+      60% { transform: rotate(-8deg) scale(1.04); }
+      80% { transform: rotate(8deg) scale(0.96); }
     }
     .dice-shake { animation: diceShake 0.3s ease-in-out; }
 
     .active-dice-btn {
-      background: linear-gradient(135deg, #24457F, #16336B) !important;
-      color: #FFFFFF !important;
-      border-color: #16336B !important;
-      box-shadow: 0 10px 20px -14px rgba(22, 51, 107, 0.9) !important;
+      background: #0EA5E9 !important;
+      color: #041424 !important;
+      border-color: #38BDF8 !important;
+      font-weight: 800 !important;
     }
 
-    /* ── Truth or Dare flip card ───────────────── */
+    /* Thẻ bài Thật / Thách */
     .tod-card-container {
       perspective: 1000px;
-      height: 220px;
-      width: 100%;
+      height: 210px; width: 100%;
     }
     .tod-card-inner {
-      position: relative;
-      width: 100%;
-      height: 100%;
-      transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative; width: 100%; height: 100%;
+      transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1);
       transform-style: preserve-3d;
     }
     .tod-card-inner.flipped { transform: rotateY(180deg); }
     .tod-card-face {
-      position: absolute;
-      inset: 0;
-      border-radius: 16px;
+      position: absolute; inset: 0;
+      border-radius: 18px;
       backface-visibility: hidden;
       -webkit-backface-visibility: hidden;
-    }
-    .tod-card-face::after {
-      content: '';
-      position: absolute;
-      inset: 7px;
-      border: 1px solid rgba(184, 148, 90, 0.22);
-      border-radius: 10px;
-      pointer-events: none;
     }
     .tod-card-back {
       transform: rotateY(180deg);
       overflow-y: auto;
     }
 
-    /* ── Bomb ──────────────────────────────────── */
-    @keyframes bombPulse {
-      0%, 100% { transform: scale(1); filter: drop-shadow(0 10px 16px rgba(22, 51, 107, 0.22)); }
-      50% { transform: scale(1.07); filter: drop-shadow(0 16px 24px rgba(22, 51, 107, 0.32)); }
+    /* Bom */
+    @keyframes bombHeartbeat {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.06); }
     }
-    .bomb-flash { animation: bombPulse 0.25s ease-in-out !important; }
+    .bomb-flash { animation: bombHeartbeat 0.22s ease-in-out !important; }
     @keyframes bombExplodeAnim {
       0% { transform: scale(1); }
-      30% { transform: scale(1.4) rotate(-6deg); filter: drop-shadow(0 0 45px rgba(192, 34, 59, 0.75)); }
-      60% { transform: scale(0.9) rotate(6deg); }
+      30% { transform: scale(1.35) rotate(-5deg); }
+      60% { transform: scale(0.92) rotate(5deg); }
       100% { transform: scale(1); }
     }
-    .bomb-explode { animation: bombExplodeAnim 0.8s ease-out forwards; }
-    #bombVisual { animation: bombPulse 1.8s ease-in-out infinite; font-size: 78px; line-height: 1; }
+    .bomb-explode { animation: bombExplodeAnim 0.75s ease-out forwards; }
+    #bombVisual { animation: bombHeartbeat 1.6s ease-in-out infinite; font-size: 76px; line-height: 1; }
 
-    /* ── Modal ─────────────────────────────────── */
+    /* Modal */
     #modalOverlay { backdrop-filter: blur(8px); }
     #modalContent {
-      background: #FFFFFF;
-      border: 1px solid #E0E7F1;
-      border-radius: 20px;
-      padding: 22px;
+      background: #0B192C;
+      border: 1px solid rgba(56, 189, 248, 0.24);
+      border-radius: 24px;
+      padding: 20px;
       width: calc(100% - 32px);
-      max-width: 420px;
+      max-width: 410px;
       max-height: 85dvh;
       overflow-y: auto;
-      box-shadow: 0 30px 70px -30px rgba(22, 51, 107, 0.55), 0 0 0 6px rgba(255, 255, 255, 0.55);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.65);
     }
 
-    /* ── Avatars ───────────────────────────────── */
-    .avatar-on {
-      width: 40px;
-      height: 40px;
-      border-radius: 9999px;
-      background: linear-gradient(145deg, #24457F, #16336B);
-      border: 2px solid #FFFFFF;
-      color: #FFFFFF;
-      box-shadow: 0 0 0 1px #C9D6E8, 0 8px 16px -10px rgba(22, 51, 107, 0.85);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 13px;
-      font-weight: 600;
-    }
-    .avatar-off {
-      width: 40px;
-      height: 40px;
-      border-radius: 9999px;
-      background: #F5F7FB;
-      border: 2px solid #FFFFFF;
-      color: #B3BECD;
-      box-shadow: 0 0 0 1px #E6EBF3;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 13px;
-      font-weight: 500;
-      opacity: 0.6;
-    }
-    .avatar-name-on {
-      font-size: 9.5px;
-      font-weight: 500;
-      color: #34435C;
-      max-width: 54px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      text-align: center;
-      margin-top: 4px;
-    }
-    .avatar-name-off {
-      font-size: 9.5px;
-      font-weight: 400;
-      color: #B3BECD;
-      max-width: 54px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      text-align: center;
-      margin-top: 4px;
-      text-decoration: line-through;
-      opacity: 0.7;
-    }
-
-    /* ── Main padding for fixed nav ────────────── */
-    .app-main { padding-bottom: 104px; }
-
-    @media (min-width: 640px) {
-      .section-title { font-size: 28px; }
+    .app-main {
+      padding-bottom: 84px;
     }
   </style>
 </head>
-
-<body class="flex flex-col min-h-screen select-none antialiased">
+<body class="flex flex-col min-h-screen select-none text-slate-100">
 
 <!-- ══════════════════════════════════════════════════
-     TOAST
+     TOAST THÔNG BÁO
 ══════════════════════════════════════════════════ -->
 <div id="toast"
-  class="fixed top-5 left-1/2 -translate-x-1/2 z-50 opacity-0 translate-y-4
-         bg-white text-[#16336B] text-[12.5px] font-medium tracking-wide px-5 py-3 rounded-xl
-         border border-[#E0E7F1] shadow-[0_18px_40px_-20px_rgba(22,51,107,0.45)] pointer-events-none max-w-xs text-center transition-all duration-300">
+  class="fixed top-4 left-1/2 -translate-x-1/2 z-50 opacity-0 translate-y-3
+         bg-[#0E2238] text-sky-200 text-xs sm:text-sm font-semibold px-4 py-2.5 rounded-xl
+         border border-sky-400/30 shadow-xl pointer-events-none max-w-xs text-center transition-all duration-200">
 </div>
 
 <!-- ══════════════════════════════════════════════════
      MODAL OVERLAY
 ══════════════════════════════════════════════════ -->
 <div id="modalOverlay"
-  class="fixed inset-0 z-40 hidden items-center justify-center p-4 bg-[#0B1A33]/45">
+  class="fixed inset-0 z-40 hidden items-center justify-center p-4 bg-black/75">
   <div id="modalContent"></div>
 </div>
 
 <!-- ══════════════════════════════════════════════════
-     BOMB SCREEN FLASH
+     MÀN HÌNH CHỚP ĐỎ KHI BOM NỔ
 ══════════════════════════════════════════════════ -->
 <div id="bombFlash"
-  class="fixed inset-0 z-30 bg-[#C0223B] pointer-events-none transition-opacity duration-300"
+  class="fixed inset-0 z-30 bg-red-600 pointer-events-none transition-opacity duration-300"
   style="opacity:0;"></div>
 
 <!-- ══════════════════════════════════════════════════
-     APP SHELL: HEADER + MEMBER BAR (single sticky unit)
+     HEADER: THANH ĐẦU TRANG GỌN GÀNG, SẮC NÉT
 ══════════════════════════════════════════════════ -->
-<div class="sticky top-0 z-20 bg-white border-b border-[#E6EBF3] shadow-[0_10px_24px_-24px_rgba(22,51,107,0.45)]">
-  <div class="tricolore"></div>
-
-  <header class="max-w-md mx-auto px-4 py-3 flex items-center justify-between">
-    <div class="flex items-center gap-3">
-      <div class="seal">🍺</div>
-      <div>
-        <h1 class="brand-serif text-[17px] sm:text-[19px] uppercase">Đại Chiến Bàn Nhậu</h1>
-        <p class="brand-sub mt-0.5">Maison de Jeux · Sài Gòn</p>
-      </div>
+<header class="sticky top-0 z-20 bg-[#070E1A]/95 backdrop-blur-md border-b border-slate-800/80 px-4 py-3 flex items-center justify-between">
+  <div class="flex items-center gap-2">
+    <span class="text-xl">🍺</span>
+    <div>
+      <h1 class="text-sm sm:text-base font-extrabold tracking-tight text-white uppercase flex items-center gap-1.5">
+        Đại Chiến Bàn Nhậu
+      </h1>
+      <p class="text-[10px] text-slate-400 font-medium">Drinking game mâm 16 người</p>
     </div>
+  </div>
+  <div class="flex items-center gap-1.5">
+    <button id="soundBtn" onclick="toggleSound()" title="Bật/tắt âm thanh"
+      class="w-9 h-9 rounded-xl bg-slate-800/80 border border-slate-700/80 text-base flex items-center justify-center active:scale-90 transition-transform">
+      🔊
+    </button>
+    <button onclick="openSettingsModal()" title="Cài đặt & Luật chơi"
+      class="w-9 h-9 rounded-xl bg-slate-800/80 border border-slate-700/80 text-base flex items-center justify-center active:scale-90 transition-transform text-slate-300">
+      ⚙️
+    </button>
+  </div>
+</header>
+
+<!-- ══════════════════════════════════════════════════
+     THANH THÀNH VIÊN (MEMBER BAR)
+══════════════════════════════════════════════════ -->
+<div class="sticky top-[57px] z-20 bg-[#070E1A]/95 backdrop-blur-md border-b border-slate-800/80 px-3 py-2">
+  <div class="flex items-center justify-between mb-1.5 px-1">
     <div class="flex items-center gap-2">
-      <button id="soundBtn" onclick="toggleSound()" title="Bật/tắt âm thanh"
-        class="w-9 h-9 rounded-full bg-white border border-[#DFE7F2] text-[15px] flex items-center justify-center active:scale-90 transition-transform shadow-[0_6px_14px_-12px_rgba(22,51,107,0.6)]">
-        🔊
-      </button>
-      <button onclick="openSettingsModal()" title="Cài đặt & luật chơi"
-        class="w-9 h-9 rounded-full bg-white border border-[#DFE7F2] text-[14px] flex items-center justify-center active:scale-90 transition-transform shadow-[0_6px_14px_-12px_rgba(22,51,107,0.6)]">
-        ⚙️
-      </button>
+      <span class="text-[11px] font-bold uppercase tracking-wider text-slate-300">Thành viên</span>
+      <span id="memberCountBadge" class="text-[10.5px] font-bold px-2 py-0.5 rounded-full bg-sky-500/15 text-sky-300 border border-sky-400/30">
+        16/16
+      </span>
     </div>
-  </header>
-
-  <!-- MEMBER BAR -->
-  <div class="max-w-md mx-auto px-3 pb-2.5">
-    <div class="flex items-center justify-between mb-1.5 px-1">
-      <div class="flex items-center gap-2">
-        <span class="eyebrow text-[#8A97AC]">Thành viên</span>
-        <span id="memberCountBadge" class="chip">16/16</span>
-      </div>
-      <span class="text-[9.5px] tracking-wide text-[#A9B4C4]">Chạm để bật / tắt</span>
-    </div>
-    <div class="flex items-center gap-3 overflow-x-auto no-scrollbar py-1" id="memberBarList">
-      <!-- Nút + và avatar cuộn ngang được render bởi app.js -->
-    </div>
+    <span class="text-[10.5px] text-slate-400">Chạm để bật / tắt</span>
+  </div>
+  <div class="flex items-center gap-2.5 overflow-x-auto no-scrollbar py-0.5" id="memberBarList">
+    <!-- Nút + tròn & danh sách avatar sẽ render bằng JavaScript -->
   </div>
 </div>
 
 <!-- ══════════════════════════════════════════════════
-     MAIN CONTENT (GAME AREA)
+     KHU VỰC TRÒ CHƠI CHÍNH
 ══════════════════════════════════════════════════ -->
-<main class="app-main relative z-10 px-4 py-5 space-y-5 max-w-md mx-auto w-full">
+<main class="app-main px-4 py-4 space-y-4 max-w-md mx-auto w-full">
 
   <!-- ───────────────────────────────────────────────
-       SECTION 1: VÒNG QUAY NHÂN PHẨM
+       TRÒ 1: VÒNG QUAY NHÂN PHẨM
   ─────────────────────────────────────────────── -->
   <section id="section-spin">
-    <div class="space-y-5">
+    <div class="space-y-3.5">
 
-      <div class="text-center space-y-1.5">
-        <p class="eyebrow">Jeu N° 01 · La Roue</p>
-        <h2 class="section-title flex items-center justify-center gap-2">
-          <span class="text-[20px]">🎡</span> Vòng Quay Nhân Phẩm
+      <div class="text-center">
+        <h2 class="text-base font-extrabold text-white flex items-center justify-center gap-1.5">
+          <span>🎡</span> Vòng Quay Nhân Phẩm
         </h2>
-        <div class="ornament"><span></span><b>◆</b><span></span></div>
-        <p class="section-sub">Quay trúng ai thì người đó nhận hình phạt!</p>
+        <p class="text-[11.5px] text-slate-400 mt-0.5">Trúng tên ai người đó nhận hình phạt!</p>
       </div>
 
-      <!-- Canvas Container + Nút QUAY ở Tâm -->
-      <div class="card p-4">
-        <div class="wheel-stage relative w-full flex items-center justify-center mx-auto" style="max-width:350px;">
+      <!-- Vòng quay Canvas + Nút tròn ở tâm -->
+      <div class="clean-card p-3 flex justify-center relative">
+        <div class="relative w-full flex items-center justify-center" style="max-width:340px;">
           <canvas id="spinWheel" onclick="spinWheel()" class="touch-none select-none" width="300" height="300"></canvas>
 
+          <!-- Nút tròn "QUAY" ở tâm: Tinh tế, rõ ràng, KHÔNG lóe sáng -->
           <button onclick="spinWheel()"
-            title="Bấm để QUAY!"
-            class="spin-center">
+            title="Chạm để QUAY!"
+            class="absolute inset-0 m-auto w-14 h-14 rounded-full bg-gradient-to-tr from-sky-500 to-teal-400 text-slate-950 font-black text-xs tracking-wider shadow-md flex items-center justify-center cursor-pointer active:scale-90 transition-transform z-10 border-2 border-white/80">
             QUAY
           </button>
         </div>
       </div>
 
-      <!-- Spin big button -->
-      <button class="btn-primary text-[14px] py-4" onclick="spinWheel()">
-        🎡 Quay ngay!
+      <!-- Nút quay lớn bên dưới -->
+      <button class="btn-primary text-base py-3.5 font-bold" onclick="spinWheel()">
+        🎡 QUAY NGAY
       </button>
 
-      <p class="text-center text-[10.5px] tracking-wide text-[#A0ABBC]">Chạm trực tiếp vào tâm vòng quay để quay</p>
+      <p class="text-center text-[11px] text-slate-400">Có thể bấm nút hoặc chạm trực tiếp vào tâm vòng quay</p>
 
     </div>
   </section>
 
   <!-- ───────────────────────────────────────────────
-       SECTION 2: AI LÀ NGƯỜI...
+       TRÒ 2: AI LÀ NGƯỜI...
   ─────────────────────────────────────────────── -->
   <section id="section-whois" class="hidden">
-    <div class="space-y-5">
+    <div class="space-y-3.5">
 
-      <div class="text-center space-y-1.5">
-        <p class="eyebrow">Jeu N° 02 · Qui est-ce ?</p>
-        <h2 class="section-title flex items-center justify-center gap-2">
-          <span class="text-[20px]">👆</span> Ai Là Người...
+      <div class="text-center">
+        <h2 class="text-base font-extrabold text-white flex items-center justify-center gap-1.5">
+          <span>👆</span> Ai Là Người...
         </h2>
-        <div class="ornament"><span></span><b>◆</b><span></span></div>
-        <p class="section-sub">Cả bàn cùng giơ tay chỉ mặt!</p>
+        <p class="text-[11.5px] text-slate-400 mt-0.5">Cả 16 người cùng giơ tay chỉ mặt!</p>
       </div>
 
-      <!-- Question Card -->
-      <div class="card text-center space-y-5 py-7 px-5">
+      <!-- Khung hiển thị câu hỏi -->
+      <div class="clean-card text-center space-y-4 py-6 px-4">
         <p id="whoIsQuestion"
-          class="placeholder-text text-base sm:text-lg font-semibold leading-relaxed min-h-[85px] flex items-center justify-center px-1">
-          Bấm "Câu hỏi mới" để bắt đầu!
+          class="text-base font-bold leading-relaxed text-slate-300 min-h-[80px] flex items-center justify-center px-1">
+          Bấm "Đổi câu hỏi khác" để bắt đầu!
         </p>
 
-        <!-- Countdown ring display -->
+        <!-- Đếm ngược 3-2-1 -->
         <div id="whoIsCount"
-          class="hidden count-ring scale-0 mx-auto">
+          class="hidden text-5xl font-black text-sky-400 scale-0 mx-auto w-20 h-20
+                 rounded-full bg-sky-500/10 border-2 border-sky-400 flex items-center justify-center">
           3
         </div>
 
-        <!-- Result -->
+        <!-- Kết quả -->
         <div id="whoIsResult"
-          class="hidden text-xs sm:text-[13px] font-medium text-[#16336B] bg-[#F4F8FE] border border-[#DCE6F4] rounded-xl px-4 py-3">
+          class="hidden text-xs font-bold text-sky-200 bg-sky-950/40 border border-sky-500/30 rounded-xl px-4 py-3 leading-relaxed">
         </div>
       </div>
 
-      <!-- Controls -->
+      <!-- Nút điều khiển -->
       <button class="btn-secondary" onclick="pickWhoIsQuestion()">
         🔀 Đổi câu hỏi khác
       </button>
 
       <div id="whoIsBtn" class="hidden">
-        <button id="whoIsStartBtn" class="btn-primary text-[14px] py-4" onclick="startWhoIsCountdown()">
-          ⏱ 3 - 2 - 1 - Chỉ!
+        <button id="whoIsStartBtn" class="btn-primary text-base py-3.5 font-bold" onclick="startWhoIsCountdown()">
+          ⏱ 3 - 2 - 1 - CHỈ!
         </button>
       </div>
 
-      <!-- Quick guideline -->
-      <div class="card-flat p-4 text-[12px] leading-relaxed text-[#5B6A82] space-y-1.5">
-        <p class="font-semibold text-[#16336B] text-[12.5px] tracking-wide">🎮 Cách chơi</p>
-        <p>1. Đọc to câu hỏi cho cả bàn</p>
-        <p>2. Bấm 3 - 2 - 1 và cả mâm cùng giơ tay chỉ 1 người</p>
-        <p>3. Người nhận nhiều ngón tay chỉ nhất thì <strong class="text-[#C0223B] font-semibold">UỐNG! 🍺</strong></p>
+      <!-- Hướng dẫn ngắn gọn -->
+      <div class="clean-card p-3.5 text-xs text-slate-300 space-y-1">
+        <p class="font-bold text-white">🎮 Cách chơi:</p>
+        <p>1. Đọc to câu hỏi cho cả bàn nghe</p>
+        <p>2. Bấm 3-2-1 và cả mâm đồng loạt giơ tay chỉ 1 người</p>
+        <p>3. Người nhận nhiều ngón tay chỉ nhất thì <strong class="text-amber-400 font-bold">UỐNG! 🍺</strong></p>
       </div>
 
     </div>
   </section>
 
   <!-- ───────────────────────────────────────────────
-       SECTION 3: THẬT HAY THÁCH
+       TRÒ 3: THẬT HAY THÁCH
   ─────────────────────────────────────────────── -->
   <section id="section-tod" class="hidden">
-    <div class="space-y-5">
+    <div class="space-y-3.5">
 
-      <div class="text-center space-y-1.5">
-        <p class="eyebrow">Jeu N° 03 · Vérité ou Défi</p>
-        <h2 class="section-title flex items-center justify-center gap-2">
-          <span class="text-[20px]">🃏</span> Thật hay Thách
+      <div class="text-center">
+        <h2 class="text-base font-extrabold text-white flex items-center justify-center gap-1.5">
+          <span>🃏</span> Thật hay Thách
         </h2>
-        <div class="ornament"><span></span><b>◆</b><span></span></div>
-        <p class="section-sub">Chọn 1 người rồi kiểm tra dũng khí!</p>
+        <p class="text-[11.5px] text-slate-400 mt-0.5">Chọn ngẫu nhiên 1 người rồi kiểm tra dũng khí!</p>
       </div>
 
-      <!-- Random player selection -->
-      <div class="card text-center space-y-3.5 p-5">
-        <p class="eyebrow">Người được chỉ định</p>
-        <div class="text-2xl font-serif font-semibold text-[#16336B] min-h-12 flex items-center justify-center rounded-xl bg-[#F6F9FE] border border-[#E0E8F4] py-3 px-4"
+      <!-- Người được chọn ngẫu nhiên -->
+      <div class="clean-card text-center space-y-3 p-4">
+        <p class="text-[11px] text-slate-400 font-bold uppercase tracking-wider">Người được chỉ định</p>
+        <div class="text-xl font-bold text-white min-h-11 flex items-center justify-center rounded-xl bg-[#091524] border border-slate-700/80 py-2.5 px-4"
           id="todPlayerName">?</div>
-        <button class="btn-primary py-3.5" onclick="pickToDPlayer()">
+        <button class="btn-primary py-3 font-bold" onclick="pickToDPlayer()">
           🎲 Chọn ngẫu nhiên 1 người
         </button>
       </div>
 
-      <!-- Mode selection -->
-      <div id="todSelection" class="hidden card space-y-4 p-5">
-        <p class="eyebrow text-center">Chọn kiểu thử thách</p>
+      <!-- Chọn chế độ Thật / Thách -->
+      <div id="todSelection" class="hidden clean-card space-y-3 p-4">
+        <p class="text-xs font-bold text-slate-300 text-center uppercase tracking-wider">Chọn hình thức thử thách:</p>
 
-        <div class="grid grid-cols-2 gap-3">
+        <div class="grid grid-cols-2 gap-2.5">
           <div class="space-y-2">
-            <p class="text-[10px] text-center font-semibold tracking-[0.16em] uppercase text-[#2B5AA7]">🤔 Thật</p>
-            <button class="btn-secondary text-[10.5px] py-2.5 w-full" onclick="selectToDMode('truth','mild')">☀️ Nhẹ nhàng</button>
-            <button class="btn-secondary text-[10.5px] py-2.5 w-full" onclick="selectToDMode('truth','spicy')">🔥 Cháy phố</button>
+            <p class="text-xs text-center font-bold text-sky-400">🤔 THẬT</p>
+            <button class="btn-secondary text-xs py-2 w-full" onclick="selectToDMode('truth','mild')">☀️ Nhẹ nhàng</button>
+            <button class="btn-secondary text-xs py-2 w-full border-sky-400/40 text-sky-200" onclick="selectToDMode('truth','spicy')">🔥 Cháy phố</button>
           </div>
           <div class="space-y-2">
-            <p class="text-[10px] text-center font-semibold tracking-[0.16em] uppercase text-[#B8945A]">🔥 Thách</p>
-            <button class="btn-secondary text-[10.5px] py-2.5 w-full" onclick="selectToDMode('dare','mild')">☀️ Nhẹ nhàng</button>
-            <button class="btn-secondary text-[10.5px] py-2.5 w-full" onclick="selectToDMode('dare','spicy')">🔥 Cháy phố</button>
+            <p class="text-xs text-center font-bold text-teal-400">🔥 THÁCH</p>
+            <button class="btn-secondary text-xs py-2 w-full text-teal-200" onclick="selectToDMode('dare','mild')">☀️ Nhẹ nhàng</button>
+            <button class="btn-secondary text-xs py-2 w-full border-teal-400/40 text-teal-200" onclick="selectToDMode('dare','spicy')">🔥 Cháy phố</button>
           </div>
         </div>
       </div>
 
-      <!-- Flip Card Area -->
+      <!-- Thẻ lật bài -->
       <div id="todCardArea" class="hidden space-y-3">
         <div class="tod-card-container">
           <div class="tod-card-inner cursor-pointer" id="todCardInner">
@@ -764,7 +434,7 @@
             <div class="tod-card-face tod-card-back" id="todCardBack"></div>
           </div>
         </div>
-        <button class="btn-danger text-[11px] py-3" onclick="todGiveUp()">
+        <button class="btn-secondary text-red-300 border-red-800/80 bg-red-950/20 py-2.5" onclick="todGiveUp()">
           🏳️ Chịu thua (Uống phạt 1 ly)
         </button>
       </div>
@@ -773,148 +443,135 @@
   </section>
 
   <!-- ───────────────────────────────────────────────
-       SECTION 4: LẮC XÚC XẮC
+       TRÒ 4: LẮC XÚC XẮC
   ─────────────────────────────────────────────── -->
   <section id="section-dice" class="hidden">
-    <div class="space-y-5">
+    <div class="space-y-3.5">
 
-      <div class="text-center space-y-1.5">
-        <p class="eyebrow">Jeu N° 04 · Les Dés</p>
-        <h2 class="section-title flex items-center justify-center gap-2">
-          <span class="text-[20px]">🎲</span> Lắc Xúc Xắc
+      <div class="text-center">
+        <h2 class="text-base font-extrabold text-white flex items-center justify-center gap-1.5">
+          <span>🎲</span> Lắc Xúc Xắc
         </h2>
-        <div class="ornament"><span></span><b>◆</b><span></span></div>
-        <p class="section-sub">Lắc điện thoại hoặc bấm nút để đổ điểm</p>
+        <p class="text-[11.5px] text-slate-400 mt-0.5">Lắc điện thoại hoặc bấm nút để đổ điểm</p>
       </div>
 
-      <!-- Selector 1-5 dice -->
-      <div class="card-flat p-4">
-        <p class="eyebrow mb-3 text-center">Số lượng xúc xắc</p>
+      <!-- Chọn 1 đến 5 viên -->
+      <div class="clean-card p-3">
+        <p class="text-[11px] font-bold text-slate-300 mb-2 text-center uppercase tracking-wider">Số lượng xúc xắc</p>
         <div class="flex gap-2 justify-center">
-          <button class="dice-count-btn flex-1 py-2.5 rounded-xl border border-[#E1E8F2] bg-white text-[#66748C] font-semibold text-base transition-all" onclick="setDiceCount(1)">1</button>
-          <button class="dice-count-btn flex-1 py-2.5 rounded-xl border border-[#E1E8F2] bg-white text-[#66748C] font-semibold text-base transition-all" onclick="setDiceCount(2)">2</button>
-          <button class="dice-count-btn flex-1 py-2.5 rounded-xl border border-[#E1E8F2] bg-white text-[#66748C] font-semibold text-base transition-all" onclick="setDiceCount(3)">3</button>
-          <button class="dice-count-btn flex-1 py-2.5 rounded-xl border border-[#E1E8F2] bg-white text-[#66748C] font-semibold text-base transition-all" onclick="setDiceCount(4)">4</button>
-          <button class="dice-count-btn flex-1 py-2.5 rounded-xl border border-[#E1E8F2] bg-white text-[#66748C] font-semibold text-base transition-all" onclick="setDiceCount(5)">5</button>
+          <button class="dice-count-btn flex-1 py-2 rounded-xl border border-slate-700 bg-slate-800/80 text-slate-300 font-bold text-sm active:scale-95 transition-all" onclick="setDiceCount(1)">1</button>
+          <button class="dice-count-btn flex-1 py-2 rounded-xl border border-slate-700 bg-slate-800/80 text-slate-300 font-bold text-sm active:scale-95 transition-all" onclick="setDiceCount(2)">2</button>
+          <button class="dice-count-btn flex-1 py-2 rounded-xl border border-slate-700 bg-slate-800/80 text-slate-300 font-bold text-sm active:scale-95 transition-all" onclick="setDiceCount(3)">3</button>
+          <button class="dice-count-btn flex-1 py-2 rounded-xl border border-slate-700 bg-slate-800/80 text-slate-300 font-bold text-sm active:scale-95 transition-all" onclick="setDiceCount(4)">4</button>
+          <button class="dice-count-btn flex-1 py-2 rounded-xl border border-slate-700 bg-slate-800/80 text-slate-300 font-bold text-sm active:scale-95 transition-all" onclick="setDiceCount(5)">5</button>
         </div>
       </div>
 
-      <!-- Dice Board -->
-      <div class="card min-h-36 flex flex-col items-center justify-center gap-3 py-7 px-4">
-        <div id="diceContainer" class="flex flex-wrap gap-3.5 justify-center"></div>
-        <div id="diceTotal" class="font-serif text-xl font-semibold text-[#16336B]"></div>
+      <!-- Bàn xúc xắc -->
+      <div class="clean-card min-h-32 flex flex-col items-center justify-center gap-3 py-5 px-4">
+        <div id="diceContainer" class="flex flex-wrap gap-3 justify-center"></div>
+        <div id="diceTotal" class="text-base font-extrabold text-sky-400"></div>
       </div>
 
-      <!-- Roll Button -->
-      <button class="btn-primary text-[14px] py-4" onclick="rollDice()">
-        🎲 Lắc ngay!
+      <!-- Nút lắc -->
+      <button class="btn-primary text-base py-3.5 font-bold" onclick="rollDice()">
+        🎲 LẮC NGAY
       </button>
 
-      <!-- iOS motion button -->
-      <button id="requestMotionBtn" class="hidden btn-secondary text-[10.5px] py-2">
+      <button id="requestMotionBtn" class="hidden btn-secondary text-xs py-2">
         📱 Bật cảm biến lắc (iOS)
       </button>
 
-      <!-- Tip recommendation -->
-      <div id="diceTip" class="hidden card-flat text-[12px] font-medium text-center text-[#16336B] leading-relaxed py-3.5 px-4"></div>
+      <!-- Gợi ý vui -->
+      <div id="diceTip" class="hidden clean-card text-xs font-semibold text-center text-sky-200 leading-relaxed py-3 px-4"></div>
 
     </div>
   </section>
 
   <!-- ───────────────────────────────────────────────
-       SECTION 5: QUẢ BOM HẸN GIỜ
+       TRÒ 5: QUẢ BOM HẸN GIỜ
   ─────────────────────────────────────────────── -->
   <section id="section-bomb" class="hidden">
-    <div class="space-y-5">
+    <div class="space-y-3.5">
 
-      <div class="text-center space-y-1.5">
-        <p class="eyebrow">Jeu N° 05 · La Bombe</p>
-        <h2 class="section-title flex items-center justify-center gap-2">
-          <span class="text-[20px]">💣</span> Quả Bom Hẹn Giờ
+      <div class="text-center">
+        <h2 class="text-base font-extrabold text-white flex items-center justify-center gap-1.5">
+          <span>💣</span> Quả Bom Hẹn Giờ
         </h2>
-        <div class="ornament"><span></span><b>◆</b><span></span></div>
-        <p class="section-sub">Chuyền tay nhanh – Nổ trên tay ai thì người đó UỐNG!</p>
+        <p class="text-[11.5px] text-slate-400 mt-0.5">Chuyền tay nhanh – Nổ trên tay ai người đó UỐNG!</p>
       </div>
 
-      <!-- Topic Card -->
-      <div class="card text-center space-y-2.5 py-6 px-5">
-        <p class="eyebrow">📌 Chủ đề</p>
-        <p id="bombTopic" class="placeholder-text text-base sm:text-lg font-semibold leading-relaxed min-h-12 flex items-center justify-center">
-          Bấm "Chủ đề mới" để bắt đầu!
+      <!-- Thẻ chủ đề -->
+      <div class="clean-card text-center space-y-2 py-4 px-4">
+        <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">📌 Chủ đề</p>
+        <p id="bombTopic" class="text-base font-bold leading-relaxed text-slate-300 min-h-11 flex items-center justify-center">
+          Bấm "Đổi chủ đề mới" để bắt đầu!
         </p>
       </div>
 
-      <!-- Bomb Visual -->
-      <div class="flex justify-center py-2">
+      <!-- Hình ảnh quả bom -->
+      <div class="flex justify-center py-1">
         <div id="bombVisual" class="select-none cursor-default">💣</div>
       </div>
 
-      <div id="bombStatus" class="text-center text-[11.5px] font-medium text-[#66748C] min-h-6">
+      <div id="bombStatus" class="text-center text-xs font-semibold text-slate-300 min-h-6">
         Nhấn BẮT ĐẦU khi cả mâm sẵn sàng!
       </div>
 
-      <!-- Controls -->
+      <!-- Nút điều khiển -->
       <button class="btn-secondary" onclick="pickBombTopic()">
         🔀 Đổi chủ đề mới
       </button>
 
-      <button id="bombStartBtn" class="btn-primary text-[14px] py-4" onclick="startBomb()">
-        🚀 Bắt đầu!
+      <button id="bombStartBtn" class="btn-primary text-base py-3.5 font-bold" onclick="startBomb()">
+        🚀 BẮT ĐẦU
       </button>
 
-      <button id="bombStopBtn" class="hidden btn-danger py-3.5 font-medium" onclick="stopBomb()">
+      <button id="bombStopBtn" class="hidden btn-secondary text-red-300 border-red-800 bg-red-950/20 py-3 font-bold" onclick="stopBomb()">
         ⏹ Dừng lại
       </button>
 
-      <!-- Guideline -->
-      <div class="card-flat p-4 text-[12px] leading-relaxed text-[#5B6A82] space-y-1.5">
-        <p class="font-semibold text-[#16336B] text-[12.5px] tracking-wide">🎮 Quy tắc chuyền bom</p>
-        <p>• Thời gian đếm ngược ngẫu nhiên từ 20 đến 45 giây ẩn</p>
-        <p>• Mỗi người nói 1 đáp án không trùng rồi chuyền ngay cho người bên cạnh</p>
-        <p>• Bom nổ trên tay ai thì người đó <strong class="text-[#C0223B] font-semibold">UỐNG! 🍺</strong></p>
+      <!-- Hướng dẫn -->
+      <div class="clean-card p-3.5 text-xs text-slate-300 space-y-1">
+        <p class="font-bold text-white">🎮 Quy tắc chuyền bom:</p>
+        <p>• Thời gian đếm ngược ẩn ngẫu nhiên 20–45 giây</p>
+        <p>• Mỗi người nói 1 đáp án không trùng rồi chuyền ngay</p>
+        <p>• Bom nổ trên tay ai thì người đó <strong class="text-amber-400 font-bold">UỐNG! 🍺</strong></p>
       </div>
 
     </div>
   </section>
 
-  <!-- Closing note -->
-  <div class="pt-3 pb-2 text-center space-y-2">
-    <div class="ornament max-w-[180px] mx-auto"><span></span><b>❦</b><span></span></div>
-    <p class="font-serif italic text-[12px] text-[#8A97AC]">L'abus d'alcool est dangereux pour la santé.</p>
-    <p class="text-[8px] tracking-[0.3em] uppercase text-[#B3BECD]">Maison de Jeux · Sài Gòn</p>
-  </div>
-
 </main>
 
 <!-- ══════════════════════════════════════════════════
-     APP SHELL: FIXED BOTTOM NAVIGATION (5 TABS GAME)
+     BOTTOM NAVIGATION: 5 TAB CỐ ĐỊNH, TINH GỌN
 ══════════════════════════════════════════════════ -->
-<nav class="fixed bottom-0 left-0 right-0 z-30 bg-white border-t border-[#E6EBF3] shadow-[0_-10px_24px_-24px_rgba(22,51,107,0.4)]">
-  <div class="tricolore"></div>
-  <div class="max-w-md mx-auto flex items-stretch justify-around gap-1 px-2 py-2">
+<nav class="fixed bottom-0 left-0 right-0 z-30 bg-[#070E1A]/95 backdrop-blur-md border-t border-slate-800/80 px-2 py-1.5">
+  <div class="max-w-md mx-auto flex items-center justify-around gap-1">
 
     <button class="nav-btn nav-active" data-section="spin" onclick="showSection('spin')">
-      <span class="nav-icon">🎡</span>
+      <span class="nav-icon text-lg">🎡</span>
       <span>Vòng Quay</span>
     </button>
 
     <button class="nav-btn" data-section="whois" onclick="showSection('whois')">
-      <span class="nav-icon">👆</span>
+      <span class="nav-icon text-lg">👆</span>
       <span>Ai Là Người</span>
     </button>
 
     <button class="nav-btn" data-section="tod" onclick="showSection('tod')">
-      <span class="nav-icon">🃏</span>
+      <span class="nav-icon text-lg">🃏</span>
       <span>Thật/Thách</span>
     </button>
 
     <button class="nav-btn" data-section="dice" onclick="showSection('dice')">
-      <span class="nav-icon">🎲</span>
+      <span class="nav-icon text-lg">🎲</span>
       <span>Xúc Xắc</span>
     </button>
 
     <button class="nav-btn" data-section="bomb" onclick="showSection('bomb')">
-      <span class="nav-icon">💣</span>
+      <span class="nav-icon text-lg">💣</span>
       <span>Quả Bom</span>
     </button>
 

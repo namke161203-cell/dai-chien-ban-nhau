@@ -1,6 +1,5 @@
 // ============================================================
-// APP.JS - Logic chính cho Đại Chiến Bàn Nhậu
-// Giao diện: Maison de Jeux (trắng · xanh Pháp · serif)
+// APP.JS - Logic chính cho Đại Chiến Bàn Nhậu (Clean Dark Mode)
 // ============================================================
 
 // ─── State ───────────────────────────────────────────────
@@ -18,7 +17,7 @@ function getAudioCtx() {
   return state.audioCtx;
 }
 
-function playTone(freq, type, duration, volume = 0.3, delay = 0) {
+function playTone(freq, type, duration, volume = 0.25, delay = 0) {
   if (!state.soundEnabled) return;
   try {
     const ctx = getAudioCtx();
@@ -36,8 +35,8 @@ function playTone(freq, type, duration, volume = 0.3, delay = 0) {
 }
 
 function playClick() {
-  playTone(850, 'sine', 0.035, 0.12);
-  playTone(1250, 'sine', 0.03, 0.08, 0.02);
+  playTone(850, 'sine', 0.03, 0.1);
+  playTone(1200, 'sine', 0.025, 0.07, 0.02);
 }
 
 function playDiceShake() {
@@ -45,13 +44,13 @@ function playDiceShake() {
   try {
     const ctx = getAudioCtx();
     for (let i = 0; i < 6; i++) {
-      const buf = ctx.createBuffer(1, ctx.sampleRate * 0.08, ctx.sampleRate);
+      const buf = ctx.createBuffer(1, ctx.sampleRate * 0.07, ctx.sampleRate);
       const data = buf.getChannelData(0);
-      for (let j = 0; j < data.length; j++) data[j] = (Math.random() * 2 - 1) * 0.35;
+      for (let j = 0; j < data.length; j++) data[j] = (Math.random() * 2 - 1) * 0.3;
       const src = ctx.createBufferSource();
       src.buffer = buf;
       const gain = ctx.createGain();
-      gain.gain.setValueAtTime(0.25, ctx.currentTime + i * 0.07);
+      gain.gain.setValueAtTime(0.2, ctx.currentTime + i * 0.07);
       gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.07 + 0.07);
       src.connect(gain);
       gain.connect(ctx.destination);
@@ -63,20 +62,20 @@ function playDiceShake() {
 function playCelebration() {
   if (!state.soundEnabled) return;
   const notes = [523, 659, 784, 1047, 784, 1047, 1319];
-  notes.forEach((f, i) => playTone(f, 'triangle', 0.18, 0.22, i * 0.11));
+  notes.forEach((f, i) => playTone(f, 'triangle', 0.16, 0.2, i * 0.11));
 }
 
 function playBombTick(fast = false) {
   if (!state.soundEnabled) return;
-  playTone(1100, 'square', 0.04, 0.18);
-  if (fast) setTimeout(() => playTone(880, 'square', 0.04, 0.14), 50);
+  playTone(1050, 'square', 0.035, 0.15);
+  if (fast) setTimeout(() => playTone(850, 'square', 0.035, 0.12), 50);
 }
 
 function playBombExplode() {
   if (!state.soundEnabled) return;
   try {
     const ctx = getAudioCtx();
-    const buf = ctx.createBuffer(1, ctx.sampleRate * 0.8, ctx.sampleRate);
+    const buf = ctx.createBuffer(1, ctx.sampleRate * 0.75, ctx.sampleRate);
     const data = buf.getChannelData(0);
     for (let i = 0; i < data.length; i++) {
       data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (ctx.sampleRate * 0.15));
@@ -84,17 +83,17 @@ function playBombExplode() {
     const src = ctx.createBufferSource();
     src.buffer = buf;
     const gain = ctx.createGain();
-    gain.gain.setValueAtTime(1.0, ctx.currentTime);
+    gain.gain.setValueAtTime(0.9, ctx.currentTime);
     src.connect(gain);
     gain.connect(ctx.destination);
     src.start();
-    playTone(55, 'sine', 0.7, 0.8);
-    playTone(95, 'sine', 0.4, 0.6, 0.05);
+    playTone(55, 'sine', 0.6, 0.7);
+    playTone(95, 'sine', 0.35, 0.5, 0.05);
   } catch (e) {}
 }
 
 function playSpinTick() {
-  playTone(950, 'triangle', 0.025, 0.08);
+  playTone(950, 'triangle', 0.02, 0.07);
 }
 
 // ─── LocalStorage ─────────────────────────────────────────
@@ -140,21 +139,21 @@ function renderMemberBar() {
   const totalCount = state.players.length;
   if (countBadge) {
     countBadge.textContent = `${activeCount}/${totalCount}`;
-    countBadge.className = `chip ${
+    countBadge.className = `text-[10.5px] font-bold px-2 py-0.5 rounded-full border ${
       activeCount > 0
-        ? ''
-        : '!bg-[#FFF5F6] !text-[#C0223B] !border-[#F0CFD5]'
+        ? 'bg-sky-500/15 text-sky-300 border-sky-400/30'
+        : 'bg-red-500/15 text-red-300 border-red-400/30'
     }`;
   }
 
   container.innerHTML = '';
 
-  // Nút + tròn mở modal nhập nhanh danh sách tên
+  // Nút + tròn mở modal nhập nhanh 16 tên
   const addBtn = document.createElement('button');
-  addBtn.className = 'w-10 h-10 rounded-full bg-gradient-to-br from-[#24457F] to-[#16336B] text-white font-semibold shadow-[0_0_0_1px_#16336B,0_0_0_3px_#FFFFFF,0_0_0_4px_rgba(184,148,90,0.55),0_8px_16px_-10px_rgba(22,51,107,0.8)] flex items-center justify-center shrink-0 active:scale-90 transition-transform';
+  addBtn.className = 'w-9 h-9 rounded-full bg-gradient-to-tr from-sky-500 to-teal-400 text-slate-950 font-black shadow-sm flex items-center justify-center shrink-0 active:scale-90 transition-transform';
   addBtn.title = 'Quản lý thành viên (nhập 16 tên)';
   addBtn.innerHTML = `
-    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
       <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
     </svg>
   `;
@@ -164,17 +163,22 @@ function renderMemberBar() {
   // Danh sách avatar từng người cuộn ngang
   state.players.forEach((p, idx) => {
     const item = document.createElement('button');
-    item.className = 'flex flex-col items-center shrink-0 group transition-all duration-200';
+    item.className = 'flex flex-col items-center shrink-0 group transition-all duration-150';
     item.onclick = () => togglePlayer(idx);
 
     const char = getAvatarChar(p.name);
-    const avatarClass = p.active ? 'avatar-on' : 'avatar-off';
-    const textClass = p.active ? 'avatar-name-on' : 'avatar-name-off';
+    const avatarClass = p.active
+      ? 'w-9 h-9 rounded-full bg-[#0D2138] border-2 border-sky-400 text-sky-200 flex items-center justify-center text-xs font-bold'
+      : 'w-9 h-9 rounded-full bg-slate-900 border border-slate-700 text-slate-500 opacity-40 flex items-center justify-center text-xs font-semibold';
+
+    const textClass = p.active
+      ? 'text-[10px] font-medium text-slate-300 max-w-[50px] truncate text-center mt-1'
+      : 'text-[10px] text-slate-500 opacity-50 max-w-[50px] truncate text-center mt-1 line-through';
 
     item.innerHTML = `
       <div class="relative">
         <div class="${avatarClass}">${char}</div>
-        ${p.active ? '<span class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-[#B8945A] rounded-full border-2 border-white shadow-sm"></span>' : ''}
+        ${p.active ? '<span class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-teal-400 rounded-full border border-[#070E1A]"></span>' : ''}
       </div>
       <span class="${textClass}">${escHtml(p.name)}</span>
     `;
@@ -231,46 +235,46 @@ function clearPlayers() {
 function openPlayerModal() {
   playClick();
   const html = `
-    <div class="space-y-5">
-      <div class="flex items-start justify-between pb-3 border-b border-[#E6EBF3]">
-        <div class="flex items-center gap-3">
-          <div class="seal">👥</div>
+    <div class="space-y-4">
+      <div class="flex items-center justify-between pb-2.5 border-b border-slate-700/80">
+        <div class="flex items-center gap-2">
+          <span class="text-xl">👥</span>
           <div>
-            <h3 class="font-serif text-xl font-semibold text-[#16336B] leading-tight">Quản lý Thành viên</h3>
-            <p class="text-[11px] text-[#8A97AC] tracking-wide mt-0.5">Nhập danh sách hoặc chạm để bật/tắt</p>
+            <h3 class="text-sm sm:text-base font-bold text-white">Quản lý Thành viên</h3>
+            <p class="text-[11px] text-slate-400">Dán danh sách hoặc chạm để bật/tắt</p>
           </div>
         </div>
-        <button onclick="closeModal()" class="w-8 h-8 rounded-full bg-white border border-[#E1E8F2] text-[#8A97AC] hover:text-[#16336B] hover:border-[#C9D6E8] flex items-center justify-center text-xs transition-colors">✕</button>
+        <button onclick="closeModal()" class="w-7 h-7 rounded-full bg-slate-800 border border-slate-700 text-slate-400 hover:text-white flex items-center justify-center text-xs">✕</button>
       </div>
 
       <!-- Bulk input -->
-      <div class="space-y-2">
-        <label class="eyebrow block">📋 Dán nhanh danh sách tên</label>
+      <div class="space-y-1.5">
+        <label class="text-[11px] font-bold uppercase tracking-wider text-slate-300">📋 Dán nhanh 16 tên</label>
         <textarea id="modalBulkInput" rows="4"
-          class="field"
+          class="w-full bg-[#081424] border border-slate-700 rounded-xl px-3 py-2 text-white text-xs placeholder-slate-500 focus:border-sky-400 focus:outline-none resize-none font-medium leading-relaxed"
           placeholder="Minh Tuấn&#10;Hồng Nhung&#10;Quang Hải&#10;... (mỗi tên 1 dòng hoặc cách nhau dấu phẩy)"></textarea>
-        <button class="btn-primary text-[11px] py-3 w-full" onclick="addPlayersFromTextarea()">
-          Lưu danh sách
+        <button class="btn-primary text-xs py-2.5 w-full font-bold" onclick="addPlayersFromTextarea()">
+          ✅ Lưu danh sách
         </button>
       </div>
 
       <!-- Quick actions -->
       <div class="flex gap-2">
-        <button class="btn-secondary text-[10px] py-2.5 flex-1" onclick="addSamplePlayers()">
+        <button class="btn-secondary text-xs py-2 flex-1" onclick="addSamplePlayers()">
           🎲 Tạo 16 người mẫu
         </button>
-        <button class="btn-danger text-[10px] py-2.5 px-3" onclick="clearPlayers()">
+        <button class="text-xs py-2 px-3 rounded-xl bg-red-950/40 border border-red-800 text-red-300 font-bold active:scale-95" onclick="clearPlayers()">
           🗑 Xóa hết
         </button>
       </div>
 
       <!-- Current players list -->
-      <div class="space-y-2">
-        <div class="flex justify-between items-center eyebrow">
-          <span>Danh sách hiện tại</span>
-          <span class="normal-case tracking-normal text-[10px] text-[#A9B4C4]">Chạm để bật/tắt</span>
+      <div class="space-y-1.5">
+        <div class="flex justify-between items-center text-[11px] text-slate-400 font-medium">
+          <span>Danh sách hiện tại:</span>
+          <span>Chạm để bật/tắt</span>
         </div>
-        <div id="modalPlayerList" class="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto pr-1"></div>
+        <div id="modalPlayerList" class="grid grid-cols-2 gap-2 max-h-44 overflow-y-auto pr-1"></div>
       </div>
     </div>
   `;
@@ -283,18 +287,18 @@ function renderModalPlayerList() {
   if (!container) return;
   container.innerHTML = '';
   if (state.players.length === 0) {
-    container.innerHTML = '<p class="text-center text-[#A9B4C4] py-4 col-span-2 text-[11px]">Chưa có người chơi nào.</p>';
+    container.innerHTML = '<p class="text-center text-slate-500 py-3 col-span-2 text-xs">Chưa có người chơi nào.</p>';
     return;
   }
   state.players.forEach((p, i) => {
     const btn = document.createElement('button');
-    btn.className = `flex items-center gap-2 px-2.5 py-2 rounded-xl text-[11px] font-medium transition-all border ${
+    btn.className = `flex items-center gap-2 px-2.5 py-1.5 rounded-xl text-xs font-medium transition-all border ${
       p.active
-        ? 'border-[#C9D9EF] bg-[#F3F7FC] text-[#16336B]'
-        : 'border-[#E6EBF3] bg-[#FAFBFD] text-[#A9B4C4] opacity-80'
+        ? 'border-sky-500/40 bg-sky-950/30 text-sky-200'
+        : 'border-slate-800 bg-slate-900/60 text-slate-500 opacity-60'
     }`;
     btn.innerHTML = `
-      <span class="w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-semibold ${p.active ? 'bg-[#16336B] text-white' : 'bg-[#E9EEF6] text-[#A9B4C4]'}">${i + 1}</span>
+      <span class="w-4 h-4 rounded-full flex items-center justify-center text-[10px] font-bold ${p.active ? 'bg-sky-500 text-slate-950' : 'bg-slate-700 text-slate-400'}">${i + 1}</span>
       <span class="flex-1 text-left truncate">${escHtml(p.name)}</span>
       <span class="text-[10px]">${p.active ? '✓' : '✗'}</span>
     `;
@@ -307,38 +311,38 @@ function renderModalPlayerList() {
 function openSettingsModal() {
   playClick();
   const html = `
-    <div class="space-y-5">
-      <div class="flex items-start justify-between pb-3 border-b border-[#E6EBF3]">
-        <div class="flex items-center gap-3">
-          <div class="seal">⚙️</div>
+    <div class="space-y-4">
+      <div class="flex items-center justify-between pb-2.5 border-b border-slate-700/80">
+        <div class="flex items-center gap-2">
+          <span class="text-xl">⚙️</span>
           <div>
-            <h3 class="font-serif text-xl font-semibold text-[#16336B] leading-tight">Cài đặt & Luật Chơi</h3>
-            <p class="text-[11px] text-[#8A97AC] tracking-wide mt-0.5">Maison de Jeux · Édition Bleue</p>
+            <h3 class="text-sm sm:text-base font-bold text-white">Cài đặt & Luật Chơi</h3>
+            <p class="text-[11px] text-slate-400">Đại Chiến Bàn Nhậu v2.1</p>
           </div>
         </div>
-        <button onclick="closeModal()" class="w-8 h-8 rounded-full bg-white border border-[#E1E8F2] text-[#8A97AC] hover:text-[#16336B] hover:border-[#C9D6E8] flex items-center justify-center text-xs transition-colors">✕</button>
+        <button onclick="closeModal()" class="w-7 h-7 rounded-full bg-slate-800 border border-slate-700 text-slate-400 hover:text-white flex items-center justify-center text-xs">✕</button>
       </div>
 
-      <div class="space-y-3 text-[12px] leading-relaxed text-[#5B6A82]">
-        <div class="flex items-center justify-between p-3.5 rounded-xl bg-[#FAFBFD] border border-[#E6EBF3]">
+      <div class="space-y-2.5 text-xs leading-relaxed text-slate-300">
+        <div class="flex items-center justify-between p-3 rounded-xl bg-[#081424] border border-slate-700/80">
           <div>
-            <div class="font-semibold text-[#16336B] text-[13px]">Âm thanh hiệu ứng</div>
-            <div class="text-[11px] text-[#8A97AC] mt-0.5">Web Audio API synth sinh động</div>
+            <div class="font-bold text-white text-xs sm:text-sm">Âm thanh hiệu ứng</div>
+            <div class="text-[11px] text-slate-400">Web Audio API sinh động</div>
           </div>
-          <button onclick="toggleSound(); updateSettingsSoundBtn(this);" id="settingsSoundToggle" class="px-3.5 py-1.5 rounded-lg text-[10px] font-semibold tracking-wide ${state.soundEnabled ? 'bg-[#EDF3FC] text-[#16336B] border border-[#C9D9EF]' : 'bg-[#F4F6FA] text-[#8A97AC] border border-[#E6EBF3]'}">
+          <button onclick="toggleSound(); updateSettingsSoundBtn(this);" id="settingsSoundToggle" class="px-3 py-1.5 rounded-lg text-xs font-bold ${state.soundEnabled ? 'bg-sky-500/20 text-sky-300 border border-sky-400/40' : 'bg-slate-800 text-slate-400 border border-slate-700'}">
             ${state.soundEnabled ? 'BẬT 🔊' : 'TẮT 🔇'}
           </button>
         </div>
 
-        <div class="p-4 rounded-xl bg-[#FAFBFD] border border-[#E6EBF3] space-y-2">
-          <div class="font-semibold text-[#16336B] text-[13px]">🍺 Luật chơi mâm đông người</div>
-          <p>• Nhấn vào avatar bất kỳ trên thanh thành viên để tạm ẩn người đang đi vệ sinh/bận nghe máy.</p>
-          <p>• Bấm nút <strong class="text-[#16336B] font-semibold">+</strong> ở góc trái thanh thành viên để dán danh sách tên mới bất cứ lúc nào.</p>
-          <p>• Chơi vui là chính, an toàn là trên hết – đã uống bia rượu thì không lái xe!</p>
+        <div class="p-3.5 rounded-xl bg-[#081424] border border-slate-700/80 space-y-1.5">
+          <div class="font-bold text-sky-300 text-xs sm:text-sm">🍺 Luật chơi mâm 16 người:</div>
+          <p>• Nhấn vào avatar trên thanh thành viên để tạm ẩn người đang đi vệ sinh/nghe điện thoại.</p>
+          <p>• Bấm nút <strong>+</strong> ở góc trái để dán 16 tên bất kỳ lúc nào.</p>
+          <p>• Uống có trách nhiệm, vui là chính – đã uống bia rượu thì tuyệt đối không lái xe!</p>
         </div>
       </div>
 
-      <button onclick="closeModal()" class="btn-primary w-full py-3.5 text-[12px]">Đã hiểu, chiến tiếp!</button>
+      <button onclick="closeModal()" class="btn-primary w-full py-2.5 font-bold text-xs sm:text-sm">Đã hiểu, tiếp tục chơi!</button>
     </div>
   `;
   showModal(html);
@@ -347,7 +351,7 @@ function openSettingsModal() {
 function updateSettingsSoundBtn(btn) {
   if (btn) {
     btn.textContent = state.soundEnabled ? 'BẬT 🔊' : 'TẮT 🔇';
-    btn.className = `px-3.5 py-1.5 rounded-lg text-[10px] font-semibold tracking-wide ${state.soundEnabled ? 'bg-[#EDF3FC] text-[#16336B] border border-[#C9D9EF]' : 'bg-[#F4F6FA] text-[#8A97AC] border border-[#E6EBF3]'}`;
+    btn.className = `px-3 py-1.5 rounded-lg text-xs font-bold ${state.soundEnabled ? 'bg-sky-500/20 text-sky-300 border border-sky-400/40' : 'bg-slate-800 text-slate-400 border border-slate-700'}`;
   }
 }
 
@@ -364,10 +368,10 @@ function showToast(msg, duration = 2500) {
   let t = document.getElementById('toast');
   if (!t) return;
   t.textContent = msg;
-  t.classList.remove('opacity-0', 'translate-y-4');
+  t.classList.remove('opacity-0', 'translate-y-3');
   t.classList.add('opacity-100', 'translate-y-0');
   setTimeout(() => {
-    t.classList.add('opacity-0', 'translate-y-4');
+    t.classList.add('opacity-0', 'translate-y-3');
     t.classList.remove('opacity-100', 'translate-y-0');
   }, duration);
 }
@@ -387,7 +391,7 @@ function closeModal() {
 }
 
 // ─────────────────────────────────────────────────────────
-// TRÒ 1: VÒNG QUAY NHÂN PHẨM (Xanh dương - Xanh ngọc - Tím pastel)
+// TRÒ 1: VÒNG QUAY NHÂN PHẨM (Hài hòa, rõ nét, không chói)
 // ─────────────────────────────────────────────────────────
 let spinCanvas, spinCtx;
 let spinAngle = 0;
@@ -395,24 +399,24 @@ let spinVelocity = 0;
 let spinAnimId = null;
 let isSpinning = false;
 
-// Bảng màu: các sắc xanh Pháp (navy → bleu de France)
+// Bảng màu 16 ô: Tông màu sâu, hài hòa, không chói mắt
 const COLORS = [
-  '#16336B', // Bleu marine
-  '#2B5AA7', // Bleu de France
-  '#1E4480',
-  '#3E6BB5',
-  '#274E92',
-  '#4A78BE',
-  '#1A3E7C',
-  '#3565AC',
-  '#16336B',
-  '#2B5AA7',
-  '#1E4480',
-  '#3E6BB5',
-  '#274E92',
-  '#4A78BE',
-  '#1A3E7C',
-  '#3565AC'
+  '#0369A1', // Ocean Blue
+  '#0F766E', // Forest Teal
+  '#4338CA', // Indigo
+  '#0284C7', // Sky Blue
+  '#0D9488', // Deep Teal
+  '#4F46E5', // Soft Indigo
+  '#0891B2', // Cyan Blue
+  '#059669', // Emerald
+  '#1D4ED8', // Royal Blue
+  '#14B8A6', // Teal
+  '#3730A3', // Dark Indigo
+  '#0284C7', // Sky
+  '#0F766E', // Muted Teal
+  '#2563EB', // Blue
+  '#10B981', // Mint
+  '#3B82F6'  // Slate Blue
 ];
 
 function initSpinWheel() {
@@ -426,7 +430,7 @@ function initSpinWheel() {
 function resizeCanvas() {
   if (!spinCanvas) return;
   const container = spinCanvas.parentElement;
-  const size = Math.min(container.clientWidth - 16, 350);
+  const size = Math.min(container.clientWidth - 16, 330);
   spinCanvas.width = size;
   spinCanvas.height = size;
 }
@@ -442,15 +446,15 @@ function drawWheel() {
   spinCtx.clearRect(0, 0, spinCanvas.width, spinCanvas.height);
 
   if (n === 0) {
-    spinCtx.fillStyle = '#F5F8FD';
+    spinCtx.fillStyle = '#0D1B2A';
     spinCtx.beginPath();
     spinCtx.arc(cx, cy, r, 0, Math.PI * 2);
     spinCtx.fill();
-    spinCtx.strokeStyle = '#D9E4F4';
+    spinCtx.strokeStyle = 'rgba(56, 189, 248, 0.25)';
     spinCtx.lineWidth = 2;
     spinCtx.stroke();
-    spinCtx.fillStyle = '#93A1B6';
-    spinCtx.font = `500 ${Math.min(14, r / 5)}px Jost, sans-serif`;
+    spinCtx.fillStyle = '#94A3B8';
+    spinCtx.font = `600 ${Math.min(14, r / 5)}px "Be Vietnam Pro", sans-serif`;
     spinCtx.textAlign = 'center';
     spinCtx.fillText('Chưa có người chơi', cx, cy);
     return;
@@ -458,7 +462,7 @@ function drawWheel() {
 
   const sliceAngle = (Math.PI * 2) / n;
 
-  // Draw slices
+  // Vẽ các ô
   players.forEach((p, i) => {
     const start = spinAngle + i * sliceAngle;
     const end = start + sliceAngle;
@@ -469,63 +473,47 @@ function drawWheel() {
     spinCtx.closePath();
     spinCtx.fillStyle = COLORS[i % COLORS.length];
     spinCtx.fill();
-    spinCtx.strokeStyle = 'rgba(255, 255, 255, 0.82)';
-    spinCtx.lineWidth = 1.5;
+    spinCtx.strokeStyle = '#070E1A';
+    spinCtx.lineWidth = 2;
     spinCtx.stroke();
 
-    // Text name
+    // Tên người chơi (chữ xoay hướng tâm, phông Be Vietnam Pro chuẩn)
     spinCtx.save();
     spinCtx.translate(cx, cy);
     spinCtx.rotate(start + sliceAngle / 2);
     spinCtx.textAlign = 'right';
 
-    const fontSize = Math.max(10, Math.min(13, r / (n * 0.52)));
-    spinCtx.font = `600 ${fontSize}px Jost, sans-serif`;
+    const fontSize = Math.max(10, Math.min(12.5, r / (n * 0.52)));
+    spinCtx.font = `700 ${fontSize}px "Be Vietnam Pro", sans-serif`;
     spinCtx.fillStyle = '#FFFFFF';
-    spinCtx.shadowColor = 'rgba(9, 22, 45, 0.45)';
-    spinCtx.shadowBlur = 3;
+    spinCtx.shadowColor = 'rgba(0, 0, 0, 0.7)';
+    spinCtx.shadowBlur = 2;
 
-    const maxLen = 12;
+    const maxLen = Math.max(5, Math.floor(18 / Math.sqrt(n)));
     let name = p.name;
     if (name.length > maxLen) name = name.slice(0, maxLen - 1) + '…';
 
-    spinCtx.fillText(name, r - 13, fontSize / 3);
+    spinCtx.fillText(name, r - 12, fontSize / 3);
     spinCtx.restore();
   });
 
-  // Inner hairline around the central button
-  spinCtx.beginPath();
-  spinCtx.arc(cx, cy, 38, 0, Math.PI * 2);
-  spinCtx.strokeStyle = 'rgba(255, 255, 255, 0.55)';
-  spinCtx.lineWidth = 1;
-  spinCtx.stroke();
-
-  // Outer rings: fine gold line + navy rim
-  spinCtx.beginPath();
-  spinCtx.arc(cx, cy, r + 3, 0, Math.PI * 2);
-  spinCtx.strokeStyle = 'rgba(184, 148, 90, 0.55)';
-  spinCtx.lineWidth = 1;
-  spinCtx.stroke();
-
+  // Viền ngoài thanh mảnh, không phát sáng chói
   spinCtx.beginPath();
   spinCtx.arc(cx, cy, r, 0, Math.PI * 2);
-  spinCtx.strokeStyle = '#16336B';
+  spinCtx.strokeStyle = 'rgba(56, 189, 248, 0.4)';
   spinCtx.lineWidth = 3;
   spinCtx.stroke();
 
-  // Pointer at top
+  // Mũi tên chỉ điểm ở trên đỉnh
   spinCtx.save();
-  spinCtx.translate(cx, cy - r);
+  spinCtx.translate(cx, 0);
   spinCtx.beginPath();
-  spinCtx.moveTo(0, 20);
-  spinCtx.lineTo(-11, -2);
-  spinCtx.lineTo(11, -2);
+  spinCtx.moveTo(0, r * 0.12);
+  spinCtx.lineTo(-12, -2);
+  spinCtx.lineTo(12, -2);
   spinCtx.closePath();
-  spinCtx.fillStyle = '#B8945A';
-  spinCtx.strokeStyle = '#16336B';
-  spinCtx.lineWidth = 2;
+  spinCtx.fillStyle = '#38BDF8';
   spinCtx.fill();
-  spinCtx.stroke();
   spinCtx.restore();
 }
 
@@ -537,7 +525,7 @@ function spinWheel() {
     return;
   }
   isSpinning = true;
-  spinVelocity = 0.28 + Math.random() * 0.22;
+  spinVelocity = 0.26 + Math.random() * 0.2;
 
   function animate() {
     spinAngle += spinVelocity;
@@ -577,21 +565,20 @@ function onSpinEnd() {
   const challenge = randItem(DATA.spins);
 
   showModal(`
-    <div class="text-center space-y-4">
-      <p class="eyebrow">Le Grand Tirage</p>
-      <div class="text-4xl mb-1">🎉</div>
-      <h2 class="font-serif text-2xl font-semibold text-[#16336B] tracking-wide">Trúng thưởng!</h2>
-      <div class="font-serif text-2xl font-semibold text-[#16336B] py-3 px-4 bg-[#F4F8FE] border border-[#D9E4F4] rounded-xl shadow-[inset_0_1px_0_#FFFFFF]">
+    <div class="text-center space-y-3.5">
+      <div class="text-4xl">🎉</div>
+      <h2 class="text-xs font-bold text-sky-400 uppercase tracking-widest">Trúng thưởng!</h2>
+      <div class="text-xl sm:text-2xl font-black text-white py-2.5 px-4 bg-sky-950/50 rounded-2xl border border-sky-400/40">
         ${escHtml(winner.name)}
       </div>
-      <div class="bg-[#FAFBFD] border border-[#E3E9F2] rounded-xl p-4 text-left space-y-2">
-        <div class="text-[9px] font-medium tracking-[0.24em] uppercase text-[#B8945A]">⚡ Lệnh phạt / Thử thách</div>
-        <div class="font-semibold text-[#16336B] text-base" id="spinChallengeTitleEl">${escHtml(challenge.title)}</div>
-        <div class="text-[#5B6A82] text-[13px] leading-relaxed" id="spinChallengeDescEl">${escHtml(challenge.desc)}</div>
+      <div class="bg-[#081424] border border-slate-700/80 rounded-2xl p-4 text-left space-y-1.5">
+        <div class="text-[11px] font-bold text-teal-300 uppercase tracking-wider">⚡ Lệnh Phạt / Thử thách</div>
+        <div class="font-bold text-white text-sm" id="spinChallengeTitleEl">${escHtml(challenge.title)}</div>
+        <div class="text-slate-300 text-xs sm:text-sm leading-relaxed" id="spinChallengeDescEl">${escHtml(challenge.desc)}</div>
       </div>
-      <div class="flex gap-3 pt-1">
-        <button onclick="closeModal()" class="flex-1 py-3 rounded-xl bg-white border border-[#DCE5F1] text-[#5B6A82] font-medium text-[12px] active:scale-95 transition-transform">↩ Xong</button>
-        <button onclick="changeSpinChallenge()" class="flex-1 py-3 rounded-xl bg-gradient-to-br from-[#24457F] to-[#16336B] text-white font-medium text-[12px] tracking-wide shadow-[0_12px_24px_-14px_rgba(22,51,107,0.9)] active:scale-95 transition-transform">🔀 Đổi lệnh</button>
+      <div class="flex gap-2.5 pt-1">
+        <button onclick="closeModal()" class="flex-1 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-slate-300 text-xs font-bold active:scale-95">↩ Xong</button>
+        <button onclick="changeSpinChallenge()" class="flex-1 py-2.5 rounded-xl btn-primary text-xs font-bold active:scale-95">🔀 Đổi lệnh khác</button>
       </div>
     </div>
   `);
@@ -618,8 +605,8 @@ function pickWhoIsQuestion() {
   const btnArea = document.getElementById('whoIsBtn');
   if (qEl) {
     qEl.textContent = whoIsQuestion;
-    qEl.classList.remove('placeholder-text');
-    qEl.classList.add('chosen-text');
+    qEl.classList.remove('text-slate-400');
+    qEl.classList.add('text-white');
   }
   if (btnArea) btnArea.classList.remove('hidden');
   const resultEl = document.getElementById('whoIsResult');
@@ -649,12 +636,11 @@ function startWhoIsCountdown() {
   let count = 3;
   if (countEl) {
     countEl.textContent = count;
-    countEl.classList.remove('count-final');
     countEl.classList.remove('hidden', 'scale-0');
     countEl.classList.add('scale-100');
   }
 
-  playTone(520, 'sine', 0.25, 0.4);
+  playTone(520, 'sine', 0.25, 0.35);
 
   whoIsCountdown = setInterval(() => {
     count--;
@@ -666,7 +652,7 @@ function startWhoIsCountdown() {
           countEl.classList.add('scale-100');
         }, 80);
       }
-      playTone(520, 'sine', 0.25, 0.4);
+      playTone(520, 'sine', 0.25, 0.35);
     } else {
       clearInterval(whoIsCountdown);
       whoIsCountdown = null;
@@ -674,7 +660,6 @@ function startWhoIsCountdown() {
         countEl.classList.remove('scale-100');
         setTimeout(() => {
           countEl.textContent = '👆 CHỈ!';
-          countEl.classList.add('count-final');
           countEl.classList.add('scale-100');
         }, 80);
       }
@@ -715,15 +700,15 @@ function pickToDPlayer() {
   if (cardArea) cardArea.classList.add('hidden');
 
   let rollCount = 0;
-  const totalRolls = 15;
+  const totalRolls = 14;
   const intervalBase = 70;
 
   function roll() {
     const p = randItem(players);
     if (nameEl) nameEl.textContent = p.name;
-    playTone(700 + Math.random() * 300, 'square', 0.04, 0.1);
+    playTone(700 + Math.random() * 300, 'square', 0.035, 0.08);
     rollCount++;
-    const delay = intervalBase + (rollCount / totalRolls) * 220;
+    const delay = intervalBase + (rollCount / totalRolls) * 200;
     if (rollCount < totalRolls) {
       todRollTimer = setTimeout(roll, delay);
     } else {
@@ -755,31 +740,31 @@ function selectToDMode(mode, level) {
 
   const modeLabel = mode === 'truth' ? '🤔 THẬT' : '🔥 THÁCH';
   const levelLabel = level === 'mild' ? '☀️ Nhẹ nhàng' : '🔥 Cháy phố';
-  const modeColor = mode === 'truth' ? 'text-[#2B5AA7]' : 'text-[#C0223B]';
-  const borderColor = mode === 'truth' ? 'border-[#C9D9EF]' : 'border-[#EBC9CF]';
+  const modeColor = mode === 'truth' ? 'text-sky-300' : 'text-teal-300';
+  const borderColor = mode === 'truth' ? 'border-sky-500/50' : 'border-teal-500/50';
 
   if (cardFront) {
-    cardFront.className = `tod-card-face tod-card-front absolute inset-0 flex items-center justify-center bg-white border ${borderColor} shadow-[0_20px_44px_-30px_rgba(22,51,107,0.5)]`;
+    cardFront.className = `tod-card-face tod-card-front absolute inset-0 rounded-2xl flex items-center justify-center bg-[#091524] border ${borderColor} shadow-md`;
     cardFront.innerHTML = `
-      <div class="text-center space-y-2.5 p-6">
+      <div class="text-center space-y-1.5 p-4">
         <div class="text-3xl">${mode === 'truth' ? '🤔' : '🔥'}</div>
-        <div class="font-serif text-3xl font-semibold tracking-wide ${modeColor}">${modeLabel}</div>
-        <div class="eyebrow">${levelLabel}</div>
-        <div class="text-[9px] text-[#B8945A] font-medium tracking-[0.2em] uppercase pt-3 animate-pulse">Chạm để lật thẻ bài ✦</div>
+        <div class="text-xl font-black ${modeColor}">${modeLabel}</div>
+        <div class="text-xs text-slate-400">${levelLabel}</div>
+        <div class="text-[11px] text-sky-300 font-medium mt-2">Chạm để lật thẻ bài</div>
       </div>`;
   }
   if (cardBack) {
-    cardBack.className = `tod-card-face tod-card-back absolute inset-0 bg-white border ${borderColor} shadow-[0_20px_44px_-30px_rgba(22,51,107,0.5)] flex flex-col justify-between p-5`;
+    cardBack.className = `tod-card-face tod-card-back absolute inset-0 rounded-2xl bg-[#091524] border ${borderColor} shadow-md flex flex-col justify-between p-4`;
     cardBack.innerHTML = `
-      <div class="space-y-3">
-        <div class="flex items-center justify-between text-[9px] font-medium uppercase tracking-[0.2em]">
+      <div class="space-y-2">
+        <div class="flex items-center justify-between text-[11px] font-bold uppercase tracking-wider">
           <span class="${modeColor}">${modeLabel}</span>
-          <span class="text-[#A9B4C4]">${levelLabel}</span>
+          <span class="text-slate-400">${levelLabel}</span>
         </div>
-        <p class="text-[#1A2436] text-sm sm:text-[15px] font-medium leading-relaxed">${escHtml(content)}</p>
+        <p class="text-white text-xs sm:text-sm font-semibold leading-relaxed">${escHtml(content)}</p>
       </div>
-      <div class="pt-2 border-t border-[#E6EBF3]">
-        <span class="text-[10px] tracking-wide text-[#8A97AC]">Dành cho: <span class="text-[#16336B] font-semibold">${escHtml(todPlayer.name)}</span></span>
+      <div class="pt-2 border-t border-slate-700/80">
+        <span class="text-xs text-slate-400">Dành cho: <span class="text-white font-bold">${escHtml(todPlayer.name)}</span></span>
       </div>`;
   }
 
@@ -791,18 +776,17 @@ function selectToDMode(mode, level) {
 
 function todGiveUp() {
   showModal(`
-    <div class="text-center space-y-4">
-      <p class="eyebrow">Sans courage</p>
+    <div class="text-center space-y-3.5">
       <div class="text-4xl">😅</div>
-      <h2 class="font-serif text-2xl font-semibold text-[#16336B] tracking-wide">Chịu thua!</h2>
-      <p class="text-[#5B6A82] text-[13px] leading-relaxed">
-        <span class="text-[#16336B] font-semibold">${todPlayer ? escHtml(todPlayer.name) : 'Người chơi'}</span> không dám thực hiện thử thách.<br>
-        <span class="text-[#C0223B] font-semibold text-base">Phạt uống 1 ly! 🍺</span>
+      <h2 class="text-base font-bold text-sky-400 uppercase tracking-wider">Chịu thua!</h2>
+      <p class="text-slate-300 text-xs sm:text-sm">
+        <span class="text-white font-bold">${todPlayer ? escHtml(todPlayer.name) : 'Người chơi'}</span> không dám thực hiện thử thách.<br>
+        <span class="text-amber-400 font-bold text-sm sm:text-base">Phạt uống 1 ly! 🍺</span>
       </p>
-      <button onclick="closeModal()" class="btn-primary w-full py-3.5 text-[12px]">OK, uống ngay!</button>
+      <button onclick="closeModal()" class="btn-primary w-full py-2.5 font-bold text-xs sm:text-sm">OK, uống ngay!</button>
     </div>
   `);
-  playTone(220, 'sawtooth', 0.4, 0.3);
+  playTone(220, 'sawtooth', 0.35, 0.25);
 }
 
 // ─────────────────────────────────────────────────────────
@@ -860,7 +844,7 @@ function renderDice(values, shaking) {
 
   const total = values.reduce((a, b) => a + b, 0);
   const totalEl = document.getElementById('diceTotal');
-  if (totalEl) totalEl.textContent = values.length > 0 ? `Tổng: ${total}` : '';
+  if (totalEl) totalEl.textContent = values.length > 0 ? `Tổng điểm: ${total}` : '';
 }
 
 function getDiceDots(n) {
@@ -873,7 +857,7 @@ function getDiceDots(n) {
     6: [[25, 20], [75, 20], [25, 50], [75, 50], [25, 80], [75, 80]],
   };
   const dots = positions[n] || [];
-  return `<svg viewBox="0 0 100 100" class="w-full h-full text-[#16336B]">${dots.map(([x, y]) => `<circle cx="${x}" cy="${y}" r="11" fill="currentColor"/>`).join('')}</svg>`;
+  return `<svg viewBox="0 0 100 100" class="w-full h-full text-slate-900">${dots.map(([x, y]) => `<circle cx="${x}" cy="${y}" r="11" fill="currentColor"/>`).join('')}</svg>`;
 }
 
 function showDiceTip() {
@@ -956,8 +940,8 @@ function pickBombTopic() {
   const topicEl = document.getElementById('bombTopic');
   if (topicEl) {
     topicEl.textContent = topic;
-    topicEl.classList.remove('placeholder-text');
-    topicEl.classList.add('chosen-text');
+    topicEl.classList.remove('text-slate-400');
+    topicEl.classList.add('text-white');
   }
   const statusEl = document.getElementById('bombStatus');
   if (statusEl) statusEl.textContent = 'Nhấn BẮT ĐẦU khi cả mâm sẵn sàng!';
@@ -968,7 +952,7 @@ function pickBombTopic() {
 function startBomb() {
   if (bombTicking) return;
   const topicEl = document.getElementById('bombTopic');
-  if (!topicEl || topicEl.classList.contains('placeholder-text')) {
+  if (!topicEl || topicEl.classList.contains('text-slate-400')) {
     showToast('⚠️ Hãy chọn chủ đề trước!');
     return;
   }
@@ -1001,7 +985,7 @@ function startBomb() {
 
     if (bombVisual) {
       bombVisual.classList.add('bomb-flash');
-      setTimeout(() => bombVisual?.classList.remove('bomb-flash'), 120);
+      setTimeout(() => bombVisual?.classList.remove('bomb-flash'), 100);
     }
 
     if (statusEl) {
@@ -1028,18 +1012,18 @@ function explodeBomb() {
   const stopBtn = document.getElementById('bombStopBtn');
 
   if (statusEl) {
-    statusEl.innerHTML = '<span class="text-[#C0223B] font-semibold text-lg animate-pulse">💥 BOM NỔ! Người đang cầm điện thoại UỐNG! 🍺</span>';
+    statusEl.innerHTML = '<span class="text-red-400 font-bold text-sm sm:text-base animate-pulse">💥 BOM NỔ! Người đang cầm điện thoại UỐNG! 🍺</span>';
   }
 
   if (bombVisual) {
     bombVisual.classList.add('bomb-explode');
-    setTimeout(() => bombVisual?.classList.remove('bomb-explode'), 1000);
+    setTimeout(() => bombVisual?.classList.remove('bomb-explode'), 800);
   }
 
   const flashEl = document.getElementById('bombFlash');
   if (flashEl) {
-    flashEl.style.opacity = '0.75';
-    setTimeout(() => { if (flashEl) flashEl.style.opacity = '0'; }, 600);
+    flashEl.style.opacity = '0.7';
+    setTimeout(() => { if (flashEl) flashEl.style.opacity = '0'; }, 500);
   }
 
   if (startBtn) startBtn.classList.remove('hidden');
@@ -1128,5 +1112,5 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  console.log('🍺 Đại Chiến Bàn Nhậu (Maison de Jeux · Édition Bleue) - Ready!');
+  console.log('🍺 Đại Chiến Bàn Nhậu (Clean Dark Mode) - Sẵn sàng!');
 });
