@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <meta name="theme-color" content="#0B1120" />
+  <meta name="theme-color" content="#061224" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <title>🍺 Đại Chiến Bàn Nhậu</title>
   <script src="https://cdn.tailwindcss.com"></script>
@@ -13,8 +13,14 @@
       theme: {
         extend: {
           colors: {
-            neon: { orange: '#F97316', pink: '#EC4899' },
-            dark: { bg: '#0B1120', card: '#1E293B', border: '#334155' }
+            app: {
+              bg: '#061224',
+              surface: '#0A1D37',
+              card: '#0F294A',
+              cyan: '#06B6D4',
+              teal: '#2DD4BF',
+              purple: '#818CF8'
+            }
           },
           fontFamily: { sans: ['system-ui', '-apple-system', 'sans-serif'] }
         }
@@ -24,90 +30,112 @@
   <style>
     * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
     body {
-      background-color: #0B1120;
-      color: #F1F5F9;
+      background: radial-gradient(circle at 50% 0%, #0A2242 0%, #061224 70%);
+      background-attachment: fixed;
+      color: #F8FAFC;
       font-family: system-ui, -apple-system, sans-serif;
       overscroll-behavior: none;
       min-height: 100dvh;
     }
 
     /* Scrollbar */
-    ::-webkit-scrollbar { width: 4px; }
-    ::-webkit-scrollbar-track { background: #1E293B; }
-    ::-webkit-scrollbar-thumb { background: #F97316; border-radius: 4px; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    ::-webkit-scrollbar { width: 4px; height: 4px; }
+    ::-webkit-scrollbar-track { background: #061224; }
+    ::-webkit-scrollbar-thumb { background: #06B6D4; border-radius: 4px; }
 
-    /* Neon glow effects */
-    .neon-orange { text-shadow: 0 0 10px #F97316, 0 0 20px #F97316; }
-    .neon-pink { text-shadow: 0 0 10px #EC4899, 0 0 20px #EC4899; }
-    .glow-orange { box-shadow: 0 0 15px rgba(249,115,22,0.4); }
-    .glow-pink { box-shadow: 0 0 15px rgba(236,72,153,0.4); }
-
-    /* Navigation */
-    .nav-btn {
-      display: flex; flex-direction: column; align-items: center;
-      gap: 2px; padding: 6px 4px; border-radius: 10px;
-      transition: all 0.2s; color: #64748B; flex: 1;
-      font-size: 10px; font-weight: 600;
-      background: transparent; border: none; cursor: pointer;
+    /* Soft Neon Glows */
+    .neon-cyan {
+      text-shadow: 0 0 12px rgba(6, 182, 212, 0.6), 0 0 25px rgba(45, 212, 191, 0.3);
     }
-    .nav-btn:active { transform: scale(0.92); }
-    .nav-active { color: #F97316; background: rgba(249,115,22,0.12); }
-    .nav-active .nav-icon { filter: drop-shadow(0 0 6px #F97316); }
+    .glow-cyan-box {
+      box-shadow: 0 0 20px rgba(6, 182, 212, 0.25);
+    }
+    .glow-teal-box {
+      box-shadow: 0 0 20px rgba(45, 212, 191, 0.3);
+    }
 
-    /* Buttons */
+    /* Glassmorphism Card */
+    .glass-card {
+      background: rgba(15, 41, 74, 0.65);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(6, 182, 212, 0.22);
+      border-radius: 24px;
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    }
+
+    /* Primary & Secondary Buttons */
     .btn-primary {
-      background: linear-gradient(135deg, #F97316, #EA580C);
-      color: white; font-weight: 800; border-radius: 16px;
-      padding: 14px 24px; border: none; cursor: pointer;
-      transition: all 0.15s; font-size: 16px; letter-spacing: 0.3px;
-      box-shadow: 0 4px 15px rgba(249,115,22,0.3);
-      width: 100%; display: block;
+      background: linear-gradient(135deg, #06B6D4 0%, #2DD4BF 100%);
+      color: #04101E;
+      font-weight: 800;
+      border-radius: 20px;
+      padding: 14px 24px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+      font-size: 16px;
+      box-shadow: 0 4px 20px rgba(6, 182, 212, 0.35);
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
     }
-    .btn-primary:active { transform: scale(0.96); box-shadow: none; }
+    .btn-primary:active { transform: scale(0.96); box-shadow: 0 2px 8px rgba(6, 182, 212, 0.2); }
 
     .btn-secondary {
-      background: #1E293B; color: #CBD5E1; font-weight: 700;
-      border-radius: 16px; padding: 12px 20px; border: 1px solid #334155;
-      cursor: pointer; transition: all 0.15s; font-size: 15px; width: 100%;
+      background: rgba(13, 36, 64, 0.85);
+      color: #A5F3FC;
+      font-weight: 700;
+      border-radius: 18px;
+      padding: 12px 20px;
+      border: 1px solid rgba(6, 182, 212, 0.28);
+      cursor: pointer;
+      transition: all 0.15s;
+      font-size: 14px;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
     }
-    .btn-secondary:active { transform: scale(0.96); background: #2D3748; }
+    .btn-secondary:active { transform: scale(0.96); background: rgba(15, 48, 88, 0.95); }
 
-    .btn-pink {
-      background: linear-gradient(135deg, #EC4899, #BE185D);
-      color: white; font-weight: 800; border-radius: 16px;
-      padding: 14px 24px; border: none; cursor: pointer;
-      transition: all 0.15s; font-size: 16px;
-      box-shadow: 0 4px 15px rgba(236,72,153,0.3);
-      width: 100%; display: block;
+    /* Bottom Navigation */
+    .nav-btn {
+      display: flex; flex-direction: column; align-items: center;
+      gap: 3px; padding: 6px 4px; border-radius: 16px;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      color: #64748B; flex: 1;
+      font-size: 10px; font-weight: 700;
+      background: transparent; border: 1px solid transparent; cursor: pointer;
     }
-    .btn-pink:active { transform: scale(0.96); box-shadow: none; }
-
-    .btn-cyan {
-      background: linear-gradient(135deg, #06B6D4, #0E7490);
-      color: white; font-weight: 800; border-radius: 16px;
-      padding: 14px 24px; border: none; cursor: pointer;
-      transition: all 0.15s; font-size: 16px;
-      box-shadow: 0 4px 15px rgba(6,182,212,0.3);
-      width: 100%; display: block;
+    .nav-btn:active { transform: scale(0.92); }
+    .nav-active {
+      color: #2DD4BF;
+      background: rgba(6, 182, 212, 0.15);
+      border-color: rgba(45, 212, 191, 0.35);
+      box-shadow: 0 0 15px rgba(45, 212, 191, 0.2);
     }
-    .btn-cyan:active { transform: scale(0.96); }
-
-    /* Cards */
-    .game-card {
-      background: #1E293B; border-radius: 20px;
-      border: 1px solid #334155; padding: 16px;
+    .nav-active .nav-icon {
+      filter: drop-shadow(0 0 8px rgba(45, 212, 191, 0.7));
+      transform: translateY(-1px);
     }
 
-    /* Spin Wheel */
-    #spinWheel { display: block; margin: 0 auto; cursor: pointer; }
+    /* Spin Wheel Canvas */
+    #spinWheel { display: block; margin: 0 auto; cursor: pointer; border-radius: 50%; }
 
     /* Dice */
     .dice-face {
       width: 72px; height: 72px;
-      background: #F1F5F9; color: #1E293B;
-      border-radius: 14px; padding: 10px;
-      border: 2px solid #CBD5E1;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.3);
+      background: linear-gradient(145deg, #FFFFFF, #E2E8F0);
+      color: #061224;
+      border-radius: 16px; padding: 10px;
+      border: 2px solid rgba(6, 182, 212, 0.5);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), 0 0 15px rgba(6, 182, 212, 0.25);
       transition: all 0.3s;
     }
     @keyframes diceShake {
@@ -120,10 +148,10 @@
     .dice-shake { animation: diceShake 0.3s ease-in-out; }
 
     .active-dice-btn {
-      background: #F97316 !important;
-      color: white !important;
-      border-color: #F97316 !important;
-      box-shadow: 0 0 10px rgba(249,115,22,0.4);
+      background: linear-gradient(135deg, #06B6D4, #2DD4BF) !important;
+      color: #04101E !important;
+      border-color: #2DD4BF !important;
+      box-shadow: 0 0 15px rgba(45, 212, 191, 0.5);
     }
 
     /* Truth or Dare Card Flip */
@@ -139,324 +167,264 @@
     .tod-card-inner.flipped { transform: rotateY(180deg); }
     .tod-card-face {
       position: absolute; inset: 0;
-      border-radius: 16px;
+      border-radius: 20px;
       backface-visibility: hidden;
       -webkit-backface-visibility: hidden;
     }
     .tod-card-back {
-      background: linear-gradient(135deg, #1E293B, #0F172A);
-      border: 2px solid #F97316;
       transform: rotateY(180deg);
       overflow-y: auto;
     }
 
     /* Bomb */
     @keyframes bombPulse {
-      0%, 100% { transform: scale(1); filter: drop-shadow(0 0 10px #F97316); }
-      50% { transform: scale(1.08); filter: drop-shadow(0 0 25px #F97316); }
+      0%, 100% { transform: scale(1); filter: drop-shadow(0 0 12px rgba(6, 182, 212, 0.6)); }
+      50% { transform: scale(1.08); filter: drop-shadow(0 0 28px rgba(45, 212, 191, 0.8)); }
     }
-    @keyframes bombFlashAnim {
-      0%, 100% { opacity: 0; }
-      50% { opacity: 0.7; }
-    }
-    .bomb-flash { animation: bombPulse 0.3s ease-in-out !important; }
+    .bomb-flash { animation: bombPulse 0.25s ease-in-out !important; }
     @keyframes bombExplodeAnim {
       0% { transform: scale(1); }
-      30% { transform: scale(1.4) rotate(-5deg); filter: drop-shadow(0 0 40px #EF4444); }
-      60% { transform: scale(0.9) rotate(5deg); }
+      30% { transform: scale(1.4) rotate(-6deg); filter: drop-shadow(0 0 45px #EF4444); }
+      60% { transform: scale(0.9) rotate(6deg); }
       100% { transform: scale(1); }
     }
     .bomb-explode { animation: bombExplodeAnim 0.8s ease-out forwards; }
-    #bombVisual { animation: bombPulse 1.5s ease-in-out infinite; font-size: 80px; line-height: 1; }
-
-    /* Who Is countdown */
-    #whoIsCount {
-      transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
-      transform-origin: center;
-    }
-
-    /* Toast */
-    #toast {
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
+    #bombVisual { animation: bombPulse 1.6s ease-in-out infinite; font-size: 80px; line-height: 1; }
 
     /* Modal */
-    #modalOverlay { backdrop-filter: blur(6px); }
+    #modalOverlay { backdrop-filter: blur(10px); }
     #modalContent {
-      background: #1E293B;
-      border: 1px solid #334155;
-      border-radius: 24px;
-      padding: 24px;
+      background: #0A1E38;
+      border: 1px solid rgba(6, 182, 212, 0.3);
+      border-radius: 28px;
+      padding: 22px;
       width: calc(100% - 32px);
       max-width: 420px;
       max-height: 85dvh;
       overflow-y: auto;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), 0 0 30px rgba(6, 182, 212, 0.2);
     }
 
-    /* Section transitions */
-    section { animation: fadeIn 0.2s ease-out; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
-
-    /* Player chip grid */
-    #playerList { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-
-    /* TruthDare mode buttons */
-    .tod-mode-btn {
-      flex: 1; padding: 12px 8px; border-radius: 14px;
-      border: 2px solid; font-weight: 800; font-size: 14px;
-      cursor: pointer; transition: all 0.15s;
-    }
-    .tod-mode-btn:active { transform: scale(0.95); }
-
-    /* Pulsing ring for who-is */
-    .pulse-ring {
-      animation: pulseRing 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;
-    }
-    @keyframes pulseRing {
-      0% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(249,115,22,0.4); }
-      70% { transform: scale(1); box-shadow: 0 0 0 20px rgba(249,115,22,0); }
-      100% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(249,115,22,0); }
-    }
-
-    /* Scrollable content above nav */
-    .main-content {
-      padding-bottom: 80px;
-      min-height: 100dvh;
+    /* Main Container padding for Fixed App Shell */
+    .app-main {
+      padding-bottom: 88px;
     }
   </style>
 </head>
-<body>
+<body class="flex flex-col min-h-screen select-none">
 
 <!-- ══════════════════════════════════════════════════
      TOAST
 ══════════════════════════════════════════════════ -->
 <div id="toast"
-  class="fixed top-4 left-1/2 -translate-x-1/2 z-50 opacity-0 translate-y-4
-         bg-slate-800 text-white text-sm font-semibold px-5 py-3 rounded-2xl
-         border border-slate-600 shadow-xl pointer-events-none max-w-xs text-center">
+  class="fixed top-5 left-1/2 -translate-x-1/2 z-50 opacity-0 translate-y-4
+         bg-[#0A2242]/95 backdrop-blur-md text-cyan-200 text-sm font-bold px-5 py-3 rounded-2xl
+         border border-cyan-400/40 shadow-2xl pointer-events-none max-w-xs text-center transition-all duration-300">
 </div>
 
 <!-- ══════════════════════════════════════════════════
-     MODAL
+     MODAL OVERLAY
 ══════════════════════════════════════════════════ -->
 <div id="modalOverlay"
-  class="fixed inset-0 z-40 hidden items-center justify-center p-4 bg-black/70">
+  class="fixed inset-0 z-40 hidden items-center justify-center p-4 bg-black/75">
   <div id="modalContent"></div>
 </div>
 
 <!-- ══════════════════════════════════════════════════
-     BOMB FLASH OVERLAY
+     BOMB SCREEN FLASH
 ══════════════════════════════════════════════════ -->
 <div id="bombFlash"
   class="fixed inset-0 z-30 bg-red-600 pointer-events-none transition-opacity duration-300"
   style="opacity:0;"></div>
 
 <!-- ══════════════════════════════════════════════════
-     HEADER
+     APP SHELL: FIXED HEADER
 ══════════════════════════════════════════════════ -->
-<header class="sticky top-0 z-20 bg-[#0B1120]/90 backdrop-blur-md border-b border-slate-800 px-4 py-3 flex items-center justify-between">
-  <div>
-    <h1 class="text-lg font-black neon-orange">🍺 Đại Chiến Bàn Nhậu</h1>
-    <p class="text-xs text-slate-500 font-medium">Game cho 16 người</p>
+<header class="sticky top-0 z-20 bg-[#061224]/90 backdrop-blur-md border-b border-cyan-500/15 px-4 py-3 flex items-center justify-between">
+  <div class="flex items-center gap-2">
+    <span class="text-xl">🍺</span>
+    <h1 class="text-base sm:text-lg font-black tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-teal-300 neon-cyan uppercase">
+      Đại Chiến Bàn Nhậu
+    </h1>
   </div>
-  <button id="soundBtn" onclick="toggleSound()"
-    class="w-10 h-10 rounded-full bg-slate-800 border border-slate-600 text-xl flex items-center justify-center active:scale-90 transition-transform">
-    🔊
-  </button>
+  <div class="flex items-center gap-2">
+    <button id="soundBtn" onclick="toggleSound()" title="Bật/tắt âm thanh"
+      class="w-9 h-9 rounded-full bg-[#0F294A]/80 border border-cyan-500/25 text-lg flex items-center justify-center active:scale-90 transition-transform">
+      🔊
+    </button>
+    <button onclick="openSettingsModal()" title="Cài đặt & luật chơi"
+      class="w-9 h-9 rounded-full bg-[#0F294A]/80 border border-cyan-500/25 text-base flex items-center justify-center active:scale-90 transition-transform text-cyan-300">
+      ⚙️
+    </button>
+  </div>
 </header>
 
 <!-- ══════════════════════════════════════════════════
-     MAIN CONTENT
+     APP SHELL: FIXED THANH THÀNH VIÊN (MEMBER BAR)
 ══════════════════════════════════════════════════ -->
-<main class="main-content px-4 py-4 space-y-4">
+<div class="sticky top-[53px] z-20 bg-[#061224]/85 backdrop-blur-md border-b border-cyan-500/15 px-3 py-2">
+  <div class="flex items-center justify-between mb-1 px-1">
+    <div class="flex items-center gap-2">
+      <span class="text-[11px] font-black uppercase tracking-wider text-cyan-300">Thành viên</span>
+      <span id="memberCountBadge" class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-cyan-500/20 text-[#2DD4BF] border border-cyan-400/30">
+        16/16
+      </span>
+    </div>
+    <span class="text-[10px] text-slate-400">Chạm để bật / tắt</span>
+  </div>
+  <div class="flex items-center gap-2.5 overflow-x-auto no-scrollbar py-1" id="memberBarList">
+    <!-- Nút + tròn xanh ngọc & avatar cuộn ngang sẽ được render ở đây -->
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     MAIN CONTENT (GAME AREA)
+══════════════════════════════════════════════════ -->
+<main class="app-main px-4 py-4 space-y-4 max-w-md mx-auto w-full">
 
   <!-- ───────────────────────────────────────────────
-       SECTION: PLAYERS
+       SECTION 1: VÒNG QUAY NHÂN PHẨM
   ─────────────────────────────────────────────── -->
-  <section id="section-players">
+  <section id="section-spin">
     <div class="space-y-4">
 
-      <!-- Title -->
       <div class="text-center">
-        <div class="text-3xl mb-1">👥</div>
-        <h2 class="text-xl font-black text-white">Danh sách người chơi</h2>
-        <p id="playerCount" class="text-sm text-slate-400 mt-1">0/0 người đang chơi</p>
+        <h2 class="text-lg font-black text-white uppercase tracking-wider flex items-center justify-center gap-1.5">
+          <span>🎡</span> Vòng Quay Nhân Phẩm
+        </h2>
+        <p class="text-xs text-cyan-300/80">Quay trúng ai thì người đó nhận hình phạt!</p>
       </div>
 
-      <!-- Bulk input -->
-      <div class="game-card space-y-3">
-        <label class="text-sm font-bold text-orange-400">📋 Nhập nhanh hàng loạt</label>
-        <textarea id="bulkInput" rows="5"
-          class="w-full bg-slate-900 border border-slate-600 rounded-xl px-3 py-3 text-white text-sm
-                 placeholder-slate-500 focus:border-orange-500 focus:outline-none resize-none font-medium"
-          placeholder="Minh Tuấn&#10;Hồng Nhung&#10;Quang Hải&#10;...&#10;(mỗi tên 1 dòng hoặc cách nhau bằng dấu phẩy)"></textarea>
-        <button class="btn-primary" onclick="addPlayersFromTextarea()">
-          ✅ Tạo danh sách
-        </button>
-      </div>
+      <!-- Canvas Container + Nút QUAY ở Tâm -->
+      <div class="glass-card p-3 flex justify-center relative">
+        <div class="relative w-full flex items-center justify-center" style="max-width:350px;">
+          <!-- Canvas Wheel -->
+          <canvas id="spinWheel" onclick="spinWheel()" class="touch-none select-none" width="300" height="300"></canvas>
 
-      <!-- Sample button -->
-      <button class="btn-secondary" onclick="addSamplePlayers()">
-        🎲 Tạo nhanh 16 người mẫu
-      </button>
-
-      <!-- Player list -->
-      <div class="game-card">
-        <div class="flex items-center justify-between mb-3">
-          <span class="text-sm font-bold text-slate-300">Bấm để bật/tắt tạm thời</span>
-          <button onclick="clearPlayers()" class="text-xs text-red-400 font-semibold px-3 py-1 rounded-lg bg-red-900/30 border border-red-800 active:scale-95">
-            🗑 Xóa
+          <!-- Nút tròn "QUAY" phát sáng nổi bật ở tâm -->
+          <button onclick="spinWheel()"
+            title="Bấm để QUAY!"
+            class="absolute inset-0 m-auto w-14 h-14 rounded-full bg-gradient-to-tr from-[#06B6D4] to-[#2DD4BF] text-slate-950 font-black text-xs tracking-wider shadow-lg shadow-cyan-400/60 flex items-center justify-center cursor-pointer active:scale-90 transition-transform z-10 border-2 border-white/60">
+            QUAY
           </button>
         </div>
-        <div id="playerList">
-          <p class="text-center text-slate-500 py-4 col-span-2">Chưa có người chơi nào. Hãy thêm vào nhé!</p>
-        </div>
       </div>
 
-      <!-- Tip -->
-      <div class="bg-blue-900/30 border border-blue-800 rounded-xl p-3 text-xs text-blue-300">
-        💡 <strong>Mẹo:</strong> Bấm vào tên người chơi để bật/tắt tạm thời. Người bị tắt sẽ không xuất hiện trong vòng quay và random, nhưng vẫn được lưu trong danh sách.
-      </div>
-
-    </div>
-  </section>
-
-  <!-- ───────────────────────────────────────────────
-       SECTION: VÒNG QUAY NHÂN PHẨM
-  ─────────────────────────────────────────────── -->
-  <section id="section-spin" class="hidden">
-    <div class="space-y-4">
-
-      <div class="text-center">
-        <div class="text-3xl mb-1">🎡</div>
-        <h2 class="text-xl font-black text-white">Vòng Quay Nhân Phẩm</h2>
-        <p class="text-xs text-slate-400">Ai trúng thì chịu!</p>
-      </div>
-
-      <!-- Canvas -->
-      <div class="game-card flex justify-center p-3">
-        <div class="relative w-full" style="max-width:380px;">
-          <canvas id="spinWheel" onclick="spinWheel()" class="touch-none select-none" width="300" height="300"></canvas>
-        </div>
-      </div>
-
-      <!-- Spin button -->
-      <button class="btn-primary text-xl py-5 tracking-wide" onclick="spinWheel()">
+      <!-- Spin big button -->
+      <button class="btn-primary text-lg py-4 font-black tracking-wide" onclick="spinWheel()">
         🎡 QUAY NGAY!
       </button>
 
-      <!-- Hint -->
-      <p class="text-center text-xs text-slate-500">Có thể bấm vào vòng quay hoặc nút để quay</p>
+      <p class="text-center text-[11px] text-slate-400">Có thể chạm trực tiếp vào tâm vòng quay để quay</p>
 
     </div>
   </section>
 
   <!-- ───────────────────────────────────────────────
-       SECTION: AI LÀ NGƯỜI...
+       SECTION 2: AI LÀ NGƯỜI...
   ─────────────────────────────────────────────── -->
   <section id="section-whois" class="hidden">
     <div class="space-y-4">
 
       <div class="text-center">
-        <div class="text-3xl mb-1">👆</div>
-        <h2 class="text-xl font-black text-white">Ai Là Người...</h2>
-        <p class="text-xs text-slate-400">Cả 16 người chơi cùng lúc!</p>
+        <h2 class="text-lg font-black text-white uppercase tracking-wider flex items-center justify-center gap-1.5">
+          <span>👆</span> Ai Là Người...
+        </h2>
+        <p class="text-xs text-cyan-300/80">Cả 16 người cùng giơ tay chỉ mặt!</p>
       </div>
 
       <!-- Question Card -->
-      <div class="game-card text-center space-y-4 py-6">
+      <div class="glass-card text-center space-y-4 py-6 px-4">
         <p id="whoIsQuestion"
-          class="text-lg font-bold leading-relaxed text-slate-500 min-h-[80px] flex items-center justify-center px-2">
+          class="text-base sm:text-lg font-extrabold leading-relaxed text-slate-400 min-h-[85px] flex items-center justify-center px-1">
           Bấm "Câu hỏi mới" để bắt đầu!
         </p>
 
-        <!-- Countdown display -->
+        <!-- Countdown ring display -->
         <div id="whoIsCount"
-          class="hidden text-7xl font-black neon-orange scale-0 mx-auto w-28 h-28
-                 rounded-full bg-orange-500/10 border-2 border-orange-500 flex items-center justify-center">
+          class="hidden text-6xl font-black neon-cyan scale-0 mx-auto w-24 h-24
+                 rounded-full bg-cyan-500/10 border-2 border-[#2DD4BF] shadow-[0_0_20px_rgba(45,212,191,0.4)] flex items-center justify-center">
           3
         </div>
 
         <!-- Result -->
         <div id="whoIsResult"
-          class="hidden text-sm font-bold text-orange-300 bg-orange-900/30 border border-orange-700 rounded-xl px-4 py-3">
+          class="hidden text-xs sm:text-sm font-bold text-cyan-200 bg-cyan-950/40 border border-cyan-500/40 rounded-2xl px-4 py-3">
         </div>
       </div>
 
-      <!-- Buttons -->
+      <!-- Controls -->
       <button class="btn-secondary" onclick="pickWhoIsQuestion()">
-        🔀 Câu hỏi mới
+        🔀 Đổi câu hỏi khác
       </button>
 
       <div id="whoIsBtn" class="hidden">
-        <button id="whoIsStartBtn" class="btn-primary text-xl py-5" onclick="startWhoIsCountdown()">
+        <button id="whoIsStartBtn" class="btn-primary text-lg py-4 font-black" onclick="startWhoIsCountdown()">
           ⏱ 3 - 2 - 1 - CHỈ!
         </button>
       </div>
 
-      <!-- How to play -->
-      <div class="bg-purple-900/30 border border-purple-800 rounded-xl p-3 text-xs text-purple-300 space-y-1">
-        <p class="font-bold text-purple-200">🎮 Cách chơi:</p>
-        <p>1. Đọc to câu hỏi cho cả mâm nghe</p>
-        <p>2. Bấm nút đếm ngược - Cả mâm sẵn sàng</p>
-        <p>3. Hết 3 giây, cùng giơ tay chỉ vào người phù hợp</p>
-        <p>4. Ai bị chỉ nhiều nhất thì <strong class="text-pink-400">UỐNG! 🍺</strong></p>
+      <!-- Quick guideline -->
+      <div class="glass-card p-3.5 text-xs text-cyan-200 space-y-1">
+        <p class="font-extrabold text-white">🎮 Cách chơi:</p>
+        <p>1. Đọc to câu hỏi cho cả bàn</p>
+        <p>2. Bấm 3 - 2 - 1 và cả mâm cùng giơ tay chỉ 1 người</p>
+        <p>3. Người nhận nhiều ngón tay chỉ nhất thì <strong class="text-teal-300 font-extrabold">UỐNG! 🍺</strong></p>
       </div>
 
     </div>
   </section>
 
   <!-- ───────────────────────────────────────────────
-       SECTION: THẬT HAY THÁCH
+       SECTION 3: THẬT HAY THÁCH
   ─────────────────────────────────────────────── -->
   <section id="section-tod" class="hidden">
     <div class="space-y-4">
 
       <div class="text-center">
-        <div class="text-3xl mb-1">🃏</div>
-        <h2 class="text-xl font-black text-white">Thật hay Thách</h2>
-        <p class="text-xs text-slate-400">Chọn ngẫu nhiên 1 người, rồi dám không?</p>
+        <h2 class="text-lg font-black text-white uppercase tracking-wider flex items-center justify-center gap-1.5">
+          <span>🃏</span> Thật hay Thách
+        </h2>
+        <p class="text-xs text-cyan-300/80">Quay chọn 1 người rồi kiểm tra dũng khí!</p>
       </div>
 
-      <!-- Random player -->
-      <div class="game-card text-center space-y-3">
-        <p class="text-xs text-slate-400 font-semibold uppercase tracking-wider">Người được chọn</p>
-        <div class="text-3xl font-black text-white min-h-12 flex items-center justify-center pulse-ring rounded-2xl bg-slate-800/50 py-3 px-4"
+      <!-- Random player selection -->
+      <div class="glass-card text-center space-y-3 p-4">
+        <p class="text-[11px] text-cyan-300 font-bold uppercase tracking-wider">Người được chỉ định</p>
+        <div class="text-2xl font-black text-white min-h-12 flex items-center justify-center rounded-2xl bg-[#08172E] border border-cyan-500/30 py-3 px-4 shadow-inner"
           id="todPlayerName">?</div>
-        <button class="btn-primary" onclick="pickToDPlayer()">
-          🎲 Chọn ngẫu nhiên
+        <button class="btn-primary py-3.5 font-black" onclick="pickToDPlayer()">
+          🎲 Chọn ngẫu nhiên 1 người
         </button>
       </div>
 
       <!-- Mode selection -->
-      <div id="todSelection" class="hidden game-card space-y-3">
-        <p class="text-sm font-bold text-slate-300 text-center">Chọn chế độ chơi:</p>
+      <div id="todSelection" class="hidden glass-card space-y-3 p-4">
+        <p class="text-xs font-bold text-slate-300 text-center uppercase tracking-wider">Chọn kiểu thử thách:</p>
 
-        <!-- Truth / Dare row -->
-        <div class="flex gap-3">
-          <div class="flex-1 space-y-2">
-            <p class="text-xs text-center font-bold text-cyan-400">🤔 THẬT</p>
-            <button class="tod-mode-btn border-cyan-600 bg-cyan-900/30 text-cyan-300 w-full" onclick="selectToDMode('truth','mild')">☀️ Nhẹ nhàng</button>
-            <button class="tod-mode-btn border-cyan-400 bg-cyan-800/40 text-cyan-200 w-full" onclick="selectToDMode('truth','spicy')">🔥 Cháy phố</button>
+        <div class="grid grid-cols-2 gap-3">
+          <div class="space-y-2">
+            <p class="text-xs text-center font-black text-cyan-300">🤔 THẬT</p>
+            <button class="btn-secondary text-xs py-2.5 w-full" onclick="selectToDMode('truth','mild')">☀️ Nhẹ nhàng</button>
+            <button class="btn-secondary text-xs py-2.5 w-full text-cyan-200 border-cyan-400/50" onclick="selectToDMode('truth','spicy')">🔥 Cháy phố</button>
           </div>
-          <div class="w-px bg-slate-700 self-stretch"></div>
-          <div class="flex-1 space-y-2">
-            <p class="text-xs text-center font-bold text-pink-400">🔥 THÁCH</p>
-            <button class="tod-mode-btn border-pink-600 bg-pink-900/30 text-pink-300 w-full" onclick="selectToDMode('dare','mild')">☀️ Nhẹ nhàng</button>
-            <button class="tod-mode-btn border-pink-400 bg-pink-800/40 text-pink-200 w-full" onclick="selectToDMode('dare','spicy')">🔥 Cháy phố</button>
+          <div class="space-y-2">
+            <p class="text-xs text-center font-black text-[#2DD4BF]">🔥 THÁCH</p>
+            <button class="btn-secondary text-xs py-2.5 w-full text-teal-200" onclick="selectToDMode('dare','mild')">☀️ Nhẹ nhàng</button>
+            <button class="btn-secondary text-xs py-2.5 w-full text-teal-200 border-[#2DD4BF]/50" onclick="selectToDMode('dare','spicy')">🔥 Cháy phố</button>
           </div>
         </div>
       </div>
 
-      <!-- Card flip area -->
+      <!-- Flip Card Area -->
       <div id="todCardArea" class="hidden space-y-3">
         <div class="tod-card-container">
-          <div class="tod-card-inner" id="todCardInner">
+          <div class="tod-card-inner cursor-pointer" id="todCardInner">
             <div class="tod-card-face" id="todCardFront"></div>
             <div class="tod-card-face tod-card-back" id="todCardBack"></div>
           </div>
         </div>
-        <button class="btn-secondary text-red-400 border-red-900 bg-red-900/20" onclick="todGiveUp()">
+        <button class="btn-secondary text-red-300 border-red-800 bg-red-950/30 py-3" onclick="todGiveUp()">
           🏳️ Chịu thua (Uống phạt 1 ly)
         </button>
       </div>
@@ -465,104 +433,101 @@
   </section>
 
   <!-- ───────────────────────────────────────────────
-       SECTION: LẮC XÚC XẮC
+       SECTION 4: LẮC XÚC XẮC
   ─────────────────────────────────────────────── -->
   <section id="section-dice" class="hidden">
     <div class="space-y-4">
 
       <div class="text-center">
-        <div class="text-3xl mb-1">🎲</div>
-        <h2 class="text-xl font-black text-white">Lắc Xúc Xắc</h2>
-        <p class="text-xs text-slate-400">Lắc điện thoại hoặc bấm nút!</p>
+        <h2 class="text-lg font-black text-white uppercase tracking-wider flex items-center justify-center gap-1.5">
+          <span>🎲</span> Lắc Xúc Xắc
+        </h2>
+        <p class="text-xs text-cyan-300/80">Lắc điện thoại hoặc bấm nút để đổ điểm</p>
       </div>
 
-      <!-- Dice count selector -->
-      <div class="game-card">
-        <p class="text-xs font-bold text-slate-400 mb-3 text-center uppercase tracking-wider">Số lượng xúc xắc</p>
+      <!-- Selector 1-5 dice -->
+      <div class="glass-card p-3">
+        <p class="text-[11px] font-bold text-cyan-300 mb-2.5 text-center uppercase tracking-wider">Số lượng xúc xắc</p>
         <div class="flex gap-2 justify-center">
-          <button class="dice-count-btn flex-1 py-3 rounded-xl border border-slate-600 bg-slate-800 text-slate-300 font-black text-lg active:scale-95 transition-all" onclick="setDiceCount(1)">1</button>
-          <button class="dice-count-btn flex-1 py-3 rounded-xl border border-slate-600 bg-slate-800 text-slate-300 font-black text-lg active:scale-95 transition-all" onclick="setDiceCount(2)">2</button>
-          <button class="dice-count-btn flex-1 py-3 rounded-xl border border-slate-600 bg-slate-800 text-slate-300 font-black text-lg active:scale-95 transition-all" onclick="setDiceCount(3)">3</button>
-          <button class="dice-count-btn flex-1 py-3 rounded-xl border border-slate-600 bg-slate-800 text-slate-300 font-black text-lg active:scale-95 transition-all" onclick="setDiceCount(4)">4</button>
-          <button class="dice-count-btn flex-1 py-3 rounded-xl border border-slate-600 bg-slate-800 text-slate-300 font-black text-lg active:scale-95 transition-all" onclick="setDiceCount(5)">5</button>
+          <button class="dice-count-btn flex-1 py-2.5 rounded-xl border border-cyan-500/30 bg-[#08172E] text-slate-300 font-black text-base active:scale-95 transition-all" onclick="setDiceCount(1)">1</button>
+          <button class="dice-count-btn flex-1 py-2.5 rounded-xl border border-cyan-500/30 bg-[#08172E] text-slate-300 font-black text-base active:scale-95 transition-all" onclick="setDiceCount(2)">2</button>
+          <button class="dice-count-btn flex-1 py-2.5 rounded-xl border border-cyan-500/30 bg-[#08172E] text-slate-300 font-black text-base active:scale-95 transition-all" onclick="setDiceCount(3)">3</button>
+          <button class="dice-count-btn flex-1 py-2.5 rounded-xl border border-cyan-500/30 bg-[#08172E] text-slate-300 font-black text-base active:scale-95 transition-all" onclick="setDiceCount(4)">4</button>
+          <button class="dice-count-btn flex-1 py-2.5 rounded-xl border border-cyan-500/30 bg-[#08172E] text-slate-300 font-black text-base active:scale-95 transition-all" onclick="setDiceCount(5)">5</button>
         </div>
       </div>
 
-      <!-- Dice display -->
-      <div class="game-card min-h-32 flex flex-col items-center justify-center gap-4 py-6">
-        <div id="diceContainer" class="flex flex-wrap gap-4 justify-center"></div>
-        <div id="diceTotal" class="text-xl font-black text-orange-400"></div>
+      <!-- Dice Board -->
+      <div class="glass-card min-h-36 flex flex-col items-center justify-center gap-3 py-6 px-4">
+        <div id="diceContainer" class="flex flex-wrap gap-3.5 justify-center"></div>
+        <div id="diceTotal" class="text-lg font-black text-[#2DD4BF]"></div>
       </div>
 
-      <!-- Roll button -->
-      <button class="btn-primary text-xl py-5" onclick="rollDice()">
+      <!-- Roll Button -->
+      <button class="btn-primary text-lg py-4 font-black" onclick="rollDice()">
         🎲 LẮC NGAY!
       </button>
 
-      <!-- iOS Motion permission -->
-      <button id="requestMotionBtn"
-        class="hidden btn-secondary text-xs py-2"
-        >📱 Bật cảm biến lắc (iOS)</button>
+      <!-- iOS motion button -->
+      <button id="requestMotionBtn" class="hidden btn-secondary text-xs py-2">
+        📱 Bật cảm biến lắc (iOS)
+      </button>
 
-      <!-- Tip -->
-      <div id="diceTip"
-        class="hidden game-card text-sm font-semibold text-center text-orange-300 leading-relaxed py-4">
-      </div>
+      <!-- Tip recommendation -->
+      <div id="diceTip" class="hidden glass-card text-xs font-bold text-center text-cyan-200 leading-relaxed py-3.5 px-4 border-cyan-400/40"></div>
 
     </div>
   </section>
 
   <!-- ───────────────────────────────────────────────
-       SECTION: QUẢ BOM HẸN GIỜ
+       SECTION 5: QUẢ BOM HẸN GIỜ
   ─────────────────────────────────────────────── -->
   <section id="section-bomb" class="hidden">
     <div class="space-y-4">
 
       <div class="text-center">
-        <div class="text-3xl mb-1">💣</div>
-        <h2 class="text-xl font-black text-white">Quả Bom Hẹn Giờ</h2>
-        <p class="text-xs text-slate-400">Chuyền tay nhanh – Bom nổ trên tay ai thì người đó UỐNG!</p>
+        <h2 class="text-lg font-black text-white uppercase tracking-wider flex items-center justify-center gap-1.5">
+          <span>💣</span> Quả Bom Hẹn Giờ
+        </h2>
+        <p class="text-xs text-cyan-300/80">Chuyền tay nhanh – Nổ trên tay ai thì người đó UỐNG!</p>
       </div>
 
-      <!-- Topic display -->
-      <div class="game-card text-center space-y-3 py-6">
-        <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">📌 Chủ đề</p>
-        <p id="bombTopic" class="text-lg font-black leading-relaxed text-slate-500 min-h-14 flex items-center justify-center">
+      <!-- Topic Card -->
+      <div class="glass-card text-center space-y-2 py-5 px-4">
+        <p class="text-[11px] font-bold text-cyan-300 uppercase tracking-wider">📌 Chủ đề</p>
+        <p id="bombTopic" class="text-base sm:text-lg font-black leading-relaxed text-slate-400 min-h-12 flex items-center justify-center">
           Bấm "Chủ đề mới" để bắt đầu!
         </p>
       </div>
 
-      <!-- Bomb visual -->
+      <!-- Bomb Visual -->
       <div class="flex justify-center py-2">
         <div id="bombVisual" class="select-none cursor-default">💣</div>
       </div>
 
-      <!-- Status -->
-      <div id="bombStatus" class="text-center text-sm font-bold text-slate-400 min-h-8">
+      <div id="bombStatus" class="text-center text-xs font-bold text-cyan-200 min-h-6">
         Nhấn BẮT ĐẦU khi cả mâm sẵn sàng!
       </div>
 
-      <!-- Buttons -->
+      <!-- Controls -->
       <button class="btn-secondary" onclick="pickBombTopic()">
-        🔀 Chủ đề mới
+        🔀 Đổi chủ đề mới
       </button>
 
-      <button id="bombStartBtn" class="btn-primary text-xl py-5" onclick="startBomb()">
+      <button id="bombStartBtn" class="btn-primary text-lg py-4 font-black" onclick="startBomb()">
         🚀 BẮT ĐẦU!
       </button>
 
-      <button id="bombStopBtn" class="hidden btn-secondary text-red-400 border-red-900 bg-red-900/20" onclick="stopBomb()">
+      <button id="bombStopBtn" class="hidden btn-secondary text-red-300 border-red-800 bg-red-950/30 py-3.5 font-bold" onclick="stopBomb()">
         ⏹ Dừng lại
       </button>
 
-      <!-- How to play -->
-      <div class="bg-red-900/30 border border-red-800 rounded-xl p-3 text-xs text-red-300 space-y-1">
-        <p class="font-bold text-red-200">🎮 Cách chơi:</p>
-        <p>1. Chọn chủ đề mới</p>
-        <p>2. Bấm Bắt đầu – Tiếng tích tắc sẽ nhanh dần</p>
-        <p>3. Mỗi người nói 1 đáp án rồi <strong>chuyền ngay</strong></p>
-        <p>4. Bom nổ trên tay ai thì người đó <strong class="text-pink-400">UỐNG! 🍺</strong></p>
-        <p>5. Không được nói trùng đáp án của người trước!</p>
+      <!-- Guideline -->
+      <div class="glass-card p-3.5 text-xs text-cyan-200 space-y-1">
+        <p class="font-extrabold text-white">🎮 Quy tắc chuyền bom:</p>
+        <p>• Thời gian đếm ngược ngẫu nhiên từ 20 đến 45 giây ẩn</p>
+        <p>• Mỗi người nói 1 đáp án không trùng rồi chuyền ngay cho người bên cạnh</p>
+        <p>• Bom nổ trên tay ai thì người đó <strong class="text-teal-300 font-extrabold">UỐNG! 🍺</strong></p>
       </div>
 
     </div>
@@ -571,24 +536,19 @@
 </main>
 
 <!-- ══════════════════════════════════════════════════
-     BOTTOM NAVIGATION
+     APP SHELL: FIXED BOTTOM NAVIGATION (5 TABS GAME)
 ══════════════════════════════════════════════════ -->
-<nav class="fixed bottom-0 left-0 right-0 z-20 bg-[#0B1120]/95 backdrop-blur-md border-t border-slate-800 px-2 py-2">
-  <div class="flex items-center justify-around">
+<nav class="fixed bottom-0 left-0 right-0 z-30 bg-[#061224]/95 backdrop-blur-md border-t border-cyan-500/20 px-2 py-2">
+  <div class="max-w-md mx-auto flex items-center justify-around gap-1">
 
-    <button class="nav-btn" data-section="players" onclick="showSection('players')">
-      <span class="nav-icon text-xl">👥</span>
-      <span>Người chơi</span>
-    </button>
-
-    <button class="nav-btn" data-section="spin" onclick="showSection('spin')">
+    <button class="nav-btn nav-active" data-section="spin" onclick="showSection('spin')">
       <span class="nav-icon text-xl">🎡</span>
-      <span>Vòng quay</span>
+      <span>Vòng Quay</span>
     </button>
 
     <button class="nav-btn" data-section="whois" onclick="showSection('whois')">
       <span class="nav-icon text-xl">👆</span>
-      <span>Ai là người</span>
+      <span>Ai Là Người</span>
     </button>
 
     <button class="nav-btn" data-section="tod" onclick="showSection('tod')">
@@ -598,12 +558,12 @@
 
     <button class="nav-btn" data-section="dice" onclick="showSection('dice')">
       <span class="nav-icon text-xl">🎲</span>
-      <span>Xúc xắc</span>
+      <span>Xúc Xắc</span>
     </button>
 
     <button class="nav-btn" data-section="bomb" onclick="showSection('bomb')">
       <span class="nav-icon text-xl">💣</span>
-      <span>Quả bom</span>
+      <span>Quả Bom</span>
     </button>
 
   </div>

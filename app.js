@@ -1,5 +1,5 @@
 // ============================================================
-// APP.JS - Logic chính cho Đại Chiến Bàn Nhậu
+// APP.JS - Logic chính cho Đại Chiến Bàn Nhậu (Blue Tone Edition)
 // ============================================================
 
 // ─── State ───────────────────────────────────────────────
@@ -35,8 +35,8 @@ function playTone(freq, type, duration, volume = 0.3, delay = 0) {
 }
 
 function playClick() {
-  playTone(800, 'square', 0.04, 0.15);
-  playTone(600, 'square', 0.04, 0.1, 0.03);
+  playTone(850, 'sine', 0.035, 0.12);
+  playTone(1250, 'sine', 0.03, 0.08, 0.02);
 }
 
 function playDiceShake() {
@@ -46,15 +46,15 @@ function playDiceShake() {
     for (let i = 0; i < 6; i++) {
       const buf = ctx.createBuffer(1, ctx.sampleRate * 0.08, ctx.sampleRate);
       const data = buf.getChannelData(0);
-      for (let j = 0; j < data.length; j++) data[j] = (Math.random() * 2 - 1) * 0.4;
+      for (let j = 0; j < data.length; j++) data[j] = (Math.random() * 2 - 1) * 0.35;
       const src = ctx.createBufferSource();
       src.buffer = buf;
       const gain = ctx.createGain();
-      gain.gain.setValueAtTime(0.3, ctx.currentTime + i * 0.08);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.08 + 0.08);
+      gain.gain.setValueAtTime(0.25, ctx.currentTime + i * 0.07);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.07 + 0.07);
       src.connect(gain);
       gain.connect(ctx.destination);
-      src.start(ctx.currentTime + i * 0.08);
+      src.start(ctx.currentTime + i * 0.07);
     }
   } catch (e) {}
 }
@@ -62,13 +62,13 @@ function playDiceShake() {
 function playCelebration() {
   if (!state.soundEnabled) return;
   const notes = [523, 659, 784, 1047, 784, 1047, 1319];
-  notes.forEach((f, i) => playTone(f, 'sine', 0.18, 0.25, i * 0.12));
+  notes.forEach((f, i) => playTone(f, 'triangle', 0.18, 0.22, i * 0.11));
 }
 
 function playBombTick(fast = false) {
   if (!state.soundEnabled) return;
-  playTone(1200, 'square', 0.05, 0.2);
-  if (fast) setTimeout(() => playTone(800, 'square', 0.05, 0.15), 60);
+  playTone(1100, 'square', 0.04, 0.18);
+  if (fast) setTimeout(() => playTone(880, 'square', 0.04, 0.14), 50);
 }
 
 function playBombExplode() {
@@ -87,14 +87,13 @@ function playBombExplode() {
     src.connect(gain);
     gain.connect(ctx.destination);
     src.start();
-    // Low boom
-    playTone(60, 'sine', 0.6, 0.8);
-    playTone(100, 'sine', 0.4, 0.6, 0.05);
+    playTone(55, 'sine', 0.7, 0.8);
+    playTone(95, 'sine', 0.4, 0.6, 0.05);
   } catch (e) {}
 }
 
 function playSpinTick() {
-  playTone(900, 'triangle', 0.03, 0.1);
+  playTone(950, 'triangle', 0.025, 0.08);
 }
 
 // ─── LocalStorage ─────────────────────────────────────────
@@ -105,9 +104,16 @@ function savePlayers() {
 function loadPlayers() {
   try {
     const saved = localStorage.getItem('dcbn_players');
-    if (saved) state.players = JSON.parse(saved);
+    if (saved) {
+      state.players = JSON.parse(saved);
+    }
   } catch (e) {
     state.players = [];
+  }
+  // Mặc định khởi tạo 16 người mẫu nếu chưa có
+  if (!state.players || state.players.length === 0) {
+    state.players = DATA.sampleNames.map(name => ({ name, active: true }));
+    savePlayers();
   }
 }
 
@@ -116,41 +122,81 @@ function getActivePlayers() {
   return state.players.filter(p => p.active);
 }
 
-function renderPlayerList() {
-  const container = document.getElementById('playerList');
+function getAvatarChar(name) {
+  if (!name) return '?';
+  const parts = name.trim().split(/\s+/);
+  const last = parts[parts.length - 1];
+  return (last[0] || name[0]).toUpperCase();
+}
+
+// Render thanh thành viên nằm ngang dưới header
+function renderMemberBar() {
+  const container = document.getElementById('memberBarList');
+  const countBadge = document.getElementById('memberCountBadge');
   if (!container) return;
-  container.innerHTML = '';
-  if (state.players.length === 0) {
-    container.innerHTML = '<p class="text-center text-slate-500 py-4 col-span-2">Chưa có người chơi nào. Hãy thêm vào nhé!</p>';
-    return;
-  }
-  state.players.forEach((p, i) => {
-    const btn = document.createElement('button');
-    btn.className = `player-chip flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-semibold transition-all duration-200 border-2 ${
-      p.active
-        ? 'border-orange-500 bg-orange-500/20 text-orange-300'
-        : 'border-slate-600 bg-slate-700/50 text-slate-500'
+
+  const activeCount = getActivePlayers().length;
+  const totalCount = state.players.length;
+  if (countBadge) {
+    countBadge.textContent = `${activeCount}/${totalCount}`;
+    countBadge.className = `text-[11px] font-extrabold px-2.5 py-0.5 rounded-full border ${
+      activeCount > 0
+        ? 'bg-cyan-500/20 text-[#2DD4BF] border-cyan-400/40 shadow-sm shadow-cyan-500/20'
+        : 'bg-red-500/20 text-red-300 border-red-400/40'
     }`;
-    btn.innerHTML = `
-      <span class="w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold ${p.active ? 'bg-orange-500 text-white' : 'bg-slate-600 text-slate-400'}">${i + 1}</span>
-      <span class="flex-1 text-left truncate">${escHtml(p.name)}</span>
-      <span class="text-xs">${p.active ? '✓' : '✗'}</span>
+  }
+
+  container.innerHTML = '';
+
+  // Nút + tròn màu xanh ngọc để mở modal nhập nhanh 16 tên
+  const addBtn = document.createElement('button');
+  addBtn.className = 'w-10 h-10 rounded-full bg-gradient-to-r from-[#06B6D4] to-[#2DD4BF] text-slate-950 font-black shadow-md shadow-cyan-500/30 flex items-center justify-center shrink-0 active:scale-90 transition-transform';
+  addBtn.title = 'Quản lý thành viên (nhập 16 tên)';
+  addBtn.innerHTML = `
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+    </svg>
+  `;
+  addBtn.onclick = () => openPlayerModal();
+  container.appendChild(addBtn);
+
+  // Danh sách avatar từng người cuộn ngang
+  state.players.forEach((p, idx) => {
+    const item = document.createElement('button');
+    item.className = 'flex flex-col items-center shrink-0 group transition-all duration-200';
+    item.onclick = () => togglePlayer(idx);
+
+    const char = getAvatarChar(p.name);
+    const avatarClass = p.active
+      ? 'w-10 h-10 rounded-full bg-gradient-to-br from-[#0F375E] to-[#0A223E] border-2 border-[#2DD4BF] text-[#2DD4BF] shadow-[0_0_12px_rgba(45,212,191,0.35)] flex items-center justify-center text-sm font-black'
+      : 'w-10 h-10 rounded-full bg-slate-800/80 border-2 border-slate-700 text-slate-500 opacity-40 flex items-center justify-center text-sm font-bold';
+
+    const textClass = p.active
+      ? 'text-[10px] font-semibold text-slate-200 max-w-[52px] truncate text-center mt-1'
+      : 'text-[10px] text-slate-500 opacity-50 max-w-[52px] truncate text-center mt-1 line-through';
+
+    item.innerHTML = `
+      <div class="relative">
+        <div class="${avatarClass}">${char}</div>
+        ${p.active ? '<span class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-[#2DD4BF] rounded-full border border-[#061224] shadow-[0_0_6px_#2DD4BF]"></span>' : ''}
+      </div>
+      <span class="${textClass}">${escHtml(p.name)}</span>
     `;
-    btn.onclick = () => togglePlayer(i);
-    container.appendChild(btn);
+    container.appendChild(item);
   });
-  document.getElementById('playerCount').textContent = `${getActivePlayers().length}/${state.players.length} người đang chơi`;
 }
 
 function togglePlayer(idx) {
   state.players[idx].active = !state.players[idx].active;
   savePlayers();
-  renderPlayerList();
+  renderMemberBar();
+  renderModalPlayerList();
+  if (spinCanvas) drawWheel();
   playClick();
 }
 
 function addPlayersFromTextarea() {
-  const ta = document.getElementById('bulkInput');
+  const ta = document.getElementById('modalBulkInput');
   if (!ta) return;
   const raw = ta.value.trim();
   if (!raw) return;
@@ -159,16 +205,20 @@ function addPlayersFromTextarea() {
   state.players = names.map(name => ({ name, active: true }));
   ta.value = '';
   savePlayers();
-  renderPlayerList();
-  showToast(`✅ Đã tạo danh sách ${names.length} người chơi!`);
+  renderMemberBar();
+  renderModalPlayerList();
+  if (spinCanvas) drawWheel();
+  showToast(`✅ Đã cập nhật ${names.length} người chơi!`);
   playCelebration();
 }
 
 function addSamplePlayers() {
   state.players = DATA.sampleNames.map(name => ({ name, active: true }));
   savePlayers();
-  renderPlayerList();
-  showToast('✅ Đã tạo 16 người mẫu!');
+  renderMemberBar();
+  renderModalPlayerList();
+  if (spinCanvas) drawWheel();
+  showToast('✅ Đã nạp 16 người mẫu!');
   playCelebration();
 }
 
@@ -176,7 +226,133 @@ function clearPlayers() {
   if (!confirm('Xóa toàn bộ danh sách người chơi?')) return;
   state.players = [];
   savePlayers();
-  renderPlayerList();
+  renderMemberBar();
+  renderModalPlayerList();
+  if (spinCanvas) drawWheel();
+}
+
+// ─── Modal Quản Lý Người Chơi ─────────────────────────────
+function openPlayerModal() {
+  playClick();
+  const html = `
+    <div class="space-y-4">
+      <div class="flex items-center justify-between pb-2 border-b border-cyan-500/20">
+        <div class="flex items-center gap-2">
+          <span class="text-2xl">👥</span>
+          <div>
+            <h3 class="text-base font-black text-white">Quản lý Thành viên</h3>
+            <p class="text-xs text-cyan-300">Nhập danh sách hoặc chạm để bật/tắt</p>
+          </div>
+        </div>
+        <button onclick="closeModal()" class="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 text-slate-400 hover:text-white flex items-center justify-center">✕</button>
+      </div>
+
+      <!-- Bulk input -->
+      <div class="space-y-2">
+        <label class="text-xs font-bold uppercase tracking-wider text-cyan-300">📋 Dán nhanh 16 tên</label>
+        <textarea id="modalBulkInput" rows="4"
+          class="w-full bg-[#08172E] border border-cyan-500/30 rounded-2xl px-3 py-2.5 text-white text-xs placeholder-slate-500 focus:border-[#2DD4BF] focus:outline-none resize-none font-medium leading-relaxed"
+          placeholder="Minh Tuấn&#10;Hồng Nhung&#10;Quang Hải&#10;... (mỗi tên 1 dòng hoặc cách nhau dấu phẩy)"></textarea>
+        <button class="btn-primary text-sm py-2.5 w-full font-bold" onclick="addPlayersFromTextarea()">
+          ✅ Lưu danh sách
+        </button>
+      </div>
+
+      <!-- Quick actions -->
+      <div class="flex gap-2">
+        <button class="btn-secondary text-xs py-2 flex-1" onclick="addSamplePlayers()">
+          🎲 Tạo 16 người mẫu
+        </button>
+        <button class="text-xs py-2 px-3 rounded-2xl bg-red-950/40 border border-red-800 text-red-300 font-bold active:scale-95" onclick="clearPlayers()">
+          🗑 Xóa hết
+        </button>
+      </div>
+
+      <!-- Current players list -->
+      <div class="space-y-2">
+        <div class="flex justify-between items-center text-xs text-slate-400 font-semibold">
+          <span>Danh sách hiện tại:</span>
+          <span>Chạm để bật/tắt</span>
+        </div>
+        <div id="modalPlayerList" class="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto pr-1"></div>
+      </div>
+    </div>
+  `;
+  showModal(html);
+  renderModalPlayerList();
+}
+
+function renderModalPlayerList() {
+  const container = document.getElementById('modalPlayerList');
+  if (!container) return;
+  container.innerHTML = '';
+  if (state.players.length === 0) {
+    container.innerHTML = '<p class="text-center text-slate-500 py-4 col-span-2 text-xs">Chưa có người chơi nào.</p>';
+    return;
+  }
+  state.players.forEach((p, i) => {
+    const btn = document.createElement('button');
+    btn.className = `flex items-center gap-2 px-2.5 py-2 rounded-xl text-xs font-semibold transition-all border ${
+      p.active
+        ? 'border-[#2DD4BF]/50 bg-[#06B6D4]/15 text-cyan-200'
+        : 'border-slate-700 bg-slate-800/40 text-slate-500 opacity-60'
+    }`;
+    btn.innerHTML = `
+      <span class="w-4 h-4 rounded-full flex items-center justify-center text-[10px] font-bold ${p.active ? 'bg-[#2DD4BF] text-slate-950' : 'bg-slate-700 text-slate-400'}">${i + 1}</span>
+      <span class="flex-1 text-left truncate">${escHtml(p.name)}</span>
+      <span class="text-[10px]">${p.active ? '✓' : '✗'}</span>
+    `;
+    btn.onclick = () => togglePlayer(i);
+    container.appendChild(btn);
+  });
+}
+
+// ─── Modal Cài Đặt ─────────────────────────────────────────
+function openSettingsModal() {
+  playClick();
+  const html = `
+    <div class="space-y-4">
+      <div class="flex items-center justify-between pb-2 border-b border-cyan-500/20">
+        <div class="flex items-center gap-2">
+          <span class="text-2xl">⚙️</span>
+          <div>
+            <h3 class="text-base font-black text-white">Cài đặt & Luật Chơi</h3>
+            <p class="text-xs text-cyan-300">Đại Chiến Bàn Nhậu Modern Blue</p>
+          </div>
+        </div>
+        <button onclick="closeModal()" class="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 text-slate-400 hover:text-white flex items-center justify-center">✕</button>
+      </div>
+
+      <div class="space-y-3 text-xs leading-relaxed text-slate-300">
+        <div class="flex items-center justify-between p-3 rounded-2xl bg-[#08172E] border border-cyan-500/20">
+          <div>
+            <div class="font-bold text-white text-sm">Âm thanh hiệu ứng</div>
+            <div class="text-slate-400">Web Audio API synth sinh động</div>
+          </div>
+          <button onclick="toggleSound(); updateSettingsSoundBtn(this);" id="settingsSoundToggle" class="px-3.5 py-1.5 rounded-xl text-xs font-extrabold ${state.soundEnabled ? 'bg-cyan-500/20 text-[#2DD4BF] border border-cyan-400/40' : 'bg-slate-700 text-slate-400'}">
+            ${state.soundEnabled ? 'BẬT 🔊' : 'TẮT 🔇'}
+          </button>
+        </div>
+
+        <div class="p-3.5 rounded-2xl bg-[#08172E] border border-cyan-500/20 space-y-2">
+          <div class="font-bold text-[#2DD4BF] text-sm">🍺 Luật chơi mâm 16 người:</div>
+          <p>• Nhấn vào avatar bất kỳ trên thanh thành viên để tạm ẩn người đang đi vệ sinh/bận nghe máy.</p>
+          <p>• Bấm nút <strong>+</strong> ở góc trái thanh thành viên để dán 16 tên mới bất cứ lúc nào.</p>
+          <p>• Chơi vui là chính, an toàn là trên hết – đã uống bia rượu thì không lái xe!</p>
+        </div>
+      </div>
+
+      <button onclick="closeModal()" class="btn-primary w-full py-3 font-bold text-sm">Đã hiểu, chiến tiếp!</button>
+    </div>
+  `;
+  showModal(html);
+}
+
+function updateSettingsSoundBtn(btn) {
+  if (btn) {
+    btn.textContent = state.soundEnabled ? 'BẬT 🔊' : 'TẮT 🔇';
+    btn.className = `px-3.5 py-1.5 rounded-xl text-xs font-extrabold ${state.soundEnabled ? 'bg-cyan-500/20 text-[#2DD4BF] border border-cyan-400/40' : 'bg-slate-700 text-slate-400'}`;
+  }
 }
 
 // ─── Helpers ──────────────────────────────────────────────
@@ -215,7 +391,7 @@ function closeModal() {
 }
 
 // ─────────────────────────────────────────────────────────
-// TRÒ 1: VÒNG QUAY NHÂN PHẨM
+// TRÒ 1: VÒNG QUAY NHÂN PHẨM (Xanh dương - Xanh ngọc - Tím pastel)
 // ─────────────────────────────────────────────────────────
 let spinCanvas, spinCtx;
 let spinAngle = 0;
@@ -223,10 +399,24 @@ let spinVelocity = 0;
 let spinAnimId = null;
 let isSpinning = false;
 
+// Bảng màu xen kẽ: Xanh dương - Xanh ngọc - Tím pastel
 const COLORS = [
-  '#F97316', '#EC4899', '#8B5CF6', '#06B6D4', '#10B981',
-  '#F59E0B', '#EF4444', '#6366F1', '#14B8A6', '#84CC16',
-  '#F472B6', '#FB923C', '#A78BFA', '#34D399', '#FCD34D', '#60A5FA'
+  '#0284C7', // Sky Blue
+  '#0D9488', // Deep Teal
+  '#818CF8', // Indigo Pastel
+  '#06B6D4', // Cyan Neon
+  '#A78BFA', // Purple Pastel
+  '#14B8A6', // Teal Mint
+  '#38BDF8', // Light Cyan
+  '#6366F1', // Indigo Vibrant
+  '#2DD4BF', // Turquoise
+  '#C084FC', // Violet Pastel
+  '#0369A1', // Ocean Blue
+  '#22D3EE', // Bright Cyan
+  '#99F6E4', // Soft Teal
+  '#818CF8', // Lavender
+  '#5EEAD4', // Aqua Pastel
+  '#38BDF8'  // Sky Cyan
 ];
 
 function initSpinWheel() {
@@ -238,14 +428,15 @@ function initSpinWheel() {
 }
 
 function resizeCanvas() {
+  if (!spinCanvas) return;
   const container = spinCanvas.parentElement;
-  const size = Math.min(container.clientWidth - 16, 380);
+  const size = Math.min(container.clientWidth - 16, 350);
   spinCanvas.width = size;
   spinCanvas.height = size;
 }
 
 function drawWheel() {
-  if (!spinCtx) return;
+  if (!spinCtx || !spinCanvas) return;
   const players = getActivePlayers();
   const n = players.length;
   const cx = spinCanvas.width / 2;
@@ -255,12 +446,15 @@ function drawWheel() {
   spinCtx.clearRect(0, 0, spinCanvas.width, spinCanvas.height);
 
   if (n === 0) {
-    spinCtx.fillStyle = '#1E293B';
+    spinCtx.fillStyle = '#0F294A';
     spinCtx.beginPath();
     spinCtx.arc(cx, cy, r, 0, Math.PI * 2);
     spinCtx.fill();
+    spinCtx.strokeStyle = 'rgba(6, 182, 212, 0.3)';
+    spinCtx.lineWidth = 3;
+    spinCtx.stroke();
     spinCtx.fillStyle = '#94A3B8';
-    spinCtx.font = `${Math.min(16, r / 5)}px sans-serif`;
+    spinCtx.font = `${Math.min(15, r / 5)}px sans-serif`;
     spinCtx.textAlign = 'center';
     spinCtx.fillText('Chưa có người chơi', cx, cy);
     return;
@@ -268,63 +462,59 @@ function drawWheel() {
 
   const sliceAngle = (Math.PI * 2) / n;
 
+  // Draw slices
   players.forEach((p, i) => {
     const start = spinAngle + i * sliceAngle;
     const end = start + sliceAngle;
 
-    // Slice
     spinCtx.beginPath();
     spinCtx.moveTo(cx, cy);
     spinCtx.arc(cx, cy, r, start, end);
     spinCtx.closePath();
     spinCtx.fillStyle = COLORS[i % COLORS.length];
     spinCtx.fill();
-    spinCtx.strokeStyle = '#0B1120';
-    spinCtx.lineWidth = 2;
+    spinCtx.strokeStyle = '#061224';
+    spinCtx.lineWidth = 2.5;
     spinCtx.stroke();
 
-    // Text
+    // Text name
     spinCtx.save();
     spinCtx.translate(cx, cy);
     spinCtx.rotate(start + sliceAngle / 2);
     spinCtx.textAlign = 'right';
 
-    const fontSize = Math.max(9, Math.min(14, r / (n * 0.55)));
+    const fontSize = Math.max(10, Math.min(13, r / (n * 0.52)));
     spinCtx.font = `bold ${fontSize}px sans-serif`;
-    spinCtx.fillStyle = '#fff';
-    spinCtx.shadowColor = 'rgba(0,0,0,0.8)';
-    spinCtx.shadowBlur = 3;
+    spinCtx.fillStyle = '#FFFFFF';
+    spinCtx.shadowColor = 'rgba(0, 0, 0, 0.85)';
+    spinCtx.shadowBlur = 4;
 
-    // Truncate name
-    const maxLen = Math.max(4, Math.floor(16 / Math.sqrt(n)));
+    const maxLen = Math.max(5, Math.floor(18 / Math.sqrt(n)));
     let name = p.name;
     if (name.length > maxLen) name = name.slice(0, maxLen - 1) + '…';
 
-    spinCtx.fillText(name, r - 10, fontSize / 3);
+    spinCtx.fillText(name, r - 12, fontSize / 3);
     spinCtx.restore();
   });
 
-  // Center circle
-  const grad = spinCtx.createRadialGradient(cx, cy, 0, cx, cy, r * 0.18);
-  grad.addColorStop(0, '#1E293B');
-  grad.addColorStop(1, '#0B1120');
+  // Outer border with soft teal neon
   spinCtx.beginPath();
-  spinCtx.arc(cx, cy, r * 0.16, 0, Math.PI * 2);
-  spinCtx.fillStyle = grad;
-  spinCtx.fill();
-  spinCtx.strokeStyle = '#F97316';
-  spinCtx.lineWidth = 3;
+  spinCtx.arc(cx, cy, r, 0, Math.PI * 2);
+  spinCtx.strokeStyle = '#2DD4BF';
+  spinCtx.lineWidth = 4;
   spinCtx.stroke();
 
-  // Arrow pointer (top)
+  // Pointer at top
   spinCtx.save();
   spinCtx.translate(cx, 0);
   spinCtx.beginPath();
-  spinCtx.moveTo(0, r * 0.08);
-  spinCtx.lineTo(-14, -4);
-  spinCtx.lineTo(14, -4);
+  spinCtx.moveTo(0, r * 0.12);
+  spinCtx.lineTo(-14, -2);
+  spinCtx.lineTo(14, -2);
   spinCtx.closePath();
-  spinCtx.fillStyle = '#F97316';
+  spinCtx.fillStyle = '#2DD4BF';
+  spinCtx.shadowColor = '#06B6D4';
+  spinCtx.shadowBlur = 10;
   spinCtx.fill();
   spinCtx.restore();
 }
@@ -337,14 +527,12 @@ function spinWheel() {
     return;
   }
   isSpinning = true;
-  spinVelocity = 0.25 + Math.random() * 0.2;
-  let tickCount = 0;
+  spinVelocity = 0.28 + Math.random() * 0.22;
 
   function animate() {
     spinAngle += spinVelocity;
     spinVelocity *= 0.985;
 
-    // Tick sound
     const prevSlice = Math.floor((spinAngle - spinVelocity) / (Math.PI * 2 / players.length));
     const currSlice = Math.floor(spinAngle / (Math.PI * 2 / players.length));
     if (currSlice !== prevSlice) {
@@ -369,10 +557,7 @@ function onSpinEnd() {
   const players = getActivePlayers();
   const n = players.length;
   const sliceAngle = (Math.PI * 2) / n;
-  // Arrow is at top (angle = -PI/2 from positive x-axis)
-  // Normalize spinAngle
   const normalized = ((spinAngle % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
-  // The slice at top: pointer at -PI/2, offset by spinAngle
   const pointerAngle = (Math.PI * 2 - normalized + Math.PI * 2) % (Math.PI * 2);
   const idx = Math.floor(pointerAngle / sliceAngle) % n;
   const winner = players[idx];
@@ -383,19 +568,19 @@ function onSpinEnd() {
 
   showModal(`
     <div class="text-center space-y-4">
-      <div class="text-5xl mb-2">🎉</div>
-      <h2 class="text-2xl font-black text-orange-400">Trúng thưởng!</h2>
-      <div class="text-3xl font-black text-white py-2 px-4 bg-orange-500/20 rounded-2xl border-2 border-orange-500">
+      <div class="text-5xl mb-1">🎉</div>
+      <h2 class="text-xl font-black text-cyan-300 uppercase tracking-wider">Trúng thưởng!</h2>
+      <div class="text-2xl font-black text-white py-3 px-4 bg-gradient-to-r from-cyan-500/20 to-teal-500/20 rounded-2xl border-2 border-[#2DD4BF] shadow-[0_0_15px_rgba(45,212,191,0.3)]">
         ${escHtml(winner.name)}
       </div>
-      <div class="bg-slate-700 rounded-2xl p-4 text-left space-y-2" id="spinChallengeBox">
-        <div class="text-xs font-bold text-pink-400 uppercase tracking-wider">⚡ Thử thách</div>
-        <div class="font-bold text-orange-300 text-base" id="spinChallengeTitleEl">${escHtml(challenge.title)}</div>
-        <div class="text-slate-200 text-sm leading-relaxed" id="spinChallengeDescEl">${escHtml(challenge.desc)}</div>
+      <div class="bg-[#08172E] border border-cyan-500/30 rounded-2xl p-4 text-left space-y-2">
+        <div class="text-xs font-bold text-[#2DD4BF] uppercase tracking-wider">⚡ Lệnh Phạt / Thử thách</div>
+        <div class="font-bold text-white text-base" id="spinChallengeTitleEl">${escHtml(challenge.title)}</div>
+        <div class="text-slate-300 text-sm leading-relaxed" id="spinChallengeDescEl">${escHtml(challenge.desc)}</div>
       </div>
       <div class="flex gap-3 pt-2">
-        <button onclick="closeModal()" class="flex-1 py-3 rounded-xl bg-slate-600 text-white font-bold active:scale-95">↩ Quay lại</button>
-        <button onclick="changeSpinChallenge()" class="flex-1 py-3 rounded-xl bg-pink-500 text-white font-bold active:scale-95">🔀 Đổi thử thách</button>
+        <button onclick="closeModal()" class="flex-1 py-3 rounded-2xl bg-slate-800 border border-slate-700 text-slate-300 font-bold active:scale-95">↩ Xong</button>
+        <button onclick="changeSpinChallenge()" class="flex-1 py-3 rounded-2xl bg-gradient-to-r from-[#06B6D4] to-[#2DD4BF] text-slate-950 font-black shadow-md shadow-cyan-500/30 active:scale-95">🔀 Đổi lệnh</button>
       </div>
     </div>
   `);
@@ -422,7 +607,7 @@ function pickWhoIsQuestion() {
   const btnArea = document.getElementById('whoIsBtn');
   if (qEl) {
     qEl.textContent = whoIsQuestion;
-    qEl.classList.remove('text-slate-500');
+    qEl.classList.remove('text-slate-400');
     qEl.classList.add('text-white');
   }
   if (btnArea) btnArea.classList.remove('hidden');
@@ -448,7 +633,7 @@ function startWhoIsCountdown() {
   }
 
   if (btnStart) btnStart.disabled = true;
-  if (resultEl) { resultEl.classList.add('hidden'); }
+  if (resultEl) resultEl.classList.add('hidden');
 
   let count = 3;
   if (countEl) {
@@ -457,7 +642,7 @@ function startWhoIsCountdown() {
     countEl.classList.add('scale-100');
   }
 
-  playTone(440, 'sine', 0.3, 0.4);
+  playTone(520, 'sine', 0.25, 0.4);
 
   whoIsCountdown = setInterval(() => {
     count--;
@@ -467,9 +652,9 @@ function startWhoIsCountdown() {
         setTimeout(() => {
           countEl.textContent = count;
           countEl.classList.add('scale-100');
-        }, 100);
+        }, 80);
       }
-      playTone(440, 'sine', 0.3, 0.4);
+      playTone(520, 'sine', 0.25, 0.4);
     } else {
       clearInterval(whoIsCountdown);
       whoIsCountdown = null;
@@ -478,14 +663,13 @@ function startWhoIsCountdown() {
         setTimeout(() => {
           countEl.textContent = '👆 CHỈ!';
           countEl.classList.add('scale-100');
-          countEl.style.fontSize = '2rem';
-        }, 100);
+        }, 80);
       }
       playCelebration();
       setTimeout(() => {
         if (countEl) countEl.classList.add('hidden');
         if (resultEl) {
-          resultEl.textContent = '🏆 Ai bị chỉ nhiều nhất thì người đó UỐNG! 🍺';
+          resultEl.innerHTML = '🏆 <strong>Ai bị chỉ nhiều nhất</strong> thì người đó <strong>UỐNG! 🍺</strong>';
           resultEl.classList.remove('hidden');
         }
         if (btnStart) btnStart.disabled = false;
@@ -498,8 +682,8 @@ function startWhoIsCountdown() {
 // TRÒ 3: THẬT HAY THÁCH
 // ─────────────────────────────────────────────────────────
 let todPlayer = null;
-let todMode = null;    // 'truth' | 'dare'
-let todLevel = null;   // 'mild' | 'spicy'
+let todMode = null;
+let todLevel = null;
 let todRolling = false;
 let todRollTimer = null;
 
@@ -519,14 +703,14 @@ function pickToDPlayer() {
 
   let rollCount = 0;
   const totalRolls = 15;
-  const intervalBase = 80;
+  const intervalBase = 70;
 
   function roll() {
     const p = randItem(players);
     if (nameEl) nameEl.textContent = p.name;
-    playTone(600 + Math.random() * 400, 'square', 0.04, 0.1);
+    playTone(700 + Math.random() * 300, 'square', 0.04, 0.1);
     rollCount++;
-    const delay = intervalBase + (rollCount / totalRolls) * 250;
+    const delay = intervalBase + (rollCount / totalRolls) * 220;
     if (rollCount < totalRolls) {
       todRollTimer = setTimeout(roll, delay);
     } else {
@@ -558,36 +742,37 @@ function selectToDMode(mode, level) {
 
   const modeLabel = mode === 'truth' ? '🤔 THẬT' : '🔥 THÁCH';
   const levelLabel = level === 'mild' ? '☀️ Nhẹ nhàng' : '🔥 Cháy phố';
-  const modeColor = mode === 'truth' ? 'text-cyan-400' : 'text-pink-400';
-  const bgColor = mode === 'truth' ? 'from-cyan-900/50 to-slate-800' : 'from-pink-900/50 to-slate-800';
+  const modeColor = mode === 'truth' ? 'text-cyan-300' : 'text-[#2DD4BF]';
+  const borderColor = mode === 'truth' ? 'border-cyan-400' : 'border-[#2DD4BF]';
 
   if (cardFront) {
-    cardFront.className = `tod-card-face tod-card-front absolute inset-0 rounded-2xl flex items-center justify-center bg-gradient-to-br ${bgColor} border-2 ${mode === 'truth' ? 'border-cyan-500' : 'border-pink-500'}`;
+    cardFront.className = `tod-card-face tod-card-front absolute inset-0 rounded-2xl flex items-center justify-center bg-[#08172E] border-2 ${borderColor} shadow-[0_0_20px_rgba(6,182,212,0.25)]`;
     cardFront.innerHTML = `
-      <div class="text-center space-y-2">
+      <div class="text-center space-y-2 p-4">
         <div class="text-4xl">${mode === 'truth' ? '🤔' : '🔥'}</div>
         <div class="text-2xl font-black ${modeColor}">${modeLabel}</div>
-        <div class="text-sm text-slate-400">${levelLabel}</div>
-        <div class="text-xs text-slate-500 mt-2">Chạm để lật bài</div>
+        <div class="text-xs text-slate-400">${levelLabel}</div>
+        <div class="text-[11px] text-[#2DD4BF] font-semibold mt-2 animate-pulse">Chạm để lật thẻ bài ✨</div>
       </div>`;
   }
   if (cardBack) {
+    cardBack.className = `tod-card-face tod-card-back absolute inset-0 rounded-2xl bg-[#08172E] border-2 ${borderColor} shadow-[0_0_20px_rgba(45,212,191,0.25)] flex flex-col justify-between p-5`;
     cardBack.innerHTML = `
-      <div class="p-5 space-y-3">
-        <div class="flex items-center gap-2 text-xs font-bold ${modeColor} uppercase tracking-wider">
-          <span>${modeLabel}</span><span class="text-slate-500">•</span><span class="text-slate-400">${levelLabel}</span>
+      <div class="space-y-3">
+        <div class="flex items-center justify-between text-xs font-bold uppercase tracking-wider">
+          <span class="${modeColor}">${modeLabel}</span>
+          <span class="text-slate-400">${levelLabel}</span>
         </div>
-        <p class="text-white text-base font-semibold leading-relaxed">${escHtml(content)}</p>
-        <div class="pt-2">
-          <span class="inline-block text-xs bg-slate-600 text-slate-300 px-2 py-1 rounded-full">Dành cho: ${escHtml(todPlayer.name)}</span>
-        </div>
+        <p class="text-white text-sm sm:text-base font-semibold leading-relaxed">${escHtml(content)}</p>
+      </div>
+      <div class="pt-2 border-t border-cyan-500/20">
+        <span class="text-xs font-bold text-cyan-300">Dành cho: <span class="text-white font-extrabold">${escHtml(todPlayer.name)}</span></span>
       </div>`;
   }
 
   cardArea.classList.remove('hidden');
-  // Reset flip
   cardInner.classList.remove('flipped');
-  setTimeout(() => cardInner.classList.add('flipped'), 50);
+  setTimeout(() => cardInner.classList.add('flipped'), 60);
   playClick();
 }
 
@@ -595,15 +780,15 @@ function todGiveUp() {
   showModal(`
     <div class="text-center space-y-4">
       <div class="text-5xl">😅</div>
-      <h2 class="text-xl font-black text-orange-400">Chịu thua!</h2>
-      <p class="text-slate-300">
+      <h2 class="text-xl font-black text-cyan-300">Chịu thua!</h2>
+      <p class="text-slate-300 text-sm">
         <span class="text-white font-bold">${todPlayer ? escHtml(todPlayer.name) : 'Người chơi'}</span> không dám thực hiện thử thách.<br>
-        <span class="text-pink-400 font-bold text-lg">Phạt uống 1 ly! 🍺</span>
+        <span class="text-red-400 font-extrabold text-base">Phạt uống 1 ly! 🍺</span>
       </p>
-      <button onclick="closeModal()" class="w-full py-3 rounded-xl bg-orange-500 text-white font-bold active:scale-95">OK, uống đi!</button>
+      <button onclick="closeModal()" class="btn-primary w-full py-3 font-bold">OK, uống ngay!</button>
     </div>
   `);
-  playTone(220, 'sawtooth', 0.5, 0.3);
+  playTone(220, 'sawtooth', 0.4, 0.3);
 }
 
 // ─────────────────────────────────────────────────────────
@@ -626,14 +811,11 @@ function rollDice() {
   diceShaking = true;
   playDiceShake();
 
-  const diceContainer = document.getElementById('diceContainer');
   const diceTip = document.getElementById('diceTip');
   if (diceTip) diceTip.textContent = '';
 
-  // Animate
-  diceValues = [];
   let frame = 0;
-  const totalFrames = 20;
+  const totalFrames = 18;
 
   const interval = setInterval(() => {
     const temp = Array.from({ length: diceCount }, () => Math.ceil(Math.random() * 6));
@@ -677,7 +859,7 @@ function getDiceDots(n) {
     6: [[25, 20], [75, 20], [25, 50], [75, 50], [25, 80], [75, 80]],
   };
   const dots = positions[n] || [];
-  return `<svg viewBox="0 0 100 100" class="w-full h-full">${dots.map(([x, y]) => `<circle cx="${x}" cy="${y}" r="10" fill="currentColor"/>`).join('')}</svg>`;
+  return `<svg viewBox="0 0 100 100" class="w-full h-full text-[#08172E]">${dots.map(([x, y]) => `<circle cx="${x}" cy="${y}" r="11" fill="currentColor"/>`).join('')}</svg>`;
 }
 
 function showDiceTip() {
@@ -687,33 +869,31 @@ function showDiceTip() {
   const max = diceCount * 6;
   const min = diceCount;
 
-  // Check for pairs/triples/etc
   const freq = {};
   diceValues.forEach(v => freq[v] = (freq[v] || 0) + 1);
   const maxFreq = Math.max(...Object.values(freq));
 
   let tip = '';
   if (diceValues.length >= 2 && maxFreq === diceValues.length) {
-    if (diceValues.length === 2) tip = '🎯 Đôi! Nhân phẩm cực mạnh – Chỉ định 1 người uống ngay!';
+    if (diceValues.length === 2) tip = '🎯 Đôi! Nhân phẩm cực đại – Chỉ định 1 người uống ngay!';
     else if (diceValues.length === 3) tip = '🔥 Bộ ba! Quyền lực tối thượng – Chọn 3 người uống cùng bạn!';
-    else tip = '👑 Tứ quý! Bạn là chủ bàn hôm nay – Cả mâm uống theo lệnh bạn!';
+    else tip = '👑 Tứ quý! Bạn là chủ bàn hôm nay – Cả mâm nâng ly theo lệnh bạn!';
   } else if (total === min) {
-    tip = '😬 Điểm thấp nhất có thể... Tự uống đi thôi, số đen hôm nay!';
+    tip = '😬 Điểm thấp nhất có thể... Tự uống 1 ly giải đen nhé!';
   } else if (total === max) {
-    tip = '🚀 Điểm tối đa! Huyền thoại của bàn nhậu – Chọn ai uống tùy ý!';
+    tip = '🚀 Điểm tối đa! Cực may mắn – Chỉ định người uống tùy ý!';
   } else if (total >= max * 0.75) {
-    tip = '💪 Điểm cao! Bạn được quyền ra 1 lệnh cho người bất kỳ trong mâm.';
+    tip = '💪 Điểm cao! Bạn được quyền ra 1 lệnh cho người bất kỳ.';
   } else if (total <= min + (max - min) * 0.25) {
-    tip = '😅 Điểm thấp... Uống nào, không có gì để bàn thêm cả!';
+    tip = '😅 Điểm thấp... Tự phạt 1 ngụm cho tỉnh táo!';
   } else {
-    tip = '👍 Điểm trung bình – Uống ngang nhau, ai muốn thì cụng thêm!';
+    tip = '👍 Điểm trung bình – Mọi người nâng ly cụng cái nào!';
   }
 
   tipEl.textContent = tip;
   tipEl.classList.remove('hidden');
 }
 
-// Shake detection
 function setupShakeDetector() {
   if (!window.DeviceMotionEvent) return;
   let lastShake = 0;
@@ -726,7 +906,6 @@ function setupShakeDetector() {
     lastAcc = { x: acc.x, y: acc.y, z: acc.z };
     if (delta > 25 && Date.now() - lastShake > 1000) {
       lastShake = Date.now();
-      // Check if dice tab is active
       const diceSection = document.getElementById('section-dice');
       if (diceSection && !diceSection.classList.contains('hidden')) {
         rollDice();
@@ -735,7 +914,6 @@ function setupShakeDetector() {
   };
 
   if (typeof DeviceMotionEvent.requestPermission === 'function') {
-    // iOS 13+
     document.getElementById('requestMotionBtn')?.classList.remove('hidden');
   } else {
     window.addEventListener('devicemotion', handler, { passive: true });
@@ -758,15 +936,13 @@ function setupShakeDetector() {
 let bombTimer = null;
 let bombEndTime = 0;
 let bombTicking = false;
-let bombTickInterval = null;
-let bombFlashInterval = null;
 
 function pickBombTopic() {
   const topic = randItem(DATA.bombTopics);
   const topicEl = document.getElementById('bombTopic');
   if (topicEl) {
     topicEl.textContent = topic;
-    topicEl.classList.remove('text-slate-500');
+    topicEl.classList.remove('text-slate-400');
     topicEl.classList.add('text-white');
   }
   const statusEl = document.getElementById('bombStatus');
@@ -778,17 +954,16 @@ function pickBombTopic() {
 function startBomb() {
   if (bombTicking) return;
   const topicEl = document.getElementById('bombTopic');
-  if (!topicEl || topicEl.classList.contains('text-slate-500')) {
+  if (!topicEl || topicEl.classList.contains('text-slate-400')) {
     showToast('⚠️ Hãy chọn chủ đề trước!');
     return;
   }
 
   bombTicking = true;
-  const duration = (20 + Math.floor(Math.random() * 26)) * 1000; // 20-45s
+  const duration = (20 + Math.floor(Math.random() * 26)) * 1000;
   bombEndTime = Date.now() + duration;
 
   const statusEl = document.getElementById('bombStatus');
-  const timerEl = document.getElementById('bombTimerDisplay');
   const bombVisual = document.getElementById('bombVisual');
   const startBtn = document.getElementById('bombStartBtn');
   const stopBtn = document.getElementById('bombStopBtn');
@@ -805,21 +980,19 @@ function startBomb() {
       return;
     }
 
-    // Update tick speed (faster as time goes on)
     const progress = 1 - remaining / duration;
-    tickSpeed = Math.max(300, 1200 - progress * 900);
+    tickSpeed = Math.max(280, 1200 - progress * 920);
 
     playBombTick(progress > 0.6);
 
-    // Flash
     if (bombVisual) {
       bombVisual.classList.add('bomb-flash');
-      setTimeout(() => bombVisual?.classList.remove('bomb-flash'), 150);
+      setTimeout(() => bombVisual?.classList.remove('bomb-flash'), 120);
     }
 
     if (statusEl) {
       const dots = ['.', '..', '...'][Math.floor(Date.now() / 400) % 3];
-      statusEl.textContent = `💣 Bom đang nổ${dots} Chuyền nhanh lên!`;
+      statusEl.textContent = `💣 Bom đang tích tắc${dots} Chuyền nhanh lên!`;
     }
 
     clearTimeout(bombTimer);
@@ -841,7 +1014,7 @@ function explodeBomb() {
   const stopBtn = document.getElementById('bombStopBtn');
 
   if (statusEl) {
-    statusEl.innerHTML = '<span class="text-red-400 font-black text-xl animate-pulse">💥 BOM NỔ! Người đang cầm điện thoại UỐNG! 🍺</span>';
+    statusEl.innerHTML = '<span class="text-red-400 font-black text-lg animate-pulse">💥 BOM NỔ! Người đang cầm điện thoại UỐNG! 🍺</span>';
   }
 
   if (bombVisual) {
@@ -849,10 +1022,9 @@ function explodeBomb() {
     setTimeout(() => bombVisual?.classList.remove('bomb-explode'), 1000);
   }
 
-  // Flash screen red
   const flashEl = document.getElementById('bombFlash');
   if (flashEl) {
-    flashEl.style.opacity = '0.7';
+    flashEl.style.opacity = '0.75';
     setTimeout(() => { if (flashEl) flashEl.style.opacity = '0'; }, 600);
   }
 
@@ -874,9 +1046,9 @@ function stopBomb(withToast = true) {
 }
 
 // ─────────────────────────────────────────────────────────
-// NAVIGATION
+// NAVIGATION (5 TABS GAME)
 // ─────────────────────────────────────────────────────────
-const SECTIONS = ['players', 'spin', 'whois', 'tod', 'dice', 'bomb'];
+const SECTIONS = ['spin', 'whois', 'tod', 'dice', 'bomb'];
 
 function showSection(id) {
   SECTIONS.forEach(s => {
@@ -885,18 +1057,14 @@ function showSection(id) {
   });
 
   document.querySelectorAll('.nav-btn').forEach(btn => {
-    btn.classList.toggle('nav-active', btn.dataset.section === id);
+    const isActive = btn.dataset.section === id;
+    btn.classList.toggle('nav-active', isActive);
   });
 
-  // Init section-specific stuff
   if (id === 'spin') {
     setTimeout(initSpinWheel, 50);
   }
-  if (id === 'players') {
-    renderPlayerList();
-  }
 
-  // Stop bomb if leaving bomb section
   if (id !== 'bomb') stopBomb(false);
 
   playClick();
@@ -917,15 +1085,13 @@ function toggleSound() {
 // ─────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   loadPlayers();
-  renderPlayerList();
-  showSection('players');
+  renderMemberBar();
+  showSection('spin');
   setupShakeDetector();
 
-  // Initial dice display
   setDiceCount(2);
   renderDice([], false);
 
-  // ToD card flip
   const cardInner = document.getElementById('todCardInner');
   if (cardInner) {
     cardInner.addEventListener('click', () => {
@@ -934,7 +1100,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Modal close on backdrop click
   const overlay = document.getElementById('modalOverlay');
   if (overlay) {
     overlay.addEventListener('click', (e) => {
@@ -942,7 +1107,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Resize spin wheel on orientation change
   window.addEventListener('resize', () => {
     if (!document.getElementById('section-spin')?.classList.contains('hidden')) {
       resizeCanvas();
@@ -950,5 +1114,5 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  console.log('🍺 Đại Chiến Bàn Nhậu - Ready to party!');
+  console.log('🍺 Đại Chiến Bàn Nhậu (Modern Blue Theme) - Ready!');
 });
