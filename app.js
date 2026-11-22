@@ -1,5 +1,6 @@
 // ============================================================
-// APP.JS - Logic chính cho Đại Chiến Bàn Nhậu (Blue Tone Edition)
+// APP.JS - Logic chính cho Đại Chiến Bàn Nhậu
+// Giao diện: Maison de Jeux (trắng · xanh Pháp · serif)
 // ============================================================
 
 // ─── State ───────────────────────────────────────────────
@@ -139,21 +140,21 @@ function renderMemberBar() {
   const totalCount = state.players.length;
   if (countBadge) {
     countBadge.textContent = `${activeCount}/${totalCount}`;
-    countBadge.className = `text-[11px] font-extrabold px-2.5 py-0.5 rounded-full border ${
+    countBadge.className = `chip ${
       activeCount > 0
-        ? 'bg-cyan-500/20 text-[#2DD4BF] border-cyan-400/40 shadow-sm shadow-cyan-500/20'
-        : 'bg-red-500/20 text-red-300 border-red-400/40'
+        ? ''
+        : '!bg-[#FFF5F6] !text-[#C0223B] !border-[#F0CFD5]'
     }`;
   }
 
   container.innerHTML = '';
 
-  // Nút + tròn màu xanh ngọc để mở modal nhập nhanh 16 tên
+  // Nút + tròn mở modal nhập nhanh danh sách tên
   const addBtn = document.createElement('button');
-  addBtn.className = 'w-10 h-10 rounded-full bg-gradient-to-r from-[#06B6D4] to-[#2DD4BF] text-slate-950 font-black shadow-md shadow-cyan-500/30 flex items-center justify-center shrink-0 active:scale-90 transition-transform';
+  addBtn.className = 'w-10 h-10 rounded-full bg-gradient-to-br from-[#24457F] to-[#16336B] text-white font-semibold shadow-[0_0_0_1px_#16336B,0_0_0_3px_#FFFFFF,0_0_0_4px_rgba(184,148,90,0.55),0_8px_16px_-10px_rgba(22,51,107,0.8)] flex items-center justify-center shrink-0 active:scale-90 transition-transform';
   addBtn.title = 'Quản lý thành viên (nhập 16 tên)';
   addBtn.innerHTML = `
-    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
       <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
     </svg>
   `;
@@ -167,18 +168,13 @@ function renderMemberBar() {
     item.onclick = () => togglePlayer(idx);
 
     const char = getAvatarChar(p.name);
-    const avatarClass = p.active
-      ? 'w-10 h-10 rounded-full bg-gradient-to-br from-[#0F375E] to-[#0A223E] border-2 border-[#2DD4BF] text-[#2DD4BF] shadow-[0_0_12px_rgba(45,212,191,0.35)] flex items-center justify-center text-sm font-black'
-      : 'w-10 h-10 rounded-full bg-slate-800/80 border-2 border-slate-700 text-slate-500 opacity-40 flex items-center justify-center text-sm font-bold';
-
-    const textClass = p.active
-      ? 'text-[10px] font-semibold text-slate-200 max-w-[52px] truncate text-center mt-1'
-      : 'text-[10px] text-slate-500 opacity-50 max-w-[52px] truncate text-center mt-1 line-through';
+    const avatarClass = p.active ? 'avatar-on' : 'avatar-off';
+    const textClass = p.active ? 'avatar-name-on' : 'avatar-name-off';
 
     item.innerHTML = `
       <div class="relative">
         <div class="${avatarClass}">${char}</div>
-        ${p.active ? '<span class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-[#2DD4BF] rounded-full border border-[#061224] shadow-[0_0_6px_#2DD4BF]"></span>' : ''}
+        ${p.active ? '<span class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-[#B8945A] rounded-full border-2 border-white shadow-sm"></span>' : ''}
       </div>
       <span class="${textClass}">${escHtml(p.name)}</span>
     `;
@@ -235,44 +231,44 @@ function clearPlayers() {
 function openPlayerModal() {
   playClick();
   const html = `
-    <div class="space-y-4">
-      <div class="flex items-center justify-between pb-2 border-b border-cyan-500/20">
-        <div class="flex items-center gap-2">
-          <span class="text-2xl">👥</span>
+    <div class="space-y-5">
+      <div class="flex items-start justify-between pb-3 border-b border-[#E6EBF3]">
+        <div class="flex items-center gap-3">
+          <div class="seal">👥</div>
           <div>
-            <h3 class="text-base font-black text-white">Quản lý Thành viên</h3>
-            <p class="text-xs text-cyan-300">Nhập danh sách hoặc chạm để bật/tắt</p>
+            <h3 class="font-serif text-xl font-semibold text-[#16336B] leading-tight">Quản lý Thành viên</h3>
+            <p class="text-[11px] text-[#8A97AC] tracking-wide mt-0.5">Nhập danh sách hoặc chạm để bật/tắt</p>
           </div>
         </div>
-        <button onclick="closeModal()" class="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 text-slate-400 hover:text-white flex items-center justify-center">✕</button>
+        <button onclick="closeModal()" class="w-8 h-8 rounded-full bg-white border border-[#E1E8F2] text-[#8A97AC] hover:text-[#16336B] hover:border-[#C9D6E8] flex items-center justify-center text-xs transition-colors">✕</button>
       </div>
 
       <!-- Bulk input -->
       <div class="space-y-2">
-        <label class="text-xs font-bold uppercase tracking-wider text-cyan-300">📋 Dán nhanh 16 tên</label>
+        <label class="eyebrow block">📋 Dán nhanh danh sách tên</label>
         <textarea id="modalBulkInput" rows="4"
-          class="w-full bg-[#08172E] border border-cyan-500/30 rounded-2xl px-3 py-2.5 text-white text-xs placeholder-slate-500 focus:border-[#2DD4BF] focus:outline-none resize-none font-medium leading-relaxed"
+          class="field"
           placeholder="Minh Tuấn&#10;Hồng Nhung&#10;Quang Hải&#10;... (mỗi tên 1 dòng hoặc cách nhau dấu phẩy)"></textarea>
-        <button class="btn-primary text-sm py-2.5 w-full font-bold" onclick="addPlayersFromTextarea()">
-          ✅ Lưu danh sách
+        <button class="btn-primary text-[11px] py-3 w-full" onclick="addPlayersFromTextarea()">
+          Lưu danh sách
         </button>
       </div>
 
       <!-- Quick actions -->
       <div class="flex gap-2">
-        <button class="btn-secondary text-xs py-2 flex-1" onclick="addSamplePlayers()">
+        <button class="btn-secondary text-[10px] py-2.5 flex-1" onclick="addSamplePlayers()">
           🎲 Tạo 16 người mẫu
         </button>
-        <button class="text-xs py-2 px-3 rounded-2xl bg-red-950/40 border border-red-800 text-red-300 font-bold active:scale-95" onclick="clearPlayers()">
+        <button class="btn-danger text-[10px] py-2.5 px-3" onclick="clearPlayers()">
           🗑 Xóa hết
         </button>
       </div>
 
       <!-- Current players list -->
       <div class="space-y-2">
-        <div class="flex justify-between items-center text-xs text-slate-400 font-semibold">
-          <span>Danh sách hiện tại:</span>
-          <span>Chạm để bật/tắt</span>
+        <div class="flex justify-between items-center eyebrow">
+          <span>Danh sách hiện tại</span>
+          <span class="normal-case tracking-normal text-[10px] text-[#A9B4C4]">Chạm để bật/tắt</span>
         </div>
         <div id="modalPlayerList" class="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto pr-1"></div>
       </div>
@@ -287,18 +283,18 @@ function renderModalPlayerList() {
   if (!container) return;
   container.innerHTML = '';
   if (state.players.length === 0) {
-    container.innerHTML = '<p class="text-center text-slate-500 py-4 col-span-2 text-xs">Chưa có người chơi nào.</p>';
+    container.innerHTML = '<p class="text-center text-[#A9B4C4] py-4 col-span-2 text-[11px]">Chưa có người chơi nào.</p>';
     return;
   }
   state.players.forEach((p, i) => {
     const btn = document.createElement('button');
-    btn.className = `flex items-center gap-2 px-2.5 py-2 rounded-xl text-xs font-semibold transition-all border ${
+    btn.className = `flex items-center gap-2 px-2.5 py-2 rounded-xl text-[11px] font-medium transition-all border ${
       p.active
-        ? 'border-[#2DD4BF]/50 bg-[#06B6D4]/15 text-cyan-200'
-        : 'border-slate-700 bg-slate-800/40 text-slate-500 opacity-60'
+        ? 'border-[#C9D9EF] bg-[#F3F7FC] text-[#16336B]'
+        : 'border-[#E6EBF3] bg-[#FAFBFD] text-[#A9B4C4] opacity-80'
     }`;
     btn.innerHTML = `
-      <span class="w-4 h-4 rounded-full flex items-center justify-center text-[10px] font-bold ${p.active ? 'bg-[#2DD4BF] text-slate-950' : 'bg-slate-700 text-slate-400'}">${i + 1}</span>
+      <span class="w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-semibold ${p.active ? 'bg-[#16336B] text-white' : 'bg-[#E9EEF6] text-[#A9B4C4]'}">${i + 1}</span>
       <span class="flex-1 text-left truncate">${escHtml(p.name)}</span>
       <span class="text-[10px]">${p.active ? '✓' : '✗'}</span>
     `;
@@ -311,38 +307,38 @@ function renderModalPlayerList() {
 function openSettingsModal() {
   playClick();
   const html = `
-    <div class="space-y-4">
-      <div class="flex items-center justify-between pb-2 border-b border-cyan-500/20">
-        <div class="flex items-center gap-2">
-          <span class="text-2xl">⚙️</span>
+    <div class="space-y-5">
+      <div class="flex items-start justify-between pb-3 border-b border-[#E6EBF3]">
+        <div class="flex items-center gap-3">
+          <div class="seal">⚙️</div>
           <div>
-            <h3 class="text-base font-black text-white">Cài đặt & Luật Chơi</h3>
-            <p class="text-xs text-cyan-300">Đại Chiến Bàn Nhậu Modern Blue</p>
+            <h3 class="font-serif text-xl font-semibold text-[#16336B] leading-tight">Cài đặt & Luật Chơi</h3>
+            <p class="text-[11px] text-[#8A97AC] tracking-wide mt-0.5">Maison de Jeux · Édition Bleue</p>
           </div>
         </div>
-        <button onclick="closeModal()" class="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 text-slate-400 hover:text-white flex items-center justify-center">✕</button>
+        <button onclick="closeModal()" class="w-8 h-8 rounded-full bg-white border border-[#E1E8F2] text-[#8A97AC] hover:text-[#16336B] hover:border-[#C9D6E8] flex items-center justify-center text-xs transition-colors">✕</button>
       </div>
 
-      <div class="space-y-3 text-xs leading-relaxed text-slate-300">
-        <div class="flex items-center justify-between p-3 rounded-2xl bg-[#08172E] border border-cyan-500/20">
+      <div class="space-y-3 text-[12px] leading-relaxed text-[#5B6A82]">
+        <div class="flex items-center justify-between p-3.5 rounded-xl bg-[#FAFBFD] border border-[#E6EBF3]">
           <div>
-            <div class="font-bold text-white text-sm">Âm thanh hiệu ứng</div>
-            <div class="text-slate-400">Web Audio API synth sinh động</div>
+            <div class="font-semibold text-[#16336B] text-[13px]">Âm thanh hiệu ứng</div>
+            <div class="text-[11px] text-[#8A97AC] mt-0.5">Web Audio API synth sinh động</div>
           </div>
-          <button onclick="toggleSound(); updateSettingsSoundBtn(this);" id="settingsSoundToggle" class="px-3.5 py-1.5 rounded-xl text-xs font-extrabold ${state.soundEnabled ? 'bg-cyan-500/20 text-[#2DD4BF] border border-cyan-400/40' : 'bg-slate-700 text-slate-400'}">
+          <button onclick="toggleSound(); updateSettingsSoundBtn(this);" id="settingsSoundToggle" class="px-3.5 py-1.5 rounded-lg text-[10px] font-semibold tracking-wide ${state.soundEnabled ? 'bg-[#EDF3FC] text-[#16336B] border border-[#C9D9EF]' : 'bg-[#F4F6FA] text-[#8A97AC] border border-[#E6EBF3]'}">
             ${state.soundEnabled ? 'BẬT 🔊' : 'TẮT 🔇'}
           </button>
         </div>
 
-        <div class="p-3.5 rounded-2xl bg-[#08172E] border border-cyan-500/20 space-y-2">
-          <div class="font-bold text-[#2DD4BF] text-sm">🍺 Luật chơi mâm 16 người:</div>
+        <div class="p-4 rounded-xl bg-[#FAFBFD] border border-[#E6EBF3] space-y-2">
+          <div class="font-semibold text-[#16336B] text-[13px]">🍺 Luật chơi mâm đông người</div>
           <p>• Nhấn vào avatar bất kỳ trên thanh thành viên để tạm ẩn người đang đi vệ sinh/bận nghe máy.</p>
-          <p>• Bấm nút <strong>+</strong> ở góc trái thanh thành viên để dán 16 tên mới bất cứ lúc nào.</p>
+          <p>• Bấm nút <strong class="text-[#16336B] font-semibold">+</strong> ở góc trái thanh thành viên để dán danh sách tên mới bất cứ lúc nào.</p>
           <p>• Chơi vui là chính, an toàn là trên hết – đã uống bia rượu thì không lái xe!</p>
         </div>
       </div>
 
-      <button onclick="closeModal()" class="btn-primary w-full py-3 font-bold text-sm">Đã hiểu, chiến tiếp!</button>
+      <button onclick="closeModal()" class="btn-primary w-full py-3.5 text-[12px]">Đã hiểu, chiến tiếp!</button>
     </div>
   `;
   showModal(html);
@@ -351,7 +347,7 @@ function openSettingsModal() {
 function updateSettingsSoundBtn(btn) {
   if (btn) {
     btn.textContent = state.soundEnabled ? 'BẬT 🔊' : 'TẮT 🔇';
-    btn.className = `px-3.5 py-1.5 rounded-xl text-xs font-extrabold ${state.soundEnabled ? 'bg-cyan-500/20 text-[#2DD4BF] border border-cyan-400/40' : 'bg-slate-700 text-slate-400'}`;
+    btn.className = `px-3.5 py-1.5 rounded-lg text-[10px] font-semibold tracking-wide ${state.soundEnabled ? 'bg-[#EDF3FC] text-[#16336B] border border-[#C9D9EF]' : 'bg-[#F4F6FA] text-[#8A97AC] border border-[#E6EBF3]'}`;
   }
 }
 
@@ -399,24 +395,24 @@ let spinVelocity = 0;
 let spinAnimId = null;
 let isSpinning = false;
 
-// Bảng màu xen kẽ: Xanh dương - Xanh ngọc - Tím pastel
+// Bảng màu: các sắc xanh Pháp (navy → bleu de France)
 const COLORS = [
-  '#0284C7', // Sky Blue
-  '#0D9488', // Deep Teal
-  '#818CF8', // Indigo Pastel
-  '#06B6D4', // Cyan Neon
-  '#A78BFA', // Purple Pastel
-  '#14B8A6', // Teal Mint
-  '#38BDF8', // Light Cyan
-  '#6366F1', // Indigo Vibrant
-  '#2DD4BF', // Turquoise
-  '#C084FC', // Violet Pastel
-  '#0369A1', // Ocean Blue
-  '#22D3EE', // Bright Cyan
-  '#99F6E4', // Soft Teal
-  '#818CF8', // Lavender
-  '#5EEAD4', // Aqua Pastel
-  '#38BDF8'  // Sky Cyan
+  '#16336B', // Bleu marine
+  '#2B5AA7', // Bleu de France
+  '#1E4480',
+  '#3E6BB5',
+  '#274E92',
+  '#4A78BE',
+  '#1A3E7C',
+  '#3565AC',
+  '#16336B',
+  '#2B5AA7',
+  '#1E4480',
+  '#3E6BB5',
+  '#274E92',
+  '#4A78BE',
+  '#1A3E7C',
+  '#3565AC'
 ];
 
 function initSpinWheel() {
@@ -446,15 +442,15 @@ function drawWheel() {
   spinCtx.clearRect(0, 0, spinCanvas.width, spinCanvas.height);
 
   if (n === 0) {
-    spinCtx.fillStyle = '#0F294A';
+    spinCtx.fillStyle = '#F5F8FD';
     spinCtx.beginPath();
     spinCtx.arc(cx, cy, r, 0, Math.PI * 2);
     spinCtx.fill();
-    spinCtx.strokeStyle = 'rgba(6, 182, 212, 0.3)';
-    spinCtx.lineWidth = 3;
+    spinCtx.strokeStyle = '#D9E4F4';
+    spinCtx.lineWidth = 2;
     spinCtx.stroke();
-    spinCtx.fillStyle = '#94A3B8';
-    spinCtx.font = `${Math.min(15, r / 5)}px sans-serif`;
+    spinCtx.fillStyle = '#93A1B6';
+    spinCtx.font = `500 ${Math.min(14, r / 5)}px Jost, sans-serif`;
     spinCtx.textAlign = 'center';
     spinCtx.fillText('Chưa có người chơi', cx, cy);
     return;
@@ -473,8 +469,8 @@ function drawWheel() {
     spinCtx.closePath();
     spinCtx.fillStyle = COLORS[i % COLORS.length];
     spinCtx.fill();
-    spinCtx.strokeStyle = '#061224';
-    spinCtx.lineWidth = 2.5;
+    spinCtx.strokeStyle = 'rgba(255, 255, 255, 0.82)';
+    spinCtx.lineWidth = 1.5;
     spinCtx.stroke();
 
     // Text name
@@ -484,38 +480,52 @@ function drawWheel() {
     spinCtx.textAlign = 'right';
 
     const fontSize = Math.max(10, Math.min(13, r / (n * 0.52)));
-    spinCtx.font = `bold ${fontSize}px sans-serif`;
+    spinCtx.font = `600 ${fontSize}px Jost, sans-serif`;
     spinCtx.fillStyle = '#FFFFFF';
-    spinCtx.shadowColor = 'rgba(0, 0, 0, 0.85)';
-    spinCtx.shadowBlur = 4;
+    spinCtx.shadowColor = 'rgba(9, 22, 45, 0.45)';
+    spinCtx.shadowBlur = 3;
 
-    const maxLen = Math.max(5, Math.floor(18 / Math.sqrt(n)));
+    const maxLen = 12;
     let name = p.name;
     if (name.length > maxLen) name = name.slice(0, maxLen - 1) + '…';
 
-    spinCtx.fillText(name, r - 12, fontSize / 3);
+    spinCtx.fillText(name, r - 13, fontSize / 3);
     spinCtx.restore();
   });
 
-  // Outer border with soft teal neon
+  // Inner hairline around the central button
+  spinCtx.beginPath();
+  spinCtx.arc(cx, cy, 38, 0, Math.PI * 2);
+  spinCtx.strokeStyle = 'rgba(255, 255, 255, 0.55)';
+  spinCtx.lineWidth = 1;
+  spinCtx.stroke();
+
+  // Outer rings: fine gold line + navy rim
+  spinCtx.beginPath();
+  spinCtx.arc(cx, cy, r + 3, 0, Math.PI * 2);
+  spinCtx.strokeStyle = 'rgba(184, 148, 90, 0.55)';
+  spinCtx.lineWidth = 1;
+  spinCtx.stroke();
+
   spinCtx.beginPath();
   spinCtx.arc(cx, cy, r, 0, Math.PI * 2);
-  spinCtx.strokeStyle = '#2DD4BF';
-  spinCtx.lineWidth = 4;
+  spinCtx.strokeStyle = '#16336B';
+  spinCtx.lineWidth = 3;
   spinCtx.stroke();
 
   // Pointer at top
   spinCtx.save();
-  spinCtx.translate(cx, 0);
+  spinCtx.translate(cx, cy - r);
   spinCtx.beginPath();
-  spinCtx.moveTo(0, r * 0.12);
-  spinCtx.lineTo(-14, -2);
-  spinCtx.lineTo(14, -2);
+  spinCtx.moveTo(0, 20);
+  spinCtx.lineTo(-11, -2);
+  spinCtx.lineTo(11, -2);
   spinCtx.closePath();
-  spinCtx.fillStyle = '#2DD4BF';
-  spinCtx.shadowColor = '#06B6D4';
-  spinCtx.shadowBlur = 10;
+  spinCtx.fillStyle = '#B8945A';
+  spinCtx.strokeStyle = '#16336B';
+  spinCtx.lineWidth = 2;
   spinCtx.fill();
+  spinCtx.stroke();
   spinCtx.restore();
 }
 
@@ -568,19 +578,20 @@ function onSpinEnd() {
 
   showModal(`
     <div class="text-center space-y-4">
-      <div class="text-5xl mb-1">🎉</div>
-      <h2 class="text-xl font-black text-cyan-300 uppercase tracking-wider">Trúng thưởng!</h2>
-      <div class="text-2xl font-black text-white py-3 px-4 bg-gradient-to-r from-cyan-500/20 to-teal-500/20 rounded-2xl border-2 border-[#2DD4BF] shadow-[0_0_15px_rgba(45,212,191,0.3)]">
+      <p class="eyebrow">Le Grand Tirage</p>
+      <div class="text-4xl mb-1">🎉</div>
+      <h2 class="font-serif text-2xl font-semibold text-[#16336B] tracking-wide">Trúng thưởng!</h2>
+      <div class="font-serif text-2xl font-semibold text-[#16336B] py-3 px-4 bg-[#F4F8FE] border border-[#D9E4F4] rounded-xl shadow-[inset_0_1px_0_#FFFFFF]">
         ${escHtml(winner.name)}
       </div>
-      <div class="bg-[#08172E] border border-cyan-500/30 rounded-2xl p-4 text-left space-y-2">
-        <div class="text-xs font-bold text-[#2DD4BF] uppercase tracking-wider">⚡ Lệnh Phạt / Thử thách</div>
-        <div class="font-bold text-white text-base" id="spinChallengeTitleEl">${escHtml(challenge.title)}</div>
-        <div class="text-slate-300 text-sm leading-relaxed" id="spinChallengeDescEl">${escHtml(challenge.desc)}</div>
+      <div class="bg-[#FAFBFD] border border-[#E3E9F2] rounded-xl p-4 text-left space-y-2">
+        <div class="text-[9px] font-medium tracking-[0.24em] uppercase text-[#B8945A]">⚡ Lệnh phạt / Thử thách</div>
+        <div class="font-semibold text-[#16336B] text-base" id="spinChallengeTitleEl">${escHtml(challenge.title)}</div>
+        <div class="text-[#5B6A82] text-[13px] leading-relaxed" id="spinChallengeDescEl">${escHtml(challenge.desc)}</div>
       </div>
-      <div class="flex gap-3 pt-2">
-        <button onclick="closeModal()" class="flex-1 py-3 rounded-2xl bg-slate-800 border border-slate-700 text-slate-300 font-bold active:scale-95">↩ Xong</button>
-        <button onclick="changeSpinChallenge()" class="flex-1 py-3 rounded-2xl bg-gradient-to-r from-[#06B6D4] to-[#2DD4BF] text-slate-950 font-black shadow-md shadow-cyan-500/30 active:scale-95">🔀 Đổi lệnh</button>
+      <div class="flex gap-3 pt-1">
+        <button onclick="closeModal()" class="flex-1 py-3 rounded-xl bg-white border border-[#DCE5F1] text-[#5B6A82] font-medium text-[12px] active:scale-95 transition-transform">↩ Xong</button>
+        <button onclick="changeSpinChallenge()" class="flex-1 py-3 rounded-xl bg-gradient-to-br from-[#24457F] to-[#16336B] text-white font-medium text-[12px] tracking-wide shadow-[0_12px_24px_-14px_rgba(22,51,107,0.9)] active:scale-95 transition-transform">🔀 Đổi lệnh</button>
       </div>
     </div>
   `);
@@ -607,8 +618,8 @@ function pickWhoIsQuestion() {
   const btnArea = document.getElementById('whoIsBtn');
   if (qEl) {
     qEl.textContent = whoIsQuestion;
-    qEl.classList.remove('text-slate-400');
-    qEl.classList.add('text-white');
+    qEl.classList.remove('placeholder-text');
+    qEl.classList.add('chosen-text');
   }
   if (btnArea) btnArea.classList.remove('hidden');
   const resultEl = document.getElementById('whoIsResult');
@@ -638,6 +649,7 @@ function startWhoIsCountdown() {
   let count = 3;
   if (countEl) {
     countEl.textContent = count;
+    countEl.classList.remove('count-final');
     countEl.classList.remove('hidden', 'scale-0');
     countEl.classList.add('scale-100');
   }
@@ -662,6 +674,7 @@ function startWhoIsCountdown() {
         countEl.classList.remove('scale-100');
         setTimeout(() => {
           countEl.textContent = '👆 CHỈ!';
+          countEl.classList.add('count-final');
           countEl.classList.add('scale-100');
         }, 80);
       }
@@ -742,31 +755,31 @@ function selectToDMode(mode, level) {
 
   const modeLabel = mode === 'truth' ? '🤔 THẬT' : '🔥 THÁCH';
   const levelLabel = level === 'mild' ? '☀️ Nhẹ nhàng' : '🔥 Cháy phố';
-  const modeColor = mode === 'truth' ? 'text-cyan-300' : 'text-[#2DD4BF]';
-  const borderColor = mode === 'truth' ? 'border-cyan-400' : 'border-[#2DD4BF]';
+  const modeColor = mode === 'truth' ? 'text-[#2B5AA7]' : 'text-[#C0223B]';
+  const borderColor = mode === 'truth' ? 'border-[#C9D9EF]' : 'border-[#EBC9CF]';
 
   if (cardFront) {
-    cardFront.className = `tod-card-face tod-card-front absolute inset-0 rounded-2xl flex items-center justify-center bg-[#08172E] border-2 ${borderColor} shadow-[0_0_20px_rgba(6,182,212,0.25)]`;
+    cardFront.className = `tod-card-face tod-card-front absolute inset-0 flex items-center justify-center bg-white border ${borderColor} shadow-[0_20px_44px_-30px_rgba(22,51,107,0.5)]`;
     cardFront.innerHTML = `
-      <div class="text-center space-y-2 p-4">
-        <div class="text-4xl">${mode === 'truth' ? '🤔' : '🔥'}</div>
-        <div class="text-2xl font-black ${modeColor}">${modeLabel}</div>
-        <div class="text-xs text-slate-400">${levelLabel}</div>
-        <div class="text-[11px] text-[#2DD4BF] font-semibold mt-2 animate-pulse">Chạm để lật thẻ bài ✨</div>
+      <div class="text-center space-y-2.5 p-6">
+        <div class="text-3xl">${mode === 'truth' ? '🤔' : '🔥'}</div>
+        <div class="font-serif text-3xl font-semibold tracking-wide ${modeColor}">${modeLabel}</div>
+        <div class="eyebrow">${levelLabel}</div>
+        <div class="text-[9px] text-[#B8945A] font-medium tracking-[0.2em] uppercase pt-3 animate-pulse">Chạm để lật thẻ bài ✦</div>
       </div>`;
   }
   if (cardBack) {
-    cardBack.className = `tod-card-face tod-card-back absolute inset-0 rounded-2xl bg-[#08172E] border-2 ${borderColor} shadow-[0_0_20px_rgba(45,212,191,0.25)] flex flex-col justify-between p-5`;
+    cardBack.className = `tod-card-face tod-card-back absolute inset-0 bg-white border ${borderColor} shadow-[0_20px_44px_-30px_rgba(22,51,107,0.5)] flex flex-col justify-between p-5`;
     cardBack.innerHTML = `
       <div class="space-y-3">
-        <div class="flex items-center justify-between text-xs font-bold uppercase tracking-wider">
+        <div class="flex items-center justify-between text-[9px] font-medium uppercase tracking-[0.2em]">
           <span class="${modeColor}">${modeLabel}</span>
-          <span class="text-slate-400">${levelLabel}</span>
+          <span class="text-[#A9B4C4]">${levelLabel}</span>
         </div>
-        <p class="text-white text-sm sm:text-base font-semibold leading-relaxed">${escHtml(content)}</p>
+        <p class="text-[#1A2436] text-sm sm:text-[15px] font-medium leading-relaxed">${escHtml(content)}</p>
       </div>
-      <div class="pt-2 border-t border-cyan-500/20">
-        <span class="text-xs font-bold text-cyan-300">Dành cho: <span class="text-white font-extrabold">${escHtml(todPlayer.name)}</span></span>
+      <div class="pt-2 border-t border-[#E6EBF3]">
+        <span class="text-[10px] tracking-wide text-[#8A97AC]">Dành cho: <span class="text-[#16336B] font-semibold">${escHtml(todPlayer.name)}</span></span>
       </div>`;
   }
 
@@ -779,13 +792,14 @@ function selectToDMode(mode, level) {
 function todGiveUp() {
   showModal(`
     <div class="text-center space-y-4">
-      <div class="text-5xl">😅</div>
-      <h2 class="text-xl font-black text-cyan-300">Chịu thua!</h2>
-      <p class="text-slate-300 text-sm">
-        <span class="text-white font-bold">${todPlayer ? escHtml(todPlayer.name) : 'Người chơi'}</span> không dám thực hiện thử thách.<br>
-        <span class="text-red-400 font-extrabold text-base">Phạt uống 1 ly! 🍺</span>
+      <p class="eyebrow">Sans courage</p>
+      <div class="text-4xl">😅</div>
+      <h2 class="font-serif text-2xl font-semibold text-[#16336B] tracking-wide">Chịu thua!</h2>
+      <p class="text-[#5B6A82] text-[13px] leading-relaxed">
+        <span class="text-[#16336B] font-semibold">${todPlayer ? escHtml(todPlayer.name) : 'Người chơi'}</span> không dám thực hiện thử thách.<br>
+        <span class="text-[#C0223B] font-semibold text-base">Phạt uống 1 ly! 🍺</span>
       </p>
-      <button onclick="closeModal()" class="btn-primary w-full py-3 font-bold">OK, uống ngay!</button>
+      <button onclick="closeModal()" class="btn-primary w-full py-3.5 text-[12px]">OK, uống ngay!</button>
     </div>
   `);
   playTone(220, 'sawtooth', 0.4, 0.3);
@@ -859,7 +873,7 @@ function getDiceDots(n) {
     6: [[25, 20], [75, 20], [25, 50], [75, 50], [25, 80], [75, 80]],
   };
   const dots = positions[n] || [];
-  return `<svg viewBox="0 0 100 100" class="w-full h-full text-[#08172E]">${dots.map(([x, y]) => `<circle cx="${x}" cy="${y}" r="11" fill="currentColor"/>`).join('')}</svg>`;
+  return `<svg viewBox="0 0 100 100" class="w-full h-full text-[#16336B]">${dots.map(([x, y]) => `<circle cx="${x}" cy="${y}" r="11" fill="currentColor"/>`).join('')}</svg>`;
 }
 
 function showDiceTip() {
@@ -942,8 +956,8 @@ function pickBombTopic() {
   const topicEl = document.getElementById('bombTopic');
   if (topicEl) {
     topicEl.textContent = topic;
-    topicEl.classList.remove('text-slate-400');
-    topicEl.classList.add('text-white');
+    topicEl.classList.remove('placeholder-text');
+    topicEl.classList.add('chosen-text');
   }
   const statusEl = document.getElementById('bombStatus');
   if (statusEl) statusEl.textContent = 'Nhấn BẮT ĐẦU khi cả mâm sẵn sàng!';
@@ -954,7 +968,7 @@ function pickBombTopic() {
 function startBomb() {
   if (bombTicking) return;
   const topicEl = document.getElementById('bombTopic');
-  if (!topicEl || topicEl.classList.contains('text-slate-400')) {
+  if (!topicEl || topicEl.classList.contains('placeholder-text')) {
     showToast('⚠️ Hãy chọn chủ đề trước!');
     return;
   }
@@ -1014,7 +1028,7 @@ function explodeBomb() {
   const stopBtn = document.getElementById('bombStopBtn');
 
   if (statusEl) {
-    statusEl.innerHTML = '<span class="text-red-400 font-black text-lg animate-pulse">💥 BOM NỔ! Người đang cầm điện thoại UỐNG! 🍺</span>';
+    statusEl.innerHTML = '<span class="text-[#C0223B] font-semibold text-lg animate-pulse">💥 BOM NỔ! Người đang cầm điện thoại UỐNG! 🍺</span>';
   }
 
   if (bombVisual) {
@@ -1114,5 +1128,5 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  console.log('🍺 Đại Chiến Bàn Nhậu (Modern Blue Theme) - Ready!');
+  console.log('🍺 Đại Chiến Bàn Nhậu (Maison de Jeux · Édition Bleue) - Ready!');
 });
