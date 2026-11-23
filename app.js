@@ -153,8 +153,8 @@ function pickWeightedWinner(list) {
 function processRoundEnd(winner) {
   if (!winner) return;
 
-  // Người vừa trúng nghỉ 2 round tiếp theo để đảm bảo công bằng!
-  winner.cooldownTurns = 2;
+  // Người vừa trúng nghỉ 1 round tiếp theo để đảm bảo công bằng!
+  winner.cooldownTurns = 1;
 
   // Giảm lượt cooldown và khiên của những người khác
   state.players.forEach(p => {
