@@ -95,7 +95,7 @@ function loadPlayers() {
       name,
       active: true,
       weight: 1,
-      shieldTurns: name.toLowerCase() === 'nam ké' ? 10 : 0,
+      shieldTurns: name.toLowerCase() === 'nam ké' ? 5 : 0,
       cooldownTurns: 0
     }));
     savePlayers();
@@ -103,7 +103,7 @@ function loadPlayers() {
     state.players.forEach(p => {
       if (p.weight === undefined) p.weight = 1;
       if (p.shieldTurns === undefined) {
-        p.shieldTurns = p.name.toLowerCase() === 'nam ké' ? 10 : 0;
+        p.shieldTurns = p.name.toLowerCase() === 'nam ké' ? 5 : 0;
       }
       if (p.cooldownTurns === undefined) {
         p.cooldownTurns = 0;
