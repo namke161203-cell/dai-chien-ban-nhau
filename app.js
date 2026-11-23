@@ -338,6 +338,47 @@ function activateAllPlayers() {
   playCelebration();
 }
 
+// Xáo trộn thứ tự các thành viên trên vòng quay
+function shufflePlayers() {
+  if (isSpinning) return;
+  const activeCount = state.players.filter(p => p.active).length;
+  if (activeCount < 2) {
+    showToast('⚠️ Cần ít nhất 2 người để xáo trộn!');
+    return;
+  }
+
+  // Fisher-Yates shuffle
+  for (let i = state.players.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [state.players[i], state.players[j]] = [state.players[j], state.players[i]];
+  }
+
+  savePlayers();
+  renderHomePlayerGrid();
+  renderModalPlayerList();
+
+  // Hiệu ứng xoay nhanh nhẹ khi xáo vị trí
+  if (spinCanvas) {
+    let count = 0;
+    const animShuffle = () => {
+      count++;
+      spinAngle += 0.45;
+      playSpinTick();
+      drawWheel();
+      if (count < 8) {
+        requestAnimationFrame(animShuffle);
+      } else {
+        drawWheel();
+        showToast('🔀 Đã xáo trộn vị trí thành viên trên vòng quay!');
+      }
+    };
+    animShuffle();
+  } else {
+    showToast('🔀 Đã xáo trộn vị trí thành viên!');
+    playClick();
+  }
+}
+
 function addPlayersFromHomeTextarea() {
   const ta = document.getElementById('homeBulkInput');
   if (!ta) return;
@@ -404,12 +445,15 @@ function openPlayerModal() {
       </div>
 
       <!-- Quick actions -->
-      <div class="grid grid-cols-2 gap-2">
+      <div class="grid grid-cols-3 gap-2">
         <button class="btn-deco-secondary text-xs py-2" onclick="activateAllPlayers()">
-          <span>⚡</span> Bật tất cả người
+          <span>⚡</span> Bật tất cả
+        </button>
+        <button class="btn-deco-secondary text-xs py-2" onclick="shufflePlayers()">
+          <span>🔀</span> Xáo vị trí
         </button>
         <button class="btn-deco-secondary text-xs py-2" onclick="showSection('home'); closeModal();">
-          <span>🏠</span> Về Trang Chủ
+          <span>🏠</span> Trang Chủ
         </button>
       </div>
 

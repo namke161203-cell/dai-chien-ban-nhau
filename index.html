@@ -343,14 +343,17 @@
         </div>
 
         <!-- Các nút thao tác nhanh -->
-        <div class="grid grid-cols-3 gap-2 pt-1">
-          <button class="btn-deco-secondary text-[11px] py-2 !rounded-xl" onclick="addSamplePlayers()">
+        <div class="grid grid-cols-4 gap-1.5 pt-1">
+          <button class="btn-deco-secondary text-[10px] sm:text-[11px] py-2 !rounded-xl" onclick="addSamplePlayers()">
             <span>🎲</span> 16 Mẫu
           </button>
-          <button class="btn-deco-secondary text-[11px] py-2 !rounded-xl" onclick="activateAllPlayers()">
+          <button class="btn-deco-secondary text-[10px] sm:text-[11px] py-2 !rounded-xl" onclick="activateAllPlayers()">
             <span>⚡</span> Bật Hết
           </button>
-          <button class="text-[11px] py-2 rounded-xl bg-red-50 border border-red-200 text-red-600 font-bold active:scale-95 text-center" onclick="clearPlayers()">
+          <button class="btn-deco-secondary text-[10px] sm:text-[11px] py-2 !rounded-xl" onclick="shufflePlayers()" title="Xáo trộn vị trí thành viên">
+            <span>🔀</span> Xáo
+          </button>
+          <button class="text-[10px] sm:text-[11px] py-2 rounded-xl bg-red-50 border border-red-200 text-red-600 font-bold active:scale-95 text-center" onclick="clearPlayers()">
             <span>🗑</span> Xóa
           </button>
         </div>
@@ -413,6 +416,12 @@
     <div class="space-y-3.5">
 
       <div class="art-deco-card p-3 sm:p-4 flex flex-col items-center justify-center relative">
+        <div class="w-full flex justify-between items-center px-1 mb-2">
+          <span class="text-[11px] font-clash font-bold text-[#756856] uppercase tracking-wider">🎡 VÒNG QUAY BÀN NHẬU</span>
+          <button onclick="shufflePlayers()" class="text-[11px] font-bold text-[#C65D3B] hover:text-[#A5482A] flex items-center gap-1 active:scale-95 bg-[#F5EFE3] px-2.5 py-1 rounded-full border border-[#D8C49D] shadow-sm">
+            <span>🔀</span> Xáo vị trí
+          </button>
+        </div>
         <div class="relative w-full flex items-center justify-center" style="max-width:320px;">
           <canvas id="spinWheel" onclick="spinWheel()" class="select-none" width="300" height="300"></canvas>
           <button onclick="spinWheel()"
@@ -423,9 +432,14 @@
         </div>
       </div>
 
-      <button class="btn-deco-primary" onclick="spinWheel()">
-        <span>✦</span> QUAY NGAY
-      </button>
+      <div class="grid grid-cols-3 gap-2">
+        <button class="btn-deco-primary col-span-2 py-3.5 text-sm font-bold shadow-md" onclick="spinWheel()">
+          <span>✦</span> QUAY NGAY
+        </button>
+        <button class="btn-deco-secondary col-span-1 py-3.5 text-xs font-bold flex items-center justify-center gap-1.5" onclick="shufflePlayers()" title="Xáo trộn vị trí các thành viên trên vòng quay">
+          <span>🔀</span> Xáo vị trí
+        </button>
+      </div>
 
       <button id="requestMotionBtn" class="btn-deco-secondary" onclick="toggleShakeSensor()">
         <span>📱</span> BẬT CẢM BIẾN LẮC (IOS)
@@ -774,7 +788,7 @@
 </footer>
 
 <!-- Scripts -->
-<script src="data.js?v=20261123c"></script>
-<script src="app.js?v=20261123c"></script>
+<script src="data.js?v=20261123d"></script>
+<script src="app.js?v=20261123d"></script>
 </body>
 </html>
