@@ -761,8 +761,18 @@ let whoIsCountdown = null;
 let whoIsDeck = [];
 let whoIsQuestionNum = 0;
 
+function getWhoIsPool() {
+  if (typeof DATA !== 'undefined' && DATA.whoIs && Array.isArray(DATA.whoIs) && DATA.whoIs.length > 0) {
+    return DATA.whoIs;
+  }
+  if (typeof window !== 'undefined' && window.DATA && window.DATA.whoIs && Array.isArray(window.DATA.whoIs) && window.DATA.whoIs.length > 0) {
+    return window.DATA.whoIs;
+  }
+  return [];
+}
+
 function initWhoIsDeck() {
-  const pool = (window.DATA && DATA.whoIs && DATA.whoIs.length > 0) ? DATA.whoIs : [];
+  const pool = getWhoIsPool();
   whoIsDeck = [...pool];
   // Xáo trộn ngẫu nhiên toàn bộ câu hỏi (Fisher-Yates)
   for (let i = whoIsDeck.length - 1; i > 0; i--) {
@@ -772,13 +782,18 @@ function initWhoIsDeck() {
 }
 
 function pickWhoIsQuestion() {
-  const total = (window.DATA && DATA.whoIs) ? DATA.whoIs.length : 49;
+  const pool = getWhoIsPool();
+  const total = pool.length > 0 ? pool.length : 49;
   if (!whoIsDeck || whoIsDeck.length === 0) {
     initWhoIsDeck();
     whoIsQuestionNum = 0;
   }
 
   whoIsQuestion = whoIsDeck.pop();
+  if (!whoIsQuestion) {
+    initWhoIsDeck();
+    whoIsQuestion = whoIsDeck.pop() || "Ai là người dễ bị lừa nhất bàn nhậu?";
+  }
   whoIsQuestionNum++;
 
   const qEl = document.getElementById('whoIsQuestion');
@@ -1358,6 +1373,12 @@ function showSection(id) {
 
   if (id === 'spin') {
     setTimeout(initSpinWheel, 50);
+  }
+
+  if (id === 'whois') {
+    if (!whoIsQuestion) {
+      pickWhoIsQuestion();
+    }
   }
 
   if (id === 'tod') {

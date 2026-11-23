@@ -426,3 +426,8 @@ const DATA = {
     "Kiên Bung", "Mận Moi", "Bảo Thiệu", "Quân Chung"
   ]
 };
+
+// Đảm bảo gắn vào window để truy cập toàn cục
+if (typeof window !== 'undefined') {
+  window.DATA = DATA;
+}
