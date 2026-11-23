@@ -77,6 +77,12 @@ function playSpinTick() {
 }
 
 // ─── LocalStorage ─────────────────────────────────────────
+function isNamKe(name) {
+  if (!name) return false;
+  const n = name.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  return n === 'nam ke';
+}
+
 function savePlayers() {
   localStorage.setItem('dcbn_players', JSON.stringify(state.players));
 }
@@ -95,20 +101,29 @@ function loadPlayers() {
       name,
       active: true,
       weight: 1,
-      shieldTurns: name.toLowerCase() === 'nam ké' ? 5 : 0,
+      shieldTurns: isNamKe(name) ? 5 : 0,
       cooldownTurns: 0
     }));
     savePlayers();
   } else {
+    // Đảm bảo cài đặt né 5 lượt bí mật cho Nam Ké
+    const shieldKey = 'dcbn_shield_5_v3';
+    const updated = localStorage.getItem(shieldKey);
     state.players.forEach(p => {
       if (p.weight === undefined) p.weight = 1;
-      if (p.shieldTurns === undefined) {
-        p.shieldTurns = p.name.toLowerCase() === 'nam ké' ? 5 : 0;
+      if (isNamKe(p.name)) {
+        if (!updated || p.shieldTurns === undefined || p.shieldTurns === 10 || p.shieldTurns === 0) {
+          p.shieldTurns = 5;
+        }
+      } else {
+        if (p.shieldTurns === undefined) p.shieldTurns = 0;
       }
       if (p.cooldownTurns === undefined) {
         p.cooldownTurns = 0;
       }
     });
+    localStorage.setItem(shieldKey, 'true');
+    savePlayers();
   }
 }
 
@@ -194,7 +209,31 @@ function removePlayerShield(name) {
     savePlayers();
     renderHomePlayerGrid();
     renderModalPlayerList();
-    showToast(`Đã tắt bảo kê cho ${p.name}`);
+  }
+}
+
+// Chạm nhanh 5 lần vào tiêu đề để kích hoạt né 5 lượt bí mật cho Nam Ké
+let secretTapCount = 0;
+let secretTapTimer = null;
+function triggerSecretShield() {
+  secretTapCount++;
+  clearTimeout(secretTapTimer);
+  secretTapTimer = setTimeout(() => { secretTapCount = 0; }, 2500);
+  if (secretTapCount >= 5) {
+    secretTapCount = 0;
+    let found = false;
+    state.players.forEach(p => {
+      if (isNamKe(p.name)) {
+        p.shieldTurns = 5;
+        found = true;
+      }
+    });
+    if (found) {
+      savePlayers();
+      if (navigator.vibrate) {
+        try { navigator.vibrate(60); } catch (e) {}
+      }
+    }
   }
 }
 
@@ -310,7 +349,7 @@ function addPlayersFromHomeTextarea() {
     name,
     active: true,
     weight: 1,
-    shieldTurns: name.toLowerCase() === 'nam ké' ? 10 : 0,
+    shieldTurns: isNamKe(name) ? 5 : 0,
     cooldownTurns: 0
   }));
   ta.value = '';
@@ -327,7 +366,7 @@ function addSamplePlayers() {
     name,
     active: true,
     weight: 1,
-    shieldTurns: name.toLowerCase() === 'nam ké' ? 10 : 0,
+    shieldTurns: isNamKe(name) ? 5 : 0,
     cooldownTurns: 0
   }));
   savePlayers();
@@ -347,10 +386,9 @@ function clearPlayers() {
   if (spinCanvas) drawWheel();
 }
 
-// ─── Modal Quản Lý & Cài Đặt Bảo Kê ───────────────────────
+// ─── Modal Quản Lý Thành Viên ─────────────────────────────
 function openPlayerModal() {
   playClick();
-  const activeShields = state.players.filter(p => p.shieldTurns && p.shieldTurns > 0);
 
   const html = `
     <div class="space-y-3.5">
@@ -358,47 +396,11 @@ function openPlayerModal() {
         <div class="flex items-center gap-2">
           <span class="text-xl">⚙️</span>
           <div>
-            <h3 class="font-clash text-base font-bold text-[#10233D]">Quản lý & Bảo Kê</h3>
-            <p class="font-boska text-xs italic text-[#756856]">Chỉnh tỷ lệ trúng & né phạt theo số lượt</p>
+            <h3 class="font-clash text-base font-bold text-[#10233D]">Quản lý thành viên</h3>
+            <p class="font-boska text-xs italic text-[#756856]">Bật / tắt người chơi & chỉnh tỷ lệ</p>
           </div>
         </div>
         <button onclick="closeModal()" class="w-8 h-8 rounded-full bg-slate-100 border border-slate-200 text-slate-500 hover:text-black flex items-center justify-center text-sm font-bold">✕</button>
-      </div>
-
-      <!-- KHUNG BẢO KÊ / NÉ LƯỢT PHẠT -->
-      <div class="p-3.5 rounded-2xl bg-[#FAF7F0] border border-[#D8C49D] space-y-2.5">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center gap-1.5 font-clash font-bold text-xs text-[#10233D] uppercase">
-            <span>🛡️</span> KHIÊN BẢO KÊ (NÉ PHẠT)
-          </div>
-          <span class="text-[10px] text-[#756856] italic">Sau X người dính mới tới</span>
-        </div>
-
-        <div class="flex gap-2">
-          <select id="shieldPlayerSelect" class="flex-1 bg-white border border-[#D8C49D] rounded-xl px-2.5 py-2 text-xs text-[#10233D] font-bold">
-            ${state.players.map(p => `<option value="${escHtml(p.name)}" ${p.name.toLowerCase() === 'nam ké' ? 'selected' : ''}>${escHtml(p.name)}</option>`).join('')}
-          </select>
-          <select id="shieldTurnsSelect" class="w-24 bg-white border border-[#D8C49D] rounded-xl px-2 py-2 text-xs text-[#10233D] font-bold">
-            <option value="5">5 lượt</option>
-            <option value="10" selected>10 lượt</option>
-            <option value="15">15 lượt</option>
-            <option value="20">20 lượt</option>
-            <option value="999">Bất tử</option>
-          </select>
-        </div>
-
-        <button onclick="applyShieldFromModal()" class="btn-deco-primary text-xs py-2 w-full">
-          <span>🛡️</span> KÍCH HOẠT NÉ LƯỢT
-        </button>
-
-        <div id="modalActiveShieldsList" class="space-y-1 pt-1">
-          ${activeShields.length > 0 ? activeShields.map(p => `
-            <div class="flex justify-between items-center text-xs p-1.5 rounded-lg bg-white border border-[#D8C49D]">
-              <span class="font-bold text-[#10233D]">🛡️ ${escHtml(p.name)}: <span class="text-[#C65D3B]">còn ${p.shieldTurns} lượt né</span></span>
-              <button onclick="removePlayerShield('${escHtml(p.name)}'); openPlayerModal();" class="text-red-500 font-bold px-1.5 text-xs">✕ Hủy</button>
-            </div>
-          `).join('') : '<p class="text-[11px] text-slate-400 italic text-center">Chưa có ai được bảo kê.</p>'}
-        </div>
       </div>
 
       <!-- Quick actions -->
@@ -427,16 +429,6 @@ function openPlayerModal() {
   `;
   showModal(html);
   renderModalPlayerList();
-}
-
-function applyShieldFromModal() {
-  const nameSelect = document.getElementById('shieldPlayerSelect');
-  const turnsSelect = document.getElementById('shieldTurnsSelect');
-  if (!nameSelect || !turnsSelect) return;
-  const name = nameSelect.value;
-  const turns = turnsSelect.value;
-  setPlayerShield(name, turns);
-  openPlayerModal();
 }
 
 function renderModalPlayerList() {
