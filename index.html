@@ -7,11 +7,10 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <title>🍺 Đại Chiến Bàn Nhậu (Desert Art Deco)</title>
 
-  <!-- Fontshare Fonts: Clash Display + Boska + Satoshi (Phong cách Pháp cổ kính Desert Art Deco) -->
-  <link href="https://api.fontshare.com/v2/css?f[]=clash-display@700,600,500&f[]=boska@500,400i&f[]=satoshi@700,500,400&display=swap" rel="stylesheet">
-  <!-- Google Font: Be Vietnam Pro (Fallback tiếng Việt chuẩn không bao giờ lỗi dấu) -->
+  <!-- Google Fonts: Be Vietnam Pro (hỗ trợ tiếng Việt hoàn hảo) + Playfair Display (thay Boska) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,700&family=Playfair+Display:ital,wght@0,700;0,800;1,400;1,700&family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
 
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -37,10 +36,10 @@
             }
           },
           fontFamily: {
-            clash: ['"Clash Display"', '"Be Vietnam Pro"', 'sans-serif'],
-            boska: ['"Boska"', '"Be Vietnam Pro"', 'serif'],
-            satoshi: ['"Satoshi"', '"Be Vietnam Pro"', 'sans-serif'],
-            sans: ['"Satoshi"', '"Be Vietnam Pro"', 'system-ui', 'sans-serif']
+            clash: ['"Be Vietnam Pro"', 'system-ui', 'sans-serif'],
+            boska: ['"Playfair Display"', '"Be Vietnam Pro"', 'serif'],
+            satoshi: ['"DM Sans"', '"Be Vietnam Pro"', 'sans-serif'],
+            sans: ['"Be Vietnam Pro"', '"DM Sans"', 'system-ui', 'sans-serif']
           }
         }
       }
@@ -51,7 +50,7 @@
     * {
       -webkit-tap-highlight-color: transparent;
       box-sizing: border-box;
-      font-family: 'Satoshi', 'Be Vietnam Pro', system-ui, -apple-system, sans-serif;
+      font-family: 'Be Vietnam Pro', system-ui, -apple-system, sans-serif;
     }
     html {
       height: 100%;
@@ -72,9 +71,9 @@
       padding: 0;
     }
 
-    .font-clash { font-family: 'Clash Display', 'Be Vietnam Pro', sans-serif; }
-    .font-boska { font-family: 'Boska', 'Be Vietnam Pro', serif; }
-    .font-satoshi { font-family: 'Satoshi', 'Be Vietnam Pro', sans-serif; }
+    .font-clash { font-family: 'Be Vietnam Pro', system-ui, sans-serif; font-weight: 700; }
+    .font-boska { font-family: 'Playfair Display', 'Be Vietnam Pro', serif; }
+    .font-satoshi { font-family: 'DM Sans', 'Be Vietnam Pro', sans-serif; }
 
     /* Scrollbar ẩn */
     .no-scrollbar::-webkit-scrollbar { display: none; }

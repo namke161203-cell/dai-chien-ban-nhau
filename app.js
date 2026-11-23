@@ -583,7 +583,7 @@ function drawWheel() {
     spinCtx.textAlign = 'right';
 
     const fontSize = Math.max(10, Math.min(13, r / (n * 0.52)));
-    spinCtx.font = `700 ${fontSize}px "Clash Display", "Be Vietnam Pro", sans-serif`;
+    spinCtx.font = `700 ${fontSize}px "Be Vietnam Pro", system-ui, sans-serif`;
     spinCtx.fillStyle = '#FFFFFF';
     spinCtx.shadowColor = 'rgba(16, 35, 61, 0.7)';
     spinCtx.shadowBlur = 3;
