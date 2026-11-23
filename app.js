@@ -162,13 +162,9 @@ function processRoundEnd(winner) {
       if (p.cooldownTurns && p.cooldownTurns > 0) {
         p.cooldownTurns--;
       }
+      // Giảm khiên bảo vệ nếu có (hoàn toàn âm thầm, không hiển thị toast làm lộ)
       if (p.shieldTurns && p.shieldTurns > 0) {
         p.shieldTurns--;
-        if (p.shieldTurns === 0) {
-          showToast(`🔔 Khiên bảo kê của ${p.name} đã hết!`);
-        } else {
-          showToast(`🛡️ ${p.name}: Còn né ${p.shieldTurns} lượt!`);
-        }
       }
     }
   });
@@ -187,7 +183,7 @@ function setPlayerShield(name, turns) {
     savePlayers();
     renderHomePlayerGrid();
     renderModalPlayerList();
-    showToast(`🛡️ Đã bật bảo kê cho ${p.name}: Né ${p.shieldTurns} lượt!`);
+    showToast(`✅ Đã lưu cài đặt thành công!`);
   }
 }
 
@@ -263,7 +259,6 @@ function renderHomePlayerGrid() {
       <button type="button" onclick="togglePlayer(${idx})" class="flex items-center gap-2 flex-1 min-w-0 text-left">
         <div class="w-8 h-8 rounded-full ${avatarStyle} flex items-center justify-center font-clash font-bold text-xs shrink-0 shadow-sm relative">
           ${char}
-          ${hasShield ? '<span class="absolute -top-1 -right-1 text-[11px]">🛡️</span>' : ''}
         </div>
         <div class="flex-1 min-w-0">
           <div class="font-clash font-bold text-xs truncate ${p.active ? 'text-[#10233D]' : 'text-slate-400 line-through'}">
@@ -271,7 +266,6 @@ function renderHomePlayerGrid() {
           </div>
           <div class="text-[10px] flex items-center gap-1">
             ${p.active ? '<span class="text-[#18C9A6] font-semibold">● Đang chơi</span>' : '<span class="text-slate-400">○ Tạm vắng</span>'}
-            ${hasShield ? `<span class="text-[#C65D3B] font-bold">· Né ${p.shieldTurns} lượt</span>` : ''}
           </div>
         </div>
       </button>
@@ -467,7 +461,6 @@ function renderModalPlayerList() {
       <button onclick="togglePlayer(${i})" class="flex items-center gap-1.5 flex-1 text-left truncate">
         <span class="w-4 h-4 rounded-full flex items-center justify-center text-[10px] font-bold ${p.active ? 'bg-[#C65D3B] text-white' : 'bg-slate-300 text-white'}">${i + 1}</span>
         <span class="truncate">${escHtml(p.name)}</span>
-        ${hasShield ? `<span class="text-[9px] text-[#C65D3B] font-bold">🛡️${p.shieldTurns}</span>` : ''}
       </button>
       <button onclick="togglePlayerWeight(${i})" class="px-1.5 py-0.5 rounded text-[10px] font-extrabold border ${weight > 1 ? 'bg-[#C65D3B] text-white' : 'bg-slate-100 text-[#756856]'}">
         ${weight}x
@@ -597,9 +590,6 @@ function drawWheel() {
 
     const maxLen = Math.max(5, Math.floor(18 / Math.sqrt(n)));
     let name = p.name;
-    if (p.shieldTurns && p.shieldTurns > 0) {
-      name = `🛡️${name}`;
-    }
     if (name.length > maxLen) name = name.slice(0, maxLen - 1) + '…';
 
     spinCtx.fillText(name, r - 12, fontSize / 3);
@@ -728,26 +718,50 @@ function changeSpinChallenge() {
 // ─────────────────────────────────────────────────────────
 // TRÒ 2: AI LÀ NGƯỜI...
 // ─────────────────────────────────────────────────────────
+// TRÒ 2: AI LÀ NGƯỜI... (Xoay vòng toàn bộ câu hỏi không trùng lặp)
+// ─────────────────────────────────────────────────────────
 let whoIsQuestion = null;
 let whoIsCountdown = null;
-let whoIsIndex = 4;
-let groupScore = 12;
+let whoIsDeck = [];
+let whoIsQuestionNum = 0;
+
+function initWhoIsDeck() {
+  const pool = (window.DATA && DATA.whoIs && DATA.whoIs.length > 0) ? DATA.whoIs : [];
+  whoIsDeck = [...pool];
+  // Xáo trộn ngẫu nhiên toàn bộ câu hỏi (Fisher-Yates)
+  for (let i = whoIsDeck.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [whoIsDeck[i], whoIsDeck[j]] = [whoIsDeck[j], whoIsDeck[i]];
+  }
+}
 
 function pickWhoIsQuestion() {
-  whoIsQuestion = randItem(DATA.whoIs);
-  const qEl = document.getElementById('whoIsQuestion');
-  const orderEl = document.getElementById('whoIsOrder');
-
-  whoIsIndex = (whoIsIndex % 30) + 1;
-  if (orderEl) {
-    orderEl.textContent = `CÂU HỎI SỐ ${whoIsIndex < 10 ? '0' + whoIsIndex : whoIsIndex}`;
+  const total = (window.DATA && DATA.whoIs) ? DATA.whoIs.length : 49;
+  if (!whoIsDeck || whoIsDeck.length === 0) {
+    initWhoIsDeck();
+    whoIsQuestionNum = 0;
   }
 
-  groupScore = Math.min(20, Math.max(1, (groupScore + 1) % 21));
+  whoIsQuestion = whoIsDeck.pop();
+  whoIsQuestionNum++;
+
+  const qEl = document.getElementById('whoIsQuestion');
+  const orderEl = document.getElementById('whoIsOrder');
   const scoreEl = document.getElementById('whoIsGroupScore');
   const progressEl = document.getElementById('whoIsProgressBar');
-  if (scoreEl) scoreEl.textContent = `${groupScore} / 20`;
-  if (progressEl) progressEl.style.width = `${(groupScore / 20) * 100}%`;
+
+  const formattedNum = whoIsQuestionNum < 10 ? '0' + whoIsQuestionNum : whoIsQuestionNum;
+  if (orderEl) {
+    orderEl.textContent = `CÂU HỎI SỐ ${formattedNum} / ${total}`;
+  }
+
+  if (scoreEl) {
+    scoreEl.textContent = `${whoIsQuestionNum} / ${total} CÂU`;
+  }
+  if (progressEl) {
+    const pct = Math.min(100, Math.round((whoIsQuestionNum / total) * 100));
+    progressEl.style.width = `${pct}%`;
+  }
 
   if (qEl) qEl.textContent = whoIsQuestion;
   const resultEl = document.getElementById('whoIsResult');
@@ -1351,6 +1365,7 @@ function toggleShakeSensor() {
 document.addEventListener('DOMContentLoaded', () => {
   loadPlayers();
   renderHomePlayerGrid();
+  initWhoIsDeck();
   showSection('home');
 
   const cardInner = document.getElementById('todCardInner');
